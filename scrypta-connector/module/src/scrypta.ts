@@ -3,10 +3,9 @@ import { LYRA_NETWORK, LYRA_TEST_NETWORK, LYRA_DERIVATION_PATH, ScryptaBlock, Sc
 import { TatumError } from './error'
 import { fromBase58, fromSeed } from 'bip32';
 import { generateMnemonic, mnemonicToSeed } from 'bip39';
-import { ECPair, networks, payments, TransactionBuilder } from 'bitcoinjs-lib';
+import { payments } from 'bitcoinjs-lib';
 import { PinoLogger } from 'nestjs-pino';
 import hdkey from 'hdkey';
-import { response } from 'express';
 
 export abstract class ScryptaBlockchainService {
   protected scrypta: any;
@@ -239,6 +238,7 @@ export abstract class ScryptaBlockchainService {
         }
         response(unspent);
       } catch (e) {
+        this.logger.error(e);
         throw new TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');
       }
     })
@@ -261,6 +261,7 @@ export abstract class ScryptaBlockchainService {
         }
         response(rawtx)
       } catch (e) {
+        this.logger.error(e);
         throw new TatumError('No such transaction.', 'tx.hash');
       }
     })
@@ -279,12 +280,13 @@ export abstract class ScryptaBlockchainService {
       try {
         let sendrawtransaction = await this.scrypta.post('/sendrawtransaction', { rawtransaction: txData })
         if (sendrawtransaction.data === null) {
-          throw new TatumError('Can\'t send transaction.', 'tx.broadcast');
+          throw new TatumError('Transaction not accepted by network.', 'tx.broadcast');
         } else {
           let txid = <string>sendrawtransaction['data']
           response({ txId: txid, failed: false })
         }
       } catch (e) {
+        this.logger.error(e);
         throw new TatumError('Can\'t send transaction.', 'tx.broadcast');
       }
 
