@@ -1,11 +1,7 @@
 const ScryptaCore = require('@scrypta/core');
-import { LYRA_NETWORK, LYRA_TEST_NETWORK, LYRA_DERIVATION_PATH, ScryptaBlock, ScryptaTx, ScryptaUnspent } from './constants';
+import { LYRA_NETWORK, LYRA_TEST_NETWORK, ScryptaBlock, ScryptaTx, ScryptaUnspent } from './constants';
 import { TatumError } from './error'
-import { fromBase58, fromSeed } from 'bip32';
-import { generateMnemonic, mnemonicToSeed } from 'bip39';
-import { payments } from 'bitcoinjs-lib';
 import { PinoLogger } from 'nestjs-pino';
-import hdkey from 'hdkey';
 import * as Tatum from '@tatumio/tatum'
 
 export abstract class ScryptaBlockchainService {
@@ -14,11 +10,15 @@ export abstract class ScryptaBlockchainService {
   protected currency: 'LYRA';
   protected readonly logger: PinoLogger;
 
-  constructor(testnet = false) {
+  constructor(testnet = false, nodes?: Array<string>) {
     this.scrypta = new ScryptaCore;
     this.testnet = testnet;
     if (this.testnet === true) {
       this.scrypta.testnet = true;
+    }
+    if(nodes !== undefined && nodes.length > 0){
+      this.scrypta.mainnetIdaNodes = nodes
+      this.scrypta.testnetIdaNodes = nodes
     }
   }
 
@@ -28,10 +28,6 @@ export abstract class ScryptaBlockchainService {
 
   public getNetwork() {
     return this.testnet ? LYRA_TEST_NETWORK : LYRA_NETWORK;
-  }
-
-  private getDerivationPath() {
-    return LYRA_DERIVATION_PATH
   }
 
   //
@@ -145,7 +141,7 @@ export abstract class ScryptaBlockchainService {
       testnet = this.testnet;
     }
     try {
-      let address = await Tatum.generateAddressFromXPub(Tatum.Currency.LYRA, testnet, xpub, derivationIndex)
+      let address = await Tatum.generateAddressFromXPub(Tatum.Currency[this.currency], testnet, xpub, derivationIndex)
       return address
     } catch (e) {
       this.logger.error(e);
@@ -159,7 +155,7 @@ export abstract class ScryptaBlockchainService {
     } else {
       testnet = this.testnet;
     }
-    const lyraWallet = await Tatum.generateWallet(Tatum.Currency.LYRA, testnet, mnem);
+    const lyraWallet = await Tatum.generateWallet(Tatum.Currency[this.currency], testnet, mnem);
     return lyraWallet
   }
 
@@ -170,7 +166,7 @@ export abstract class ScryptaBlockchainService {
       testnet = this.testnet;
     }
     try {
-      let privateKey = await Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency.LYRA, testnet, mnemonic, derivationIndex);
+      let privateKey = await Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency[this.currency], testnet, mnemonic, derivationIndex);
       return { key: privateKey }
     } catch (e) {
       this.logger.error(e);

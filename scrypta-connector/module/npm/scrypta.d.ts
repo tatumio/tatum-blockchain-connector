@@ -1,11 +1,12 @@
 import { ScryptaBlock, ScryptaTx, ScryptaUnspent } from './constants';
 import { PinoLogger } from 'nestjs-pino';
+import * as Tatum from '@tatumio/tatum';
 export declare abstract class ScryptaBlockchainService {
     protected scrypta: any;
     protected testnet: boolean;
     protected currency: 'LYRA';
     protected readonly logger: PinoLogger;
-    constructor(testnet?: boolean);
+    constructor(testnet?: boolean, nodes?: Array<string>);
     getNetwork(): {
         messagePrefix: string;
         bech32: string;
@@ -17,19 +18,22 @@ export declare abstract class ScryptaBlockchainService {
         scriptHash: number;
         wif: number;
     };
-    private getDerivationPath;
     getBlockChainInfo(testnet?: boolean): Promise<any>;
     getCurrentBlock(testnet?: boolean): Promise<number>;
     getBlockHash(i: number, testnet?: boolean): Promise<string>;
     getBlock(hash: string, testnet?: boolean): Promise<ScryptaBlock>;
-    generateAddress(xpub: string, derivationIndex: number): Promise<{
+    generateAddress(xpub: string, derivationIndex: number, testnet?: boolean): Promise<string>;
+    generateWallet(mnem?: string, testnet?: boolean): Promise<Tatum.Wallet | {
         address: string;
+        privateKey: string;
+    } | {
+        privateKey: string;
+        address: string;
+    } | {
+        address: string;
+        secret: string;
     }>;
-    generateWallet(mnem?: string): Promise<{
-        mnemonic: string;
-        xpub: any;
-    }>;
-    generateAddressPrivateKey(derivationIndex: number, mnemonic: string): Promise<{
+    generateAddressPrivateKey(derivationIndex: number, mnemonic: string, testnet?: boolean): Promise<{
         key: string;
     }>;
     getTransactionsByAddress(address: string, pagination?: object, testnet?: boolean): Promise<Array<ScryptaTx>>;

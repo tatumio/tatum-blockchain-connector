@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,23 +32,21 @@ exports.ScryptaBlockchainService = void 0;
 const ScryptaCore = require('@scrypta/core');
 const constants_1 = require("./constants");
 const error_1 = require("./error");
-const bip32_1 = require("bip32");
-const bip39_1 = require("bip39");
-const bitcoinjs_lib_1 = require("bitcoinjs-lib");
-const hdkey_1 = require("hdkey");
+const Tatum = __importStar(require("@tatumio/tatum"));
 class ScryptaBlockchainService {
-    constructor(testnet = false) {
+    constructor(testnet = false, nodes) {
         this.scrypta = new ScryptaCore;
         this.testnet = testnet;
         if (this.testnet === true) {
             this.scrypta.testnet = true;
         }
+        if (nodes !== undefined && nodes.length > 0) {
+            this.scrypta.mainnetIdaNodes = nodes;
+            this.scrypta.testnetIdaNodes = nodes;
+        }
     }
     getNetwork() {
         return this.testnet ? constants_1.LYRA_TEST_NETWORK : constants_1.LYRA_NETWORK;
-    }
-    getDerivationPath() {
-        return constants_1.LYRA_DERIVATION_PATH;
     }
     getBlockChainInfo(testnet) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -51,6 +68,9 @@ class ScryptaBlockchainService {
             if (testnet) {
                 this.scrypta.testnet = testnet;
             }
+            else {
+                testnet = this.testnet;
+            }
             try {
                 let info = yield this.scrypta.get('/wallet/getinfo');
                 response(info.blocks);
@@ -66,6 +86,9 @@ class ScryptaBlockchainService {
             if (testnet) {
                 this.scrypta.testnet = testnet;
             }
+            else {
+                testnet = this.testnet;
+            }
             try {
                 let block = yield this.scrypta.get('/blockhash/' + i);
                 response(block.hash);
@@ -80,6 +103,9 @@ class ScryptaBlockchainService {
         return new Promise((response) => __awaiter(this, void 0, void 0, function* () {
             if (testnet) {
                 this.scrypta.testnet = testnet;
+            }
+            else {
+                testnet = this.testnet;
             }
             try {
                 let block = yield this.scrypta.get('/rawblock/' + hash);
@@ -97,36 +123,47 @@ class ScryptaBlockchainService {
             }
         }));
     }
-    generateAddress(xpub, derivationIndex) {
+    generateAddress(xpub, derivationIndex, testnet) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (testnet) {
+                this.scrypta.testnet = testnet;
+            }
+            else {
+                testnet = this.testnet;
+            }
             try {
-                const w = bip32_1.fromBase58(xpub, this.getNetwork()).derivePath(String(derivationIndex));
-                const address = bitcoinjs_lib_1.payments.p2pkh({ pubkey: w.publicKey, network: this.getNetwork() }).address;
-                if (address !== undefined) {
-                    return { address };
-                }
+                let address = yield Tatum.generateAddressFromXPub(Tatum.Currency[this.currency], testnet, xpub, derivationIndex);
+                return address;
             }
             catch (e) {
                 this.logger.error(e);
                 throw new error_1.TatumError('Unable to generate address, wrong xpub and account type.', 'address.generation.failed.wrong.xpub');
             }
-            throw new error_1.TatumError('Unable to generate address', 'address.generation.failed');
         });
     }
-    generateWallet(mnem) {
+    generateWallet(mnem, testnet) {
         return __awaiter(this, void 0, void 0, function* () {
-            const mnemonic = mnem ? mnem : bip39_1.generateMnemonic(256);
-            const hdwallet = hdkey_1.default.fromMasterSeed(bip39_1.mnemonicToSeed(mnemonic), this.getNetwork().bip32);
-            return { mnemonic, xpub: hdwallet.derive(this.getDerivationPath()).toJSON().xpub };
+            if (testnet) {
+                this.scrypta.testnet = testnet;
+            }
+            else {
+                testnet = this.testnet;
+            }
+            const lyraWallet = yield Tatum.generateWallet(Tatum.Currency[this.currency], testnet, mnem);
+            return lyraWallet;
         });
     }
-    generateAddressPrivateKey(derivationIndex, mnemonic) {
+    generateAddressPrivateKey(derivationIndex, mnemonic, testnet) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (testnet) {
+                this.scrypta.testnet = testnet;
+            }
+            else {
+                testnet = this.testnet;
+            }
             try {
-                const w = bip32_1.fromSeed(yield bip39_1.mnemonicToSeed(mnemonic), this.getNetwork())
-                    .derivePath(this.getDerivationPath())
-                    .derive(derivationIndex);
-                return { key: w.toWIF() };
+                let privateKey = yield Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency[this.currency], testnet, mnemonic, derivationIndex);
+                return { key: privateKey };
             }
             catch (e) {
                 this.logger.error(e);
@@ -139,6 +176,9 @@ class ScryptaBlockchainService {
             return new Promise((response) => __awaiter(this, void 0, void 0, function* () {
                 if (testnet) {
                     this.scrypta.testnet = testnet;
+                }
+                else {
+                    testnet = this.testnet;
                 }
                 try {
                     let transactions = yield this.scrypta.get('/transactions/' + address);
@@ -156,6 +196,9 @@ class ScryptaBlockchainService {
             return new Promise((response) => __awaiter(this, void 0, void 0, function* () {
                 if (testnet) {
                     this.scrypta.testnet = testnet;
+                }
+                else {
+                    testnet = this.testnet;
                 }
                 try {
                     let unspent = yield this.scrypta.get('/unspent/' + address);
@@ -185,6 +228,9 @@ class ScryptaBlockchainService {
                 if (testnet) {
                     this.scrypta.testnet = testnet;
                 }
+                else {
+                    testnet = this.testnet;
+                }
                 try {
                     let unspent = yield this.scrypta.get('/utxo/' + hash + '/' + index);
                     if (unspent === false) {
@@ -193,6 +239,7 @@ class ScryptaBlockchainService {
                     response(unspent);
                 }
                 catch (e) {
+                    this.logger.error(e);
                     throw new error_1.TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');
                 }
             }));
@@ -204,6 +251,9 @@ class ScryptaBlockchainService {
                 if (testnet) {
                     this.scrypta.testnet = testnet;
                 }
+                else {
+                    testnet = this.testnet;
+                }
                 try {
                     let rawtx = yield this.scrypta.get('/rawtransaction/' + txHash);
                     if (rawtx === false) {
@@ -212,6 +262,7 @@ class ScryptaBlockchainService {
                     response(rawtx);
                 }
                 catch (e) {
+                    this.logger.error(e);
                     throw new error_1.TatumError('No such transaction.', 'tx.hash');
                 }
             }));
@@ -223,10 +274,13 @@ class ScryptaBlockchainService {
                 if (testnet) {
                     this.scrypta.testnet = testnet;
                 }
+                else {
+                    testnet = this.testnet;
+                }
                 try {
                     let sendrawtransaction = yield this.scrypta.post('/sendrawtransaction', { rawtransaction: txData });
                     if (sendrawtransaction.data === null) {
-                        throw new error_1.TatumError('Can\'t send transaction.', 'tx.broadcast');
+                        throw new error_1.TatumError('Transaction not accepted by network.', 'tx.broadcast');
                     }
                     else {
                         let txid = sendrawtransaction['data'];
@@ -234,6 +288,7 @@ class ScryptaBlockchainService {
                     }
                 }
                 catch (e) {
+                    this.logger.error(e);
                     throw new error_1.TatumError('Can\'t send transaction.', 'tx.broadcast');
                 }
             }));
