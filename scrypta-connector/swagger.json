@@ -1,0 +1,2126 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Tatum API",
+    "version": "3.3",
+    "x-logo": {
+      "url": "https://tatum.io/images/logo.svg",
+      "altText": "Tatum"
+    },
+    "description": "# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->"
+  },
+  "servers": [
+    {
+      "url": "https://api-eu1.tatum.io"
+    }
+  ],
+  "tags": [
+    {
+      "description": "<p>Tatum Account is the primary building block of Tatum-powered applications. It is an envelope that holds essential information about balances, state of the account or customer, whom the account belongs to.<br/><br/>\nAccounts in Tatum are stored within Tatum Private Ledger. Tatum Private Ledger contains information about accounts, customers that own accounts, transactions that affect accounts or virtual currencies present in the ledger.<br/><br/>\nPrivate Ledger is not connected to any blockchain by default. It is possible to create application without any blockchain at all, only on the private ledger. Using Tatum Private Ledger and building blocks included inside, it is possible to quickly swap whole application from ledger to any supported blockchain within Tatum. All of the API calls will remain the same, only the blockchain, on which the application will live, will be changed.<br/><br/>\nMost of the blockchains do not have any compliance layer at all. It is not possible to freeze funds on the blockchain address or deactivate the address. Tatum Account has built-in compliance, and it is possible to block funds on the account, freeze outgoing transactions from the account or even deactivate account at all.\n</p>\n",
+      "name": "Ledger / Account"
+    },
+    {
+      "description": "<p>Endpoint used to create and list transactions within Tatum Private Ledger. The transaction is performed between 2 accounts with the same currency. To perform exchange operation between accounts with different currency, API calls from <a href=\"#tag/Ledger-Order-Book\">Order Book</a> sections are available. Transactions in the ledger are instant, with settlement time bellow 200ms.<br/>\nTatum Private Ledger supports microtransactions - a transaction with the transacted amount as little as 1e-30 (30 decimal places). Transactions are atomic.<br/>\nWhen there is insufficient balance on the sender account or recipient account cannot receive funds, the transaction is not settled.</p>\n",
+      "name": "Ledger / Transaction"
+    },
+    {
+      "description": "<p>Endpoint used to handle customer operations, like update information about customer, enable/disable etc.\nWithin Tatum API, customer represents the client of the entity, which is communicating with Tatum.<br/>\nCustomers cannot be created via any other operation then Create Ledger Account.<br/>\nDue to compliance restrictions it is advised to enter the country of residence of the customer and the country of provider of the provider. Based on\nthese information, Tatum compliance engine is able to operate.\n</p>\n",
+      "name": "Ledger / Customer"
+    },
+    {
+      "description": "<p>Register and use Tatum private's virtual currencies. You can create your virtual currency and distribute it amongst your customers.<br/>\nVirtual currencies are used to support FIAT currencies. When virtual currency is created with basePair of the FIAT currency, it is possible to perform transactions in the private ledger in FIAT.\n</p>\n",
+      "name": "Ledger / Virtual Currency"
+    },
+    {
+      "description": "<p>Endpoints to handle subscriptions to the Tatum Platform. Subscriptions enable users to enable some additional features or reports, which are not enabled by default,\nlike outgoing off-chain transaction scanning, accounts with balances above the limit, etc.</p>\n",
+      "name": "Ledger / Subscription"
+    },
+    {
+      "description": "<p>Endpoint to handle Order book operations like create BID / ASK trades between Tatum Ledger accounts, obtain history of trades etc. It is possible to build exchange based on the Ledger Accounts.</p>",
+      "name": "Ledger / Order Book"
+    },
+    {
+      "description": "<p>Endpoint used to handle operations connected to Tatum KMS. It provides a list of a pending transaction to sign, possibilies\nto complete transaction after signature, obtain detail of the transaction with the result of the blockchain operation via transaction ID.<br/>\nIn Tatum KMS tool, each managed wallet or private key have assigned a unique signature Id, which represents a concrete wallet / private key.\nThis signature Id is then used in a request to identify concrete wallet.<br/>\nTatum API accepts 3 representations of signature Ids in its requests:\n<ul>\n<li>signatureId represents <b>mnemonic</b> type of the wallet. In API calls like /v3/offchain/scrypta/transfer, signatureId present in the request should represent mnemonic type of wallet.</li>\n<li>signatureId represents <b>privateKey</b> type of the wallet. In API calls like /v3/scrypta/transaction, signatureId present in the request should represent private key type of wallet.</li>\n<li>signatureId represents <b>mnemonic</b> and <b>index</b> type of the wallet. In API calls like /v3/offchain/ethereum/transfer, alongside signatureId there should be index of the concrete private key from the mnemonic, which should be used.</li>\n</ul></p>\n",
+      "name": "Security / Key Management System"
+    },
+    {
+      "description": "<p>Endpoint to check, if the blockchain address is safe to work with or not.</p>\n",
+      "name": "Security / Address"
+    },
+    {
+      "description": "<p>Endpoint to handle operations on Tatum Ledger accounts and blockchain, generate blockchain addresses and link them to accounts.<br/>\nThere are 2 main concepts within Tatum Ledger accounts and blockchain:\n<ul>\n<li>Tatum account with generated blockchain address - customer is able to use Tatum's private ledger transactions, send funds to blockchain addresses as well as receive funds from blockchain users.</li>\n<li>Tatum account with no blockchain address generated - account generated on the private ledger with currency such as LYRA, but without blockchain address associated with it. Customer can send and receive funds within Tatum's private ledger, as well as send assets to the blockchain. But it is impossible to receive funds from blockchain.</li>\n</ul></p>\n",
+      "name": "Off-chain / Account"
+    },
+    {
+      "description": "<p>Endpoint to handle operations between Tatum Private ledger and the blockchain, e.g. create blockchain transactions from the Ledger accounts,\ncreate custom Ethereum ERC20 tokens, Stellar XLM or Ripple XRP custom assets and register them as the regular currency into the Tatum Private LEdger.</p>\n",
+      "name": "Off-chain / Blockchain"
+    },
+    {
+      "description": "<p>Endpoint used to create, cancel or complete withdrawals from Tatum to supported blockchains made by your customers.\nWithdrawals are always a multi-step operations, which consists of the following steps:\n<ul>\n<li><b>create withdrawal</b></li>\n<li><b>perform blockchain transaction</b></li>\n<li><b>complete withdrawal</b></li>\n<li><b>cancel withdrawal</b>, when any of the previous operation fails</li>\n</ul>\n</p>\n",
+      "name": "Off-chain / Withdrawal"
+    },
+    {
+      "description": "<p>Scrypta Blockchain enables access to most commonly used Scrypta methods. These methods bring small level of abstraction,\nand are used for the type of applications that want to communicate with blockchain directly. Some of the methods are used alongside Tatum Private Ledger\nto connect blockchain and private ledger together, like wallet generation or getting information about transactions.<br/>\nTatum supports 2 chains:\n<ul><li>Mainnet - is regular live chain</li>\n<li>Testnet3 - test chain used for testing purposes. Coins on test chain have no value and can be obtained from Faucet, e.g. <a target=\"_blank\" href=\"https://testnet-faucet.mempool.co/\">https://testnet-faucet.mempool.co/</a></li></ul><br/>\nTatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. It is possible to generate this type of wallet with 1 simple API call.</p>\n",
+      "name": "Blockchain / Scrypta"
+    },
+    {
+      "description": "<p>Ethereum Blockchain enables access to most commonly used Ethereum methods. These methods bring small level of abstraction,\n and are used for the type of applications that want to communicate with blockchain directly. Some of the methods are used alongside Tatum Private Ledger\n to connect blockchain and private ledger together, like wallet generation or getting information about transactions.<br/>\nTatum supports 2 chains:\n<ul><li>Mainnet - regular live chain\n<li>Ropsten - test chain used for testing purposes. Coins on test chain have no value and can be obtained from\nFaucet, e.g. <a target=\"_blank\" href=\"https://faucet.ropsten.be/\">https://faucet.ropsten.be/</a></li></ul><br/>\nTatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. It is possible to generate this type of wallet with 1 simple API call.</p>\n",
+      "name": "Blockchain / Ethereum"
+    },
+    {
+      "description": "<p>Scrypta Cash Blockchain enables access to most commonly used Scrypta Cash methods. These methods bring small level of abstraction,\n and are used for the type of applications that want to communicate with blockchain directly. Some of the methods are used alongside Tatum Private Ledger\n to connect blockchain and private ledger together, like wallet generation or getting information about transactions.<br/>\nTatum supports 2 chains:\n  <ul><li>Mainnet - is regular live chain</li>\n  <li>Testnet - test chain used for testing purposes. Coins on test chain have no value and can be obtained from Faucet, e.g. <a target=\"_blank\" href=\"https://faucet.fullstack.cash/\">https://faucet.fullstack.cash/</a></li></ul>\n  </ul>\nTatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. It is possible to generate this type of wallet with 1 simple API call.</p>\n",
+      "name": "Blockchain / Scrypta Cash"
+    },
+    {
+      "description": "<p>Litecoin Blockchain enables access to most commonly used Litecoin methods. These methods bring small level of abstraction,\n and are used for the type of applications that want to communicate with blockchain directly. Some of the methods are used alongside Tatum Private Ledger\n to connect blockchain and private ledger together, like wallet generation or getting information about transactions.<br/>\nTatum supports 2 chains:\n  <ul><li>Mainnet - is regular live chain</li>\n  <li>Testnet - test chain used for testing purposes. Coins on test chain have no value and can be obtained from Faucet, e.g. <a target=\"_blank\" href=\"http://testnet.litecointools.com/\">http://testnet.litecointools.com/</a></li></ul>\nTatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. It is possible to generate this type of wallet with 1 simple API call.</p>\n",
+      "name": "Blockchain / Litecoin"
+    },
+    {
+      "description": "<p>XRP Blockchain enables access to most commonly used XRP methods. These methods bring small level of abstraction,\n and are used for the type of applications that want to communicate with blockchain directly. Some of the methods are used alongside Tatum Private Ledger\n to connect blockchain and private ledger together, like wallet generation or getting information about transactions.<br/>\n Tatum supports 2 chains:\n<ul><li> Mainnet - regular live chain</li>\n<li>Test chain - used for testing purposes. Coins on test chain have no value and can be obtained from Faucet, e.g. <a href=\"https://developers.ripple.com/xrp-test-net-faucet.html\" target=\"_blank\">https://developers.ripple.com/xrp-test-net-faucet.html</a>.</li></ul></p>\n<p><br/>In order to start using XRP blockchain, first we need to create an XRP account. In XRP, same account is used for Mainnet and Test chain. In order to have account activated, it must be credited with 20 XRP. Because of this requirement, it is common to use one account for all customers and differentiate them via Destination tags, number included in every transaction as an account distinguisher.<br/>\nWhen offchain deposit address is created for the ledger account, Destination tag is generated, e.g. 12345 for that account. When transaction to the blockchain should be performed, it should contain address of the recipient and Destination tag as an account distinguisher.</p>\n",
+      "name": "Blockchain / XRP"
+    },
+    {
+      "description": "<p>XLM Blockchain enables access to most commonly used XLM methods. These methods bring small level of abstraction,\nand are used for the type of applications that want to communicate with blockchain directly. Some of the methods are used alongside Tatum Private Ledger\nto connect blockchain and private ledger together, like wallet generation or getting information about transactions.<br/>\nTatum supports 2 chains:\n<ul><li> Mainnet - regular live chain</li>\n<li>Test chain - used for testing purposes. Coins on test chain have no value and can be obtained from Faucet, e.g. <a href=\"https://friendbot.stellar.org/?addr=address\" target=\"_blank\">https://friendbot.stellar.org/?addr=address</a>.</li></ul>\n<br/>In order to start using XLM blockchain, first we need to create an XLM account. In order to have account activated, it must be credited with 0.5 XLM.  Because of this requirement, it is common to use one account for all customers and differentiate them via memo - short text / number information included in every transaction as an account distinguisher.<br/>\nWhen offchain deposit address is created for the ledger account, memo is generated, e.g. 12345 for that account. When transaction to the blockchain should be performed, it should contain address of the recipient and memo as an account distinguisher.</p>\n",
+      "name": "Blockchain / XLM"
+    },
+    {
+      "description": "<p>Record section enables storing of records on the blockchain. Record is stored permanently, it cannot be changed,\ndeleted or modified by anyone and will be stored on the blockchain forever. Tatum supports following blockchains, where data can be stored:</p>\n<ul>\n<li>Ethereum</li>\n</ul>\n",
+      "name": "Blockchain / Record"
+    },
+    {
+      "description": "<p>Binance Blockchain enables access to most commonly used Binance methods.Tatum does not support offchain capabilities for the BNB blockchain. <br/>\nTatum supports 2 chains:\n<ul><li>Mainnet - regular live chain\n<li>Testnet - test chain used for testing purposes. Coins on test chain have no value and can be obtained from\nFaucet, e.g. <a target=\"_blank\" href=\"https://www.binance.com/en/dex/testnet/address\">https://www.binance.com/en/dex/testnet/address</a></li></ul>\nTatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. It is possible to generate this type of wallet with 1 simple API call.</p>\n",
+      "name": "Blockchain / Binance"
+    },
+    {
+      "description": "<p>VeChain Blockchain enables access to most commonly used VeChain methods. Tatum does not support offchain capabilities for the VET blockchain.\nTatum KMS is not supported for VET transactions. VET supports 2 native assets - VET and VTHO. VTHO is used to paying for the transaction fee.\n<br/>\nTatum supports 2 chains:\n<ul><li>Mainnet - regular live chain\n<li>Testnet - test chain used for testing purposes. Coins on test chain have no value and can be obtained from\nFaucet, e.g. <a target=\"_blank\" href=\"https://faucet.vecha.in/\">https://faucet.vecha.in/</a></li></ul>\nTatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. It is possible to generate this type of wallet with 1 simple API call.</p>\n",
+      "name": "Blockchain / VeChain"
+    },
+    {
+      "description": "<p>NEO Blockchain enables access to most commonly used NEO methods. Tatum does not support offchain capabilities for the NEO blockchain.\nTatum KMS is not supported for NEO transactions. NEO supports 2 native assets - NEO and GAS. GAS is used to paying for the transaction fee.<br/>\nTatum supports 2 chains:\n<ul><li>Mainnet - regular live chain\n<li>Testnet - test chain used for testing purposes. Coins on test chain have no value and can be obtained from\nFaucet, e.g. <a target=\"_blank\" href=\"http://neo.mywish.io/\">http://neo.mywish.io/</a></li></ul></p>\n",
+      "name": "Blockchain / NEO"
+    },
+    {
+      "description": "<p>Libra Blockchain enables access to most commonly used Libra methods. Libra is currently in TestNet phase only.\n Libra is under heavy development and the functionality might change in the future. Tatum does not support offchain capabilities for the Libra blockchain.</p>\n",
+      "name": "Blockchain / Libra"
+    }
+  ],
+  "paths": {
+    "/v3/scrypta/wallet": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/><p>Tatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. Mnemonic phrase consists of 24 special words in defined order and can restore access to all generated addresses and private keys.<br/>Each address is identified by 3 main values:<ul><li>Private Key - your secret value, which should never be revealed</li><li>Public Key - public address to be published</li><li>Derivation index - index of generated address</li></ul></p><p>Tatum follows BIP44 specification and generates for Scrypta wallet with derivation path m'/44'/0'/0'/0. More about BIP44 HD wallets can be found here - <a target=\"_blank\" href=\"https://github.com/scrypta/bips/blob/master/bip-0044.mediawiki\">https://github.com/scrypta/bips/blob/master/bip-0044.mediawiki</a>.\nGenerate BIP44 compatible Scrypta wallet.</p>\n",
+        "operationId": "ScryptaGenerateWallet",
+        "parameters": [
+          {
+            "description": "Mnemonic to use for generation of extended public and private keys.",
+            "in": "query",
+            "name": "mnemonic",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wallet"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url 'https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE' \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/wallet?mnemonic=SOME_STRING_VALUE\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Generate Scrypta wallet",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/address/{xpub}/{index}": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/>\n<p>Generate Scrypta deposit address from Extended public key. Deposit address is generated for the concrete index - each extended public key can generate\nup to 2^32 addresses starting from index 0 until 2^31.</p>\n",
+        "operationId": "ScryptaGenerateAddress",
+        "parameters": [
+          {
+            "description": "Extended public key of wallet.",
+            "in": "path",
+            "name": "xpub",
+            "required": true,
+            "example": "xpub6EsCk1uU6cJzqvP9CdsTiJwT2rF748YkPnhv5Qo8q44DG7nn2vbyt48YRsNSUYS44jFCW9gwvD9kLQu9AuqXpTpM1c5hgg9PsuBLdeNncid",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Derivation index of desired address to be generated.",
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "example": 1,
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "type": "string",
+                      "description": "Scrypta address",
+                      "example": "n36h3pAH7sC3z8KMB47BjbqvW2aJd2oTi7"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error403AccountIncompatibleXpubScrypta"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error403AccountAddressGeneral"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/address/%7Bxpub%7D/%7Bindex%7D\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Generate Scrypta deposit address from Extended public key",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/wallet/priv": {
+      "post": {
+        "description": "<h4>1 credit per API call.</h4><br/>\n<p>Generate private key for address from mnemonic for given derivation path index. Private key is generated for the concrete index - each mnemonic\ncan generate up to 2^32 private keys starting from index 0 until 2^31.</p>\n",
+        "operationId": "ScryptaGenerateAddressPrivateKey",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrivKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivKey"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403BlockchainPrivateFailed"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request POST \\\n  --url https://api-eu1.tatum.io/v3/scrypta/wallet/priv \\\n  --header 'content-type: application/json' \\\n  --header 'x-api-key: REPLACE_KEY_VALUE' \\\n  --data '{\"index\":4,\"mnemonic\":\"urge pulp usage sister evidence arrest palm math please chief egg abuse\"}'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"POST\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/wallet/priv\",\n  \"headers\": {\n    \"content-type\": \"application/json\",\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.write(JSON.stringify({\n  index: 4,\n  mnemonic: 'urge pulp usage sister evidence arrest palm math please chief egg abuse'\n}));\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.post(\"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\")\n  .header(\"content-type\", \"application/json\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .body(\"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\"\n\n\tpayload := strings.NewReader(\"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\")\n\n\treq, _ := http.NewRequest(\"POST\", url, payload)\n\n\treq.Header.Add(\"content-type\", \"application/json\")\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"POST\",\n  CURLOPT_POSTFIELDS => \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\",\n  CURLOPT_HTTPHEADER => array(\n    \"content-type: application/json\",\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\npayload = \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\"\n\nheaders = {\n    'content-type': \"application/json\",\n    'x-api-key': \"REPLACE_KEY_VALUE\"\n    }\n\nconn.request(\"POST\", \"/v3/scrypta/wallet/priv\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"POST\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"content-type: application/json\");\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\ncurl_easy_setopt(hnd, CURLOPT_POSTFIELDS, \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\");\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\");\nvar request = new RestRequest(Method.POST);\nrequest.AddHeader(\"content-type\", \"application/json\");\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nrequest.AddParameter(\"application/json\", \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\", ParameterType.RequestBody);\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\",\n  \"method\": \"POST\",\n  \"headers\": {\n    \"content-type\": \"application/json\",\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  },\n  \"processData\": false,\n  \"data\": \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\"\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"content-type\": @\"application/json\",\n                           @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\nNSDictionary *parameters = @{ @\"index\": @4,\n                              @\"mnemonic\": @\"urge pulp usage sister evidence arrest palm math please chief egg abuse\" };\n\nNSData *postData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"POST\"];\n[request setAllHTTPHeaderFields:headers];\n[request setHTTPBody:postData];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\" in\nlet headers = Header.add_list (Header.init ()) [\n  (\"content-type\", \"application/json\");\n  (\"x-api-key\", \"REPLACE_KEY_VALUE\");\n] in\nlet body = Cohttp_lwt_body.of_string \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\" in\n\nClient.call ~headers ~body `POST uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Post.new(url)\nrequest[\"content-type\"] = 'application/json'\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\nrequest.body = \"{\\\"index\\\":4,\\\"mnemonic\\\":\\\"urge pulp usage sister evidence arrest palm math please chief egg abuse\\\"}\"\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\n  \"content-type\": \"application/json\",\n  \"x-api-key\": \"REPLACE_KEY_VALUE\"\n]\nlet parameters = [\n  \"index\": 4,\n  \"mnemonic\": \"urge pulp usage sister evidence arrest palm math please chief egg abuse\"\n] as [String : Any]\n\nlet postData = JSONSerialization.data(withJSONObject: parameters, options: [])\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/wallet/priv\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"POST\"\nrequest.allHTTPHeaderFields = headers\nrequest.httpBody = postData as Data\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Generate Scrypta private key",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/info": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/><p>Get Scrypta Blockchain Information. Obtain basic info like testnet / mainent version of the chain, current block number and it's hash.</p>",
+        "operationId": "ScryptaGetBlockChainInfo",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScryptaInfo"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url https://api-eu1.tatum.io/v3/scrypta/info \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/info\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/info\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/info\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/info\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/info\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/info\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/info\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/info\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/info\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/info\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/info\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/info\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Get Blockchain Information",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/block/hash/{i}": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/><p>Get Scrypta Block hash. Returns hash of the block to get the block detail.</p>",
+        "operationId": "ScryptaGetBlockHash",
+        "parameters": [
+          {
+            "description": "The number of blocks preceding a particular block on a block chain.",
+            "in": "path",
+            "name": "i",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "example": 1580117
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hash": {
+                      "type": "string",
+                      "description": "Block hash",
+                      "example": "0000000053f225e202cf27fe3046e06719efd3b31b5ab75fc5ef7f853c8b246f"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/block/hash/%7Bi%7D\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/block/hash/%7Bi%7D\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/block/hash/%7Bi%7D\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Get Block hash",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/block/{hash}": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/><p>Get Scrypta Block detail by block hash or height.</p>",
+        "operationId": "ScryptaGetBlock",
+        "parameters": [
+          {
+            "description": "Block hash or height.",
+            "in": "path",
+            "name": "hash",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "00000000ca231a439a5c0a86a5a5dd6dc1918a8e897b96522fa9499288e70183"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScryptaBlock"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403BlockNotExists"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/block/%7Bhash%7D\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/block/%7Bhash%7D\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/block/%7Bhash%7D\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Get Block by hash or height",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/transaction/{hash}": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/><p>Get Scrypta Transaction detail by transaction hash.</p>",
+        "operationId": "ScryptaGetRawTransaction",
+        "parameters": [
+          {
+            "description": "Transaction hash",
+            "in": "path",
+            "name": "hash",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1451692ebbfbea1a2d2ec6fe6782596b6aa2e46c0589d04c406f491b5b46bc6a"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScryptaTx"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error403TxNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/transaction/%7Bhash%7D\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/transaction/%7Bhash%7D\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/transaction/%7Bhash%7D\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Get Transaction by hash",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/transaction/address/{address}": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/><p>Get Scrypta Transaction by address.</p>",
+        "operationId": "ScryptaGetTxByAddress",
+        "parameters": [
+          {
+            "description": "Address",
+            "in": "path",
+            "name": "address",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "2MsM67NLa71fHvTUBqNENW15P68nHB2vVXb"
+            }
+          },
+          {
+            "description": "Max number of items per page is 50.",
+            "in": "query",
+            "name": "pageSize",
+            "example": 10,
+            "schema": {
+              "type": "number",
+              "maximum": 50,
+              "minimum": 1
+            },
+            "required": true
+          },
+          {
+            "description": "Offset to obtain next page of the data.",
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScryptaTx"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url 'https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE' \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/transaction/address/%7Baddress%7D?pageSize=SOME_NUMBER_VALUE&offset=SOME_NUMBER_VALUE\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Get Transactions by address",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/utxo/{hash}/{index}": {
+      "get": {
+        "description": "<h4>1 credit per API call.</h4><br/>\n<p>Get UTXO of given transaction and output index. UTXO means Unspent Transaction Output, which is in blockchain terminology assets, that user\nreceived on the concrete address and does not spend it yet.<br/>\nIn scrypta-like blockchains (LYRA, LTC, BCH), every transaction is built from the list of previously\nnot spent transactions connected to the address. If user owns address A, receives in transaciont T1 10 LYRA, he can spend in the next transaction\nUTXO T1 of total value 10 LYRA. User can spend multiple UTXOs from different addresses in 1 transaction.<br/>\nIf UTXO is not spent, data are returned, otherwise 404 error code.</p>\n",
+        "operationId": "ScryptaGetUTXO",
+        "parameters": [
+          {
+            "description": "TX Hash",
+            "in": "path",
+            "name": "hash",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "example": "53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc"
+            }
+          },
+          {
+            "description": "Index of tx output to check if spent or not",
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "example": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScryptaUTXO"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error403ScryptaUTXO"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request GET \\\n  --url https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D \\\n  --header 'x-api-key: REPLACE_KEY_VALUE'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"GET\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.get(\"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\"\n\n\treq, _ := http.NewRequest(\"GET\", url, nil)\n\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"GET\",\n  CURLOPT_HTTPHEADER => array(\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\nheaders = { 'x-api-key': \"REPLACE_KEY_VALUE\" }\n\nconn.request(\"GET\", \"/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"GET\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\");\nvar request = new RestRequest(Method.GET);\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\",\n  \"method\": \"GET\",\n  \"headers\": {\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"GET\"];\n[request setAllHTTPHeaderFields:headers];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\" in\nlet headers = Header.add (Header.init ()) \"x-api-key\" \"REPLACE_KEY_VALUE\" in\n\nClient.call ~headers `GET uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Get.new(url)\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\"x-api-key\": \"REPLACE_KEY_VALUE\"]\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/utxo/%7Bhash%7D/%7Bindex%7D\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"GET\"\nrequest.allHTTPHeaderFields = headers\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Get UTXO of Transaction",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/transaction": {
+      "post": {
+        "description": "<h4>2 credits per API call.</h4><br/>\n<p>Send Scrypta to blockchain addresses. It is possible to build a blockchain transaction in 2 ways:\n<ul>\n<li><b>fromAddress</b> - assets will be sent from the list of addresses. For each of the addresses last 100 transactions will be scanned for any unspent UTXO and will be included in the transaction.</li>\n<li><b>fromUTXO</b> - assets will be sent from the list of unspent UTXOs. Each of the UTXO will be included in the transaction.</li>\n</ul>\nIn scrypta-like blockchains, the transaction is created from the list of previously not spent UTXO. Every UTXO contains the number of funds, which can be spent.\nWhen the UTXO enters into the transaction, the whole amount is included and must be spent. For example, address A receives 2 transactions, T1 with 1 LYRA and T2 with 2 LYRA.\nThe transaction, which will consume UTXOs for T1 and T2, will have available amount to spent 3 LYRA = 1 LYRA (T1) + 2 LYRA(T2).<br/><br/>\nThere can be multiple recipients of the transactions, not only one. In the <b>to</b> section, every recipient address has it's corresponding amount.\nWhen the amount of funds, that should receive the recipient is lower than the number of funds from the UTXOs, the difference is used as a transaction fee.<br/><br/>\nThis operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.\nNo one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and losing funds. In this method, it is possible to enter privateKey\nor signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,\n<a href=\"https://github.com/tatumio/tatum-kms\" target=\"_blank\">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.\nAlternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.\n</p>\n",
+        "operationId": "ScryptaTransferBlockchain",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScryptaTransaction"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TransactionHashKMS"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SignatureId"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error403ScryptaTx"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error403ScryptaUTXO"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error403ScryptaTxFailed"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request POST \\\n  --url https://api-eu1.tatum.io/v3/scrypta/transaction \\\n  --header 'content-type: application/json' \\\n  --header 'x-api-key: REPLACE_KEY_VALUE' \\\n  --data '{\"fromAddress\":[{\"signatureId\":\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\",\"address\":\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\",\"privateKey\":\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\"}],\"fromUTXO\":[{\"txHash\":\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\",\"index\":0,\"privateKey\":\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\",\"signatureId\":\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\"}],\"to\":[{\"address\":\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\",\"value\":0.02969944}]}'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"POST\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/transaction\",\n  \"headers\": {\n    \"content-type\": \"application/json\",\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.write(JSON.stringify({\n  fromAddress: [\n    {\n      signatureId: '1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6',\n      address: '2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS',\n      privateKey: 'cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf'\n    }\n  ],\n  fromUTXO: [\n    {\n      txHash: '53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc',\n      index: 0,\n      privateKey: 'cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf',\n      signatureId: '1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6'\n    }\n  ],\n  to: [{address: '2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7', value: 0.02969944}]\n}));\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.post(\"https://api-eu1.tatum.io/v3/scrypta/transaction\")\n  .header(\"content-type\", \"application/json\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .body(\"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/transaction\"\n\n\tpayload := strings.NewReader(\"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\")\n\n\treq, _ := http.NewRequest(\"POST\", url, payload)\n\n\treq.Header.Add(\"content-type\", \"application/json\")\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/transaction\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"POST\",\n  CURLOPT_POSTFIELDS => \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\",\n  CURLOPT_HTTPHEADER => array(\n    \"content-type: application/json\",\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\npayload = \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\"\n\nheaders = {\n    'content-type': \"application/json\",\n    'x-api-key': \"REPLACE_KEY_VALUE\"\n    }\n\nconn.request(\"POST\", \"/v3/scrypta/transaction\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"POST\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/transaction\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"content-type: application/json\");\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\ncurl_easy_setopt(hnd, CURLOPT_POSTFIELDS, \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\");\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/transaction\");\nvar request = new RestRequest(Method.POST);\nrequest.AddHeader(\"content-type\", \"application/json\");\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nrequest.AddParameter(\"application/json\", \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\", ParameterType.RequestBody);\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/transaction\",\n  \"method\": \"POST\",\n  \"headers\": {\n    \"content-type\": \"application/json\",\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  },\n  \"processData\": false,\n  \"data\": \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\"\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"content-type\": @\"application/json\",\n                           @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\nNSDictionary *parameters = @{ @\"fromAddress\": @[ @{ @\"signatureId\": @\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\", @\"address\": @\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\", @\"privateKey\": @\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\" } ],\n                              @\"fromUTXO\": @[ @{ @\"txHash\": @\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\", @\"index\": @0, @\"privateKey\": @\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\", @\"signatureId\": @\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\" } ],\n                              @\"to\": @[ @{ @\"address\": @\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\", @\"value\": @0.02969944 } ] };\n\nNSData *postData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/transaction\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"POST\"];\n[request setAllHTTPHeaderFields:headers];\n[request setHTTPBody:postData];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/transaction\" in\nlet headers = Header.add_list (Header.init ()) [\n  (\"content-type\", \"application/json\");\n  (\"x-api-key\", \"REPLACE_KEY_VALUE\");\n] in\nlet body = Cohttp_lwt_body.of_string \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\" in\n\nClient.call ~headers ~body `POST uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/transaction\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Post.new(url)\nrequest[\"content-type\"] = 'application/json'\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\nrequest.body = \"{\\\"fromAddress\\\":[{\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\",\\\"address\\\":\\\"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\\\",\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\"}],\\\"fromUTXO\\\":[{\\\"txHash\\\":\\\"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\\\",\\\"index\\\":0,\\\"privateKey\\\":\\\"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}],\\\"to\\\":[{\\\"address\\\":\\\"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\\\",\\\"value\\\":0.02969944}]}\"\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\n  \"content-type\": \"application/json\",\n  \"x-api-key\": \"REPLACE_KEY_VALUE\"\n]\nlet parameters = [\n  \"fromAddress\": [\n    [\n      \"signatureId\": \"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\",\n      \"address\": \"2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS\",\n      \"privateKey\": \"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\"\n    ]\n  ],\n  \"fromUTXO\": [\n    [\n      \"txHash\": \"53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc\",\n      \"index\": 0,\n      \"privateKey\": \"cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf\",\n      \"signatureId\": \"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\"\n    ]\n  ],\n  \"to\": [\n    [\n      \"address\": \"2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7\",\n      \"value\": 0.02969944\n    ]\n  ]\n] as [String : Any]\n\nlet postData = JSONSerialization.data(withJSONObject: parameters, options: [])\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/transaction\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"POST\"\nrequest.allHTTPHeaderFields = headers\nrequest.httpBody = postData as Data\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Send LYRA to blockchain addresses",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    },
+    "/v3/scrypta/broadcast": {
+      "post": {
+        "description": "<h4>2 credits per API call.</h4><br/>\n<p>Broadcast signed transaction to Scrypta blockchain. This method is used internally from Tatum KMS, Tatum Middleware or Tatum client libraries.\nIt is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>\n",
+        "operationId": "ScryptaBroadcast",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BroadcastKMS"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionHashKMS"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error400"
+                }
+              }
+            },
+            "description": "Bad Request. Validation failed for the given object in the HTTP Body or Request parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error401NotActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error401Invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized. Not valid or inactive subscription key present in the HTTP Header."
+          },
+          "403": {
+            "description": "Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Error403ScryptaBlockchain"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error403Broadcast"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            },
+            "description": "Internal server error. There was an error on the server during the processing of the request."
+          }
+        },
+        "security": [
+          {
+            "X-Api-Key": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "cURL",
+            "source": "curl --request POST \\\n  --url https://api-eu1.tatum.io/v3/scrypta/broadcast \\\n  --header 'content-type: application/json' \\\n  --header 'x-api-key: REPLACE_KEY_VALUE' \\\n  --data '{\"txData\":\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\",\"signatureId\":\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\"}'"
+          },
+          {
+            "lang": "Node",
+            "source": "var http = require(\"https\");\n\nvar options = {\n  \"method\": \"POST\",\n  \"hostname\": \"api-eu1.tatum.io\",\n  \"port\": null,\n  \"path\": \"/v3/scrypta/broadcast\",\n  \"headers\": {\n    \"content-type\": \"application/json\",\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  }\n};\n\nvar req = http.request(options, function (res) {\n  var chunks = [];\n\n  res.on(\"data\", function (chunk) {\n    chunks.push(chunk);\n  });\n\n  res.on(\"end\", function () {\n    var body = Buffer.concat(chunks);\n    console.log(body.toString());\n  });\n});\n\nreq.write(JSON.stringify({\n  txData: '62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D',\n  signatureId: '1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6'\n}));\nreq.end();"
+          },
+          {
+            "lang": "Java",
+            "source": "HttpResponse<String> response = Unirest.post(\"https://api-eu1.tatum.io/v3/scrypta/broadcast\")\n  .header(\"content-type\", \"application/json\")\n  .header(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n  .body(\"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\")\n  .asString();"
+          },
+          {
+            "lang": "Go",
+            "source": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io/ioutil\"\n)\n\nfunc main() {\n\n\turl := \"https://api-eu1.tatum.io/v3/scrypta/broadcast\"\n\n\tpayload := strings.NewReader(\"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\")\n\n\treq, _ := http.NewRequest(\"POST\", url, payload)\n\n\treq.Header.Add(\"content-type\", \"application/json\")\n\treq.Header.Add(\"x-api-key\", \"REPLACE_KEY_VALUE\")\n\n\tres, _ := http.DefaultClient.Do(req)\n\n\tdefer res.Body.Close()\n\tbody, _ := ioutil.ReadAll(res.Body)\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+          },
+          {
+            "lang": "PHP",
+            "source": "<?php\n\n$curl = curl_init();\n\ncurl_setopt_array($curl, array(\n  CURLOPT_URL => \"https://api-eu1.tatum.io/v3/scrypta/broadcast\",\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_ENCODING => \"\",\n  CURLOPT_MAXREDIRS => 10,\n  CURLOPT_TIMEOUT => 30,\n  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,\n  CURLOPT_CUSTOMREQUEST => \"POST\",\n  CURLOPT_POSTFIELDS => \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\",\n  CURLOPT_HTTPHEADER => array(\n    \"content-type: application/json\",\n    \"x-api-key: REPLACE_KEY_VALUE\"\n  ),\n));\n\n$response = curl_exec($curl);\n$err = curl_error($curl);\n\ncurl_close($curl);\n\nif ($err) {\n  echo \"cURL Error #:\" . $err;\n} else {\n  echo $response;\n}"
+          },
+          {
+            "lang": "Python3",
+            "source": "import http.client\n\nconn = http.client.HTTPSConnection(\"api-eu1.tatum.io\")\n\npayload = \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\"\n\nheaders = {\n    'content-type': \"application/json\",\n    'x-api-key': \"REPLACE_KEY_VALUE\"\n    }\n\nconn.request(\"POST\", \"/v3/scrypta/broadcast\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+          },
+          {
+            "lang": "C",
+            "source": "CURL *hnd = curl_easy_init();\n\ncurl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, \"POST\");\ncurl_easy_setopt(hnd, CURLOPT_URL, \"https://api-eu1.tatum.io/v3/scrypta/broadcast\");\n\nstruct curl_slist *headers = NULL;\nheaders = curl_slist_append(headers, \"content-type: application/json\");\nheaders = curl_slist_append(headers, \"x-api-key: REPLACE_KEY_VALUE\");\ncurl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);\n\ncurl_easy_setopt(hnd, CURLOPT_POSTFIELDS, \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\");\n\nCURLcode ret = curl_easy_perform(hnd);"
+          },
+          {
+            "lang": "C#",
+            "source": "var client = new RestClient(\"https://api-eu1.tatum.io/v3/scrypta/broadcast\");\nvar request = new RestRequest(Method.POST);\nrequest.AddHeader(\"content-type\", \"application/json\");\nrequest.AddHeader(\"x-api-key\", \"REPLACE_KEY_VALUE\");\nrequest.AddParameter(\"application/json\", \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\", ParameterType.RequestBody);\nIRestResponse response = client.Execute(request);"
+          },
+          {
+            "lang": "Javascript - jQuery",
+            "source": "var settings = {\n  \"async\": true,\n  \"crossDomain\": true,\n  \"url\": \"https://api-eu1.tatum.io/v3/scrypta/broadcast\",\n  \"method\": \"POST\",\n  \"headers\": {\n    \"content-type\": \"application/json\",\n    \"x-api-key\": \"REPLACE_KEY_VALUE\"\n  },\n  \"processData\": false,\n  \"data\": \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\"\n}\n\n$.ajax(settings).done(function (response) {\n  console.log(response);\n});"
+          },
+          {
+            "lang": "Objective-C",
+            "source": "#import <Foundation/Foundation.h>\n\nNSDictionary *headers = @{ @\"content-type\": @\"application/json\",\n                           @\"x-api-key\": @\"REPLACE_KEY_VALUE\" };\nNSDictionary *parameters = @{ @\"txData\": @\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\",\n                              @\"signatureId\": @\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\" };\n\nNSData *postData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];\n\nNSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@\"https://api-eu1.tatum.io/v3/scrypta/broadcast\"]\n                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy\n                                                   timeoutInterval:10.0];\n[request setHTTPMethod:@\"POST\"];\n[request setAllHTTPHeaderFields:headers];\n[request setHTTPBody:postData];\n\nNSURLSession *session = [NSURLSession sharedSession];\nNSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request\n                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {\n                                                if (error) {\n                                                    NSLog(@\"%@\", error);\n                                                } else {\n                                                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;\n                                                    NSLog(@\"%@\", httpResponse);\n                                                }\n                                            }];\n[dataTask resume];"
+          },
+          {
+            "lang": "OCaml",
+            "source": "open Cohttp_lwt_unix\nopen Cohttp\nopen Lwt\n\nlet uri = Uri.of_string \"https://api-eu1.tatum.io/v3/scrypta/broadcast\" in\nlet headers = Header.add_list (Header.init ()) [\n  (\"content-type\", \"application/json\");\n  (\"x-api-key\", \"REPLACE_KEY_VALUE\");\n] in\nlet body = Cohttp_lwt_body.of_string \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\" in\n\nClient.call ~headers ~body `POST uri\n>>= fun (res, body_stream) ->\n  (* Do stuff with the result *)"
+          },
+          {
+            "lang": "Ruby",
+            "source": "require 'uri'\nrequire 'net/http'\nrequire 'openssl'\n\nurl = URI(\"https://api-eu1.tatum.io/v3/scrypta/broadcast\")\n\nhttp = Net::HTTP.new(url.host, url.port)\nhttp.use_ssl = true\nhttp.verify_mode = OpenSSL::SSL::VERIFY_NONE\n\nrequest = Net::HTTP::Post.new(url)\nrequest[\"content-type\"] = 'application/json'\nrequest[\"x-api-key\"] = 'REPLACE_KEY_VALUE'\nrequest.body = \"{\\\"txData\\\":\\\"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\\\",\\\"signatureId\\\":\\\"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\\\"}\"\n\nresponse = http.request(request)\nputs response.read_body"
+          },
+          {
+            "lang": "Swift",
+            "source": "import Foundation\n\nlet headers = [\n  \"content-type\": \"application/json\",\n  \"x-api-key\": \"REPLACE_KEY_VALUE\"\n]\nlet parameters = [\n  \"txData\": \"62BD544D1B9031EFC330A3E855CC3A0D51CA5131455C1AB3BCAC6D243F65460D\",\n  \"signatureId\": \"1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6\"\n] as [String : Any]\n\nlet postData = JSONSerialization.data(withJSONObject: parameters, options: [])\n\nlet request = NSMutableURLRequest(url: NSURL(string: \"https://api-eu1.tatum.io/v3/scrypta/broadcast\")! as URL,\n                                        cachePolicy: .useProtocolCachePolicy,\n                                    timeoutInterval: 10.0)\nrequest.httpMethod = \"POST\"\nrequest.allHTTPHeaderFields = headers\nrequest.httpBody = postData as Data\n\nlet session = URLSession.shared\nlet dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in\n  if (error != nil) {\n    print(error)\n  } else {\n    let httpResponse = response as? HTTPURLResponse\n    print(httpResponse)\n  }\n})\n\ndataTask.resume()"
+          }
+        ],
+        "summary": "Broadcast signed Scrypta transaction",
+        "tags": [
+          "Blockchain / Scrypta"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ScryptaBlock": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "description": "Hash of block.",
+            "example": "00000000ca231a439a5c0a86a5a5dd6dc1918a8e897b96522fa9499288e70183"
+          },
+          "height": {
+            "description": "The number of blocks preceding a particular block on a block chain.",
+            "type": "number",
+            "example": 15235
+          },
+          "depth": {
+            "description": "The number of blocks following a particular block on a block chain, including current one.",
+            "type": "number",
+            "example": 1567867
+          },
+          "version": {
+            "type": "number",
+            "description": "Block version.",
+            "example": 1
+          },
+          "prevBlock": {
+            "type": "string",
+            "description": "Hash of the previous block.",
+            "example": "000000006e79360d7b2519410fe5a73e8e08393fd7166620c73c711e4507d9fd"
+          },
+          "merkleRoot": {
+            "type": "string",
+            "description": "The root node of a merkle tree, a descendant of all the hashed pairs in the tree.",
+            "example": "480c227c5042377dbd54464d33e1f59c19fe02fe76d7f55b6955db438479aece"
+          },
+          "time": {
+            "type": "number",
+            "description": "Time of the block.",
+            "example": 1338861927
+          },
+          "bits": {
+            "type": "number",
+            "example": 486604799
+          },
+          "nonce": {
+            "type": "number",
+            "description": "Arbitrary number that is used in Scrypta's proof of stake consensus algorithm.",
+            "example": 1193572362
+          },
+          "txs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScryptaTx"
+            }
+          }
+        }
+      },
+      "ScryptaInfo": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string",
+            "description": "Chain of the blockchain, main or test.",
+            "example": "test"
+          },
+          "blocks": {
+            "type": "number",
+            "description": "Last block.",
+            "example": 1579820
+          },
+          "headers": {
+            "type": "number",
+            "description": "Last headers.",
+            "example": 1579820
+          },
+          "bestblockhash": {
+            "description": "Hash of the last block.",
+            "type": "string",
+            "example": "0000000000000106e4c03ca093ce0cf77e796ddff4f3cadc59ca6b0380e3eed4"
+          },
+          "difficulty": {
+            "type": "number",
+            "description": "Difficulty of the algorithm.",
+            "example": 6522714.521250089
+          }
+        }
+      },
+      "ScryptaTx": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "description": "Transaction hash.",
+            "example": "4c7846a8ff8415945e96937dea27bdb3144c15d793648d725602784826052586"
+          },
+          "witnessHash": {
+            "type": "string",
+            "description": "Witness hash in case of a SegWit transaction.",
+            "example": "4c7846a8ff8415945e96937dea27bdb3144c15d793648d725602784826052586"
+          },
+          "fee": {
+            "type": "number",
+            "description": "Fee paid for this transaction, in satoshis.",
+            "example": 4540
+          },
+          "rate": {
+            "type": "number",
+            "example": 20088
+          },
+          "mtime": {
+            "type": "number",
+            "example": 1575663337
+          },
+          "height": {
+            "type": "number",
+            "description": "Height of the block this transaction belongs to.",
+            "example": 1611609
+          },
+          "block": {
+            "type": "string",
+            "description": "Hash of the block this transaction belongs to.",
+            "example": "00000000000001e13fe1eb3977f3379e3d0f6577fc6e087d27db46597ebddb8b"
+          },
+          "time": {
+            "type": "number",
+            "description": "Time of the transaction.",
+            "example": 1575663091
+          },
+          "index": {
+            "type": "number",
+            "description": "Index of the transaction in the block.",
+            "example": 1
+          },
+          "version": {
+            "type": "number",
+            "description": "Index of the transaction.",
+            "example": 2
+          },
+          "inputs": {
+            "description": "List of transactions, from which assets are being sent.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "prevout": {
+                  "properties": {
+                    "hash": {
+                      "type": "string",
+                      "description": "Transaction hash of the input.",
+                      "example": "60bc8445c11318e45a72a3259e65118d2f352568757e6ceb8bf1b527ce68379f"
+                    },
+                    "index": {
+                      "type": "number",
+                      "description": "Transaction index of the input.",
+                      "example": 1
+                    }
+                  },
+                  "type": "object"
+                },
+                "script": {
+                  "type": "string",
+                  "description": "Data generated by a spender which is almost always used as variables to satisfy a pubkey script.",
+                  "example": "1600148c65244f095f3689aebb70981d102e33036fe786"
+                },
+                "witness": {
+                  "type": "string",
+                  "description": "Transaction witness.",
+                  "example": "0247304402207d7af97665ef5502c957f76a9fcdde2c228b6a8dc9951d45c318e6dfca0fcd2802207519528d6b61cc044800ab2cb499ef5f31d4decdc327c14fad4abbc3dd6e0190012102861d682cfd3bec8cbed98f5162299ba613bc5f352dd0d51961a5d81359fbc0af"
+                },
+                "sequence": {
+                  "type": "number",
+                  "example": 4294967294
+                },
+                "coin": {
+                  "properties": {
+                    "version": {
+                      "type": "number",
+                      "example": 2
+                    },
+                    "height": {
+                      "type": "number",
+                      "example": 1611608
+                    },
+                    "value": {
+                      "type": "number",
+                      "description": "Amount of the transaction, in Satoshis (1 LYRA = 100 000 000 Satoshis)",
+                      "example": 1341956178
+                    },
+                    "script": {
+                      "type": "string",
+                      "example": "0014049a97d91d4e1123899bf48c5ba6ce3fd959664e"
+                    },
+                    "address": {
+                      "type": "string",
+                      "description": "Sender address.",
+                      "example": "tb1qqjdf0kgafcgj8zvm7jx9hfkw8lv4jejw6wsmjg"
+                    },
+                    "coinbase": {
+                      "type": "boolean",
+                      "description": "Coinbase transaction - miner fee.",
+                      "example": false
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "description": "List of recipient addresses and amounts to send to each of them.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "description": "Sent amount in satoshis.",
+                  "example": 2068942
+                },
+                "script": {
+                  "type": "string",
+                  "description": "Transaction script.",
+                  "example": "a914eaf2ad7e161c3ce7092bde14dc5842b642fe925187"
+                },
+                "address": {
+                  "type": "string",
+                  "description": "Recipient address.",
+                  "example": "2NEfWpiQwLEcHGbX2Fwij16NDxTEZwHk4BH"
+                }
+              }
+            }
+          },
+          "locktime": {
+            "type": "number",
+            "description": "Block this transaction was included in.",
+            "example": 1611608
+          }
+        }
+      },
+      "ScryptaUTXO": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "number",
+            "description": "Version of the UTXO.",
+            "example": 1
+          },
+          "height": {
+            "type": "number",
+            "example": -1
+          },
+          "value": {
+            "type": "number",
+            "description": "Amount of UTXO in satoshis.",
+            "example": 30000000
+          },
+          "script": {
+            "type": "string",
+            "description": "Data generated by a spender which is almost always used as variables to satisfy a pubkey script.",
+            "example": "76a91400ba915c3d18907b79e6cfcd8b9fdf69edc7a7db88ac"
+          },
+          "address": {
+            "type": "string",
+            "description": "Address of the owner of the UTXO.",
+            "example": "R9M3aUWCcKoiqDPusJvqNkAbjffLgCqYip"
+          },
+          "coinbase": {
+            "type": "boolean",
+            "description": "Coinbase transaction - miner fee.",
+            "example": false
+          },
+          "hash": {
+            "type": "string",
+            "description": "Transaction hash.",
+            "example": "53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc"
+          },
+          "index": {
+            "type": "number",
+            "description": "Transaction index of the output.",
+            "example": 0
+          }
+        }
+      },
+      "ScryptaTransaction": {
+        "type": "object",
+        "required": [
+          "to"
+        ],
+        "properties": {
+          "fromAddress": {
+            "description": "Array of addresses and corresponding private keys. Tatum will automatically scan last 100 transactions for each address and will use all of the unspent values. We advise to use this option if you have 1 address per 1 transaction only.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "address"
+              ],
+              "properties": {
+                "signatureId": {
+                  "type": "string",
+                  "minimum": 36,
+                  "maximum": 36,
+                  "format": "uuid",
+                  "example": "1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6",
+                  "description": "Identifier of the private key associated in signing application. Private key, or signature Id must be present."
+                },
+                "address": {
+                  "description": "Address to send assets from.",
+                  "type": "string",
+                  "example": "2N9bBiH2qrTDrPCzrNhaFGdkNKS86PJAAAS",
+                  "minimum": 30,
+                  "maximum": 50
+                },
+                "privateKey": {
+                  "description": "Private key of the address to send assets from. Private key, or signature Id must be present.",
+                  "type": "string",
+                  "minimum": 52,
+                  "maximum": 52,
+                  "example": "cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf"
+                }
+              }
+            }
+          },
+          "fromUTXO": {
+            "description": "Array of transaction hashes, index of UTXO in it and corresponding private keys. Use this option if you want to calculate amount to send manually. Either fromUTXO or fromAddress must be present.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "txHash",
+                "index"
+              ],
+              "properties": {
+                "txHash": {
+                  "description": "Transaction hash of the UTXO to be spent.",
+                  "type": "string",
+                  "example": "53faa103e8217e1520f5149a4e8c84aeb58e55bdab11164a95e69a8ca50f8fcc",
+                  "minLength": 64,
+                  "maxLength": 64
+                },
+                "index": {
+                  "description": "Index of the UTXO to be spent.",
+                  "type": "number",
+                  "example": 0,
+                  "minimum": 0,
+                  "maximum": 2147483647
+                },
+                "privateKey": {
+                  "description": "Private key of the UTXO to be spent.",
+                  "type": "string",
+                  "example": "cVX7YtgL5muLTPncHFhP95oitV1mqUUA5VeSn8HeCRJbPqipzobf",
+                  "minLength": 52,
+                  "maxLength": 52
+                },
+                "signatureId": {
+                  "type": "string",
+                  "minimum": 36,
+                  "maximum": 36,
+                  "format": "uuid",
+                  "example": "1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6",
+                  "description": "Identifier of the private key associated in signing application."
+                }
+              }
+            }
+          },
+          "to": {
+            "description": "Array of addresses and values to send LYRA to. Values must be set in LYRA. Difference between from and to is transaction fee.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "address",
+                "value"
+              ],
+              "properties": {
+                "address": {
+                  "description": "Destination address.",
+                  "type": "string",
+                  "example": "2MzNGwuKvMEvKMQogtgzSqJcH2UW3Tc5oc7",
+                  "minimum": 30,
+                  "maximum": 60
+                },
+                "value": {
+                  "description": "Amount to be sent, in LYRA.",
+                  "type": "number",
+                  "minimum": 0,
+                  "example": 0.02969944
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "X-Api-Key": {
+        "description": "To maintain the highest security level, Tatum requires X-API-Key HTTP header.\nThis X-API-Key represents identification of the plan and can be used by 1 developer or per environment.\nEach X-API-Key is bound to the test or production blockchains.\n",
+        "in": "header",
+        "name": "x-api-key",
+        "type": "apiKey"
+      }
+    }
+  }
+}
