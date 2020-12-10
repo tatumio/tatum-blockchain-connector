@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@scrypta/core": "^2.9.0",
+    "@tatumio/tatum": "^1.4.19",
     "bip32": "^2.0.6",
     "bip39": "^3.0.3",
     "bitcoinjs-lib": "^5.2.0",

@@ -6,6 +6,7 @@ import { generateMnemonic, mnemonicToSeed } from 'bip39';
 import { payments } from 'bitcoinjs-lib';
 import { PinoLogger } from 'nestjs-pino';
 import hdkey from 'hdkey';
+import * as Tatum from '@tatumio/tatum'
 
 export abstract class ScryptaBlockchainService {
   protected scrypta: any;
@@ -64,6 +65,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
 
       try {
@@ -85,6 +88,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let block = await this.scrypta.get('/blockhash/' + i)
@@ -105,6 +110,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let block = await this.scrypta.get('/rawblock/' + hash)
@@ -131,32 +138,40 @@ export abstract class ScryptaBlockchainService {
    * @param xpub 
    * @param derivationIndex 
    */
-  public async generateAddress(xpub: string, derivationIndex: number) {
+  public async generateAddress(xpub: string, derivationIndex: number, testnet?: boolean) {
+    if (testnet) {
+      this.scrypta.testnet = testnet;
+    } else {
+      testnet = this.testnet;
+    }
     try {
-      const w = fromBase58(xpub, this.getNetwork()).derivePath(String(derivationIndex));
-      const address = payments.p2pkh({ pubkey: w.publicKey, network: this.getNetwork() }).address;
-      if (address !== undefined) {
-        return { address };
-      }
+      let address = await Tatum.generateAddressFromXPub(Tatum.Currency.LYRA, testnet, xpub, derivationIndex)
+      return address
     } catch (e) {
       this.logger.error(e);
       throw new TatumError('Unable to generate address, wrong xpub and account type.', 'address.generation.failed.wrong.xpub');
     }
-    throw new TatumError('Unable to generate address', 'address.generation.failed');
   }
 
-  public async generateWallet(mnem?: string) {
-    const mnemonic = mnem ? mnem : generateMnemonic(256);
-    const hdwallet = hdkey.fromMasterSeed(mnemonicToSeed(mnemonic), this.getNetwork().bip32);
-    return { mnemonic, xpub: hdwallet.derive(this.getDerivationPath()).toJSON().xpub };
+  public async generateWallet(mnem?: string, testnet?: boolean) {
+    if (testnet) {
+      this.scrypta.testnet = testnet;
+    } else {
+      testnet = this.testnet;
+    }
+    const lyraWallet = await Tatum.generateWallet(Tatum.Currency.LYRA, testnet, mnem);
+    return lyraWallet
   }
 
-  public async generateAddressPrivateKey(derivationIndex: number, mnemonic: string): Promise<{ key: string }> {
+  public async generateAddressPrivateKey(derivationIndex: number, mnemonic: string, testnet?: boolean): Promise<{ key: string }> {
+    if (testnet) {
+      this.scrypta.testnet = testnet;
+    } else {
+      testnet = this.testnet;
+    }
     try {
-      const w = fromSeed(await mnemonicToSeed(mnemonic), this.getNetwork())
-        .derivePath(this.getDerivationPath())
-        .derive(derivationIndex);
-      return { key: w.toWIF() };
+      let privateKey = await Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency.LYRA, testnet, mnemonic, derivationIndex);
+      return { key: privateKey }
     } catch (e) {
       this.logger.error(e);
       throw new TatumError('Unable to generate address, wrong mnemonic and index.', 'key.generation.failed.wrong.mnemonic');
@@ -177,6 +192,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let transactions = await this.scrypta.get('/transactions/' + address)
@@ -199,6 +216,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let unspent = await this.scrypta.get('/unspent/' + address)
@@ -230,6 +249,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let unspent = await this.scrypta.get('/utxo/' + hash + '/' + index)
@@ -253,6 +274,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let rawtx = await this.scrypta.get('/rawtransaction/' + txHash)
@@ -276,6 +299,8 @@ export abstract class ScryptaBlockchainService {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
+      } else {
+        testnet = this.testnet;
       }
       try {
         let sendrawtransaction = await this.scrypta.post('/sendrawtransaction', { rawtransaction: txData })
