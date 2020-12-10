@@ -34,15 +34,19 @@ const constants_1 = require("./constants");
 const error_1 = require("./error");
 const Tatum = __importStar(require("@tatumio/tatum"));
 class ScryptaBlockchainService {
-    constructor(testnet = false, nodes) {
+    constructor(testnet = false, nodes, debug) {
         this.scrypta = new ScryptaCore;
         this.testnet = testnet;
+        this.scrypta.staticnodes = true;
         if (this.testnet === true) {
             this.scrypta.testnet = true;
         }
         if (nodes !== undefined && nodes.length > 0) {
             this.scrypta.mainnetIdaNodes = nodes;
             this.scrypta.testnetIdaNodes = nodes;
+        }
+        if (debug === true) {
+            this.scrypta.debug = true;
         }
     }
     getNetwork() {

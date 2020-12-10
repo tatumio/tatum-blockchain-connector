@@ -1,13 +1,15 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
-import { ScryptaReady } from '@scrypta/tatum'
+import { ScryptaBlockchainService } from '@scrypta/tatum'
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  scrypta: any
+  constructor() {
+    this.scrypta = new ScryptaBlockchainService(false, ["http://localhost:3001"], true)
+  }
 
-  @Get()
-  getHello(): object {
-    return ScryptaReady()
+  @Get('/v3/scrypta/info')
+  async getInfo(): Promise<object> {
+    return await this.scrypta.getBlockChainInfo()
   }
 }

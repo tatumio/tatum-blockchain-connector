@@ -4,21 +4,25 @@ import { TatumError } from './error'
 import { PinoLogger } from 'nestjs-pino';
 import * as Tatum from '@tatumio/tatum'
 
-export abstract class ScryptaBlockchainService {
+export class ScryptaBlockchainService {
   protected scrypta: any;
   protected testnet: boolean;
   protected currency: 'LYRA';
   protected readonly logger: PinoLogger;
 
-  constructor(testnet = false, nodes?: Array<string>) {
+  constructor(testnet = false, nodes?: Array<string>, debug?: boolean) {
     this.scrypta = new ScryptaCore;
     this.testnet = testnet;
+    this.scrypta.staticnodes = true;
     if (this.testnet === true) {
       this.scrypta.testnet = true;
     }
     if(nodes !== undefined && nodes.length > 0){
-      this.scrypta.mainnetIdaNodes = nodes
-      this.scrypta.testnetIdaNodes = nodes
+      this.scrypta.mainnetIdaNodes = nodes;
+      this.scrypta.testnetIdaNodes = nodes;
+    }
+    if(debug === true){
+      this.scrypta.debug = true;
     }
   }
 

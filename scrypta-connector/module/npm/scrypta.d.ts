@@ -1,12 +1,12 @@
 import { ScryptaBlock, ScryptaTx, ScryptaUnspent } from './constants';
 import { PinoLogger } from 'nestjs-pino';
 import * as Tatum from '@tatumio/tatum';
-export declare abstract class ScryptaBlockchainService {
+export declare class ScryptaBlockchainService {
     protected scrypta: any;
     protected testnet: boolean;
     protected currency: 'LYRA';
     protected readonly logger: PinoLogger;
-    constructor(testnet?: boolean, nodes?: Array<string>);
+    constructor(testnet?: boolean, nodes?: Array<string>, debug?: boolean);
     getNetwork(): {
         messagePrefix: string;
         bech32: string;
