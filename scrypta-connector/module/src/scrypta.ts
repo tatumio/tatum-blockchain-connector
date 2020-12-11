@@ -1,5 +1,5 @@
 const ScryptaCore = require('@scrypta/core');
-import { LYRA_NETWORK, LYRA_TEST_NETWORK, ScryptaBlock, ScryptaTx, ScryptaUnspent } from './constants';
+import { LYRA_NETWORK, LYRA_TEST_NETWORK, ScryptaBlock, ScryptaParsedTx, ScryptaUnspent } from './constants';
 import { TatumError } from './error'
 import { PinoLogger } from 'nestjs-pino';
 import * as Tatum from '@tatumio/tatum'
@@ -7,7 +7,7 @@ import * as Tatum from '@tatumio/tatum'
 export class ScryptaBlockchainService {
   protected scrypta: any;
   protected testnet: boolean;
-  protected currency: 'LYRA';
+  protected currency: Tatum.Currency = Tatum.Currency.LYRA;
   protected readonly logger: PinoLogger;
 
   constructor(testnet = false, nodes?: Array<string>, debug?: boolean) {
@@ -17,11 +17,11 @@ export class ScryptaBlockchainService {
     if (this.testnet === true) {
       this.scrypta.testnet = true;
     }
-    if(nodes !== undefined && nodes.length > 0){
+    if (nodes !== undefined && nodes.length > 0) {
       this.scrypta.mainnetIdaNodes = nodes;
       this.scrypta.testnetIdaNodes = nodes;
     }
-    if(debug === true){
+    if (debug === true) {
       this.scrypta.debug = true;
     }
   }
@@ -116,11 +116,11 @@ export class ScryptaBlockchainService {
       try {
         let block = await this.scrypta.get('/rawblock/' + hash)
         response({
-          hash: block.hash,
-          height: block.height,
-          confirmations: block.confirmations,
-          time: block.time,
-          txs: block.txs
+          hash: block.data.hash,
+          height: block.data.height,
+          confirmations: block.data.confirmations,
+          time: block.data.time,
+          txs: block.data.txs
         })
       } catch (e) {
         this.logger.error(e);
@@ -145,7 +145,7 @@ export class ScryptaBlockchainService {
       testnet = this.testnet;
     }
     try {
-      let address = await Tatum.generateAddressFromXPub(Tatum.Currency[this.currency], testnet, xpub, derivationIndex)
+      let address = await Tatum.generateAddressFromXPub(this.currency, testnet, xpub, derivationIndex)
       return address
     } catch (e) {
       this.logger.error(e);
@@ -159,7 +159,7 @@ export class ScryptaBlockchainService {
     } else {
       testnet = this.testnet;
     }
-    const lyraWallet = await Tatum.generateWallet(Tatum.Currency[this.currency], testnet, mnem);
+    const lyraWallet = await Tatum.generateWallet(this.currency, testnet, mnem);
     return lyraWallet
   }
 
@@ -170,7 +170,7 @@ export class ScryptaBlockchainService {
       testnet = this.testnet;
     }
     try {
-      let privateKey = await Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency[this.currency], testnet, mnemonic, derivationIndex);
+      let privateKey = await Tatum.generatePrivateKeyFromMnemonic(this.currency, testnet, mnemonic, derivationIndex);
       return { key: privateKey }
     } catch (e) {
       this.logger.error(e);
@@ -188,7 +188,7 @@ export class ScryptaBlockchainService {
    * @param pagination 
    */
   public async getTransactionsByAddress(address: string, pagination?: object, testnet?: boolean):
-    Promise<Array<ScryptaTx>> {
+    Promise<Array<ScryptaParsedTx>> {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
@@ -197,7 +197,20 @@ export class ScryptaBlockchainService {
       }
       try {
         let transactions = await this.scrypta.get('/transactions/' + address)
-        response(transactions.data)
+        let parsed = []
+        for(let k in transactions.data){
+          let tx = transactions.data[k]
+          parsed.push({
+            hash: tx.txid,
+            from: tx.from,
+            to: tx.to,
+            value: tx.value,
+            time: tx.time,
+            type: tx.type,
+            blockhash: tx.blockhash
+          })
+        }
+        response(parsed)
       } catch (e) {
         this.logger.error(e);
         throw new TatumError(`${e.message}`, `blockchain.error.code`);
@@ -229,7 +242,8 @@ export class ScryptaBlockchainService {
             vout: utxo.vout,
             amount: utxo.amount,
             scriptPubKey: utxo.scriptPubKey,
-            block: utxo.block
+            block: utxo.block,
+            redeemed: utxo.redeemed
           })
         }
         response(parsed)
@@ -245,7 +259,7 @@ export class ScryptaBlockchainService {
    * @param hash
    * @param index 
    */
-  public async getUTXO(hash: string, index: number, testnet?: boolean): Promise<ScryptaTx> {
+  public async getUTXO(hash: string, index: number, testnet?: boolean): Promise<ScryptaUnspent> {
     return new Promise(async response => {
       if (testnet) {
         this.scrypta.testnet = testnet;
@@ -253,11 +267,18 @@ export class ScryptaBlockchainService {
         testnet = this.testnet;
       }
       try {
-        let unspent = await this.scrypta.get('/utxo/' + hash + '/' + index)
-        if (unspent === false) {
+        let utxo = await this.scrypta.get('/utxo/' + hash + '/' + index)
+        if (utxo === false) {
           throw new TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');
         }
-        response(unspent);
+        response({
+          txid: utxo.txid,
+          vout: utxo.vout,
+          amount: utxo.amount,
+          scriptPubKey: utxo.scriptPubKey,
+          block: utxo.block,
+          redeemed: utxo.redeemed
+        });
       } catch (e) {
         this.logger.error(e);
         throw new TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');

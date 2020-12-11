@@ -40,6 +40,14 @@ export interface ScryptaTx {
     time: number;
     blockhash: string;
 }
+export interface ScryptaParsedTx {
+    hash: string;
+    from: Array<string>;
+    to: Array<string>;
+    type: string;
+    time: number;
+    blockhash: string;
+}
 export interface ScryptaBlock {
     hash: string;
     height: number;
@@ -53,4 +61,5 @@ export interface ScryptaUnspent {
     amount: number;
     scriptPubKey: string;
     block: number;
+    redeemed: string;
 }

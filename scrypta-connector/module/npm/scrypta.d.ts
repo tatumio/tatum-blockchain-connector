@@ -1,10 +1,10 @@
-import { ScryptaBlock, ScryptaTx, ScryptaUnspent } from './constants';
+import { ScryptaBlock, ScryptaParsedTx, ScryptaUnspent } from './constants';
 import { PinoLogger } from 'nestjs-pino';
 import * as Tatum from '@tatumio/tatum';
 export declare class ScryptaBlockchainService {
     protected scrypta: any;
     protected testnet: boolean;
-    protected currency: 'LYRA';
+    protected currency: Tatum.Currency;
     protected readonly logger: PinoLogger;
     constructor(testnet?: boolean, nodes?: Array<string>, debug?: boolean);
     getNetwork(): {
@@ -36,9 +36,9 @@ export declare class ScryptaBlockchainService {
     generateAddressPrivateKey(derivationIndex: number, mnemonic: string, testnet?: boolean): Promise<{
         key: string;
     }>;
-    getTransactionsByAddress(address: string, pagination?: object, testnet?: boolean): Promise<Array<ScryptaTx>>;
+    getTransactionsByAddress(address: string, pagination?: object, testnet?: boolean): Promise<Array<ScryptaParsedTx>>;
     getUnspentsByAddress(address: string, pagination?: object, testnet?: boolean): Promise<Array<ScryptaUnspent>>;
-    getUTXO(hash: string, index: number, testnet?: boolean): Promise<ScryptaTx>;
+    getUTXO(hash: string, index: number, testnet?: boolean): Promise<ScryptaUnspent>;
     getRawTransaction(txHash: string, testnet?: boolean): Promise<any>;
     broadcast(txData: string, testnet?: boolean): Promise<{
         txId: string;

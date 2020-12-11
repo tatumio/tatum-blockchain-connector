@@ -35,6 +35,7 @@ const error_1 = require("./error");
 const Tatum = __importStar(require("@tatumio/tatum"));
 class ScryptaBlockchainService {
     constructor(testnet = false, nodes, debug) {
+        this.currency = Tatum.Currency.LYRA;
         this.scrypta = new ScryptaCore;
         this.testnet = testnet;
         this.scrypta.staticnodes = true;
@@ -114,11 +115,11 @@ class ScryptaBlockchainService {
             try {
                 let block = yield this.scrypta.get('/rawblock/' + hash);
                 response({
-                    hash: block.hash,
-                    height: block.height,
-                    confirmations: block.confirmations,
-                    time: block.time,
-                    txs: block.txs
+                    hash: block.data.hash,
+                    height: block.data.height,
+                    confirmations: block.data.confirmations,
+                    time: block.data.time,
+                    txs: block.data.txs
                 });
             }
             catch (e) {
@@ -136,7 +137,7 @@ class ScryptaBlockchainService {
                 testnet = this.testnet;
             }
             try {
-                let address = yield Tatum.generateAddressFromXPub(Tatum.Currency[this.currency], testnet, xpub, derivationIndex);
+                let address = yield Tatum.generateAddressFromXPub(this.currency, testnet, xpub, derivationIndex);
                 return address;
             }
             catch (e) {
@@ -153,7 +154,7 @@ class ScryptaBlockchainService {
             else {
                 testnet = this.testnet;
             }
-            const lyraWallet = yield Tatum.generateWallet(Tatum.Currency[this.currency], testnet, mnem);
+            const lyraWallet = yield Tatum.generateWallet(this.currency, testnet, mnem);
             return lyraWallet;
         });
     }
@@ -166,7 +167,7 @@ class ScryptaBlockchainService {
                 testnet = this.testnet;
             }
             try {
-                let privateKey = yield Tatum.generatePrivateKeyFromMnemonic(Tatum.Currency[this.currency], testnet, mnemonic, derivationIndex);
+                let privateKey = yield Tatum.generatePrivateKeyFromMnemonic(this.currency, testnet, mnemonic, derivationIndex);
                 return { key: privateKey };
             }
             catch (e) {
@@ -186,7 +187,20 @@ class ScryptaBlockchainService {
                 }
                 try {
                     let transactions = yield this.scrypta.get('/transactions/' + address);
-                    response(transactions.data);
+                    let parsed = [];
+                    for (let k in transactions.data) {
+                        let tx = transactions.data[k];
+                        parsed.push({
+                            hash: tx.txid,
+                            from: tx.from,
+                            to: tx.to,
+                            value: tx.value,
+                            time: tx.time,
+                            type: tx.type,
+                            blockhash: tx.blockhash
+                        });
+                    }
+                    response(parsed);
                 }
                 catch (e) {
                     this.logger.error(e);
@@ -214,7 +228,8 @@ class ScryptaBlockchainService {
                             vout: utxo.vout,
                             amount: utxo.amount,
                             scriptPubKey: utxo.scriptPubKey,
-                            block: utxo.block
+                            block: utxo.block,
+                            redeemed: utxo.redeemed
                         });
                     }
                     response(parsed);
@@ -236,11 +251,18 @@ class ScryptaBlockchainService {
                     testnet = this.testnet;
                 }
                 try {
-                    let unspent = yield this.scrypta.get('/utxo/' + hash + '/' + index);
-                    if (unspent === false) {
+                    let utxo = yield this.scrypta.get('/utxo/' + hash + '/' + index);
+                    if (utxo === false) {
                         throw new error_1.TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');
                     }
-                    response(unspent);
+                    response({
+                        txid: utxo.txid,
+                        vout: utxo.vout,
+                        amount: utxo.amount,
+                        scriptPubKey: utxo.scriptPubKey,
+                        block: utxo.block,
+                        redeemed: utxo.redeemed
+                    });
                 }
                 catch (e) {
                     this.logger.error(e);
