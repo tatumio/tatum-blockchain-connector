@@ -1,6 +1,5 @@
 const ScryptaCore = require('@scrypta/core');
 import { LYRA_NETWORK, LYRA_TEST_NETWORK, ScryptaBlock, ScryptaParsedTx, ScryptaUnspent } from './constants';
-import { TatumError } from './error'
 import { PinoLogger } from 'nestjs-pino';
 import * as Tatum from '@tatumio/tatum'
 
@@ -53,7 +52,7 @@ export class ScryptaBlockchainService {
       return info;
     } catch (e) {
       this.logger.error(e);
-      throw new TatumError(`${e.message} Code: ${e.code}`, `blockchain.error.code`);
+      throw new Error(`${e.message} Code: ${e.code}`);
     }
   }
 
@@ -74,7 +73,7 @@ export class ScryptaBlockchainService {
         response(info.blocks);
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError(`${e.message}`, `blockchain.error.code`);
+        throw new Error(`${e.message}`);
       }
     })
   }
@@ -96,7 +95,7 @@ export class ScryptaBlockchainService {
         response(block.hash)
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError(`${e.message}`, `blockchain.error.code`);
+        throw new Error(`${e.message}`);
       }
     })
   }
@@ -124,7 +123,7 @@ export class ScryptaBlockchainService {
         })
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError(`${e.message}`, `blockchain.error.code`);
+        throw new Error(`${e.message}`);
       }
     })
   }
@@ -149,7 +148,7 @@ export class ScryptaBlockchainService {
       return address
     } catch (e) {
       this.logger.error(e);
-      throw new TatumError('Unable to generate address, wrong xpub and account type.', 'address.generation.failed.wrong.xpub');
+      throw new Error('Unable to generate address, wrong xpub and account type.');
     }
   }
 
@@ -174,7 +173,7 @@ export class ScryptaBlockchainService {
       return { key: privateKey }
     } catch (e) {
       this.logger.error(e);
-      throw new TatumError('Unable to generate address, wrong mnemonic and index.', 'key.generation.failed.wrong.mnemonic');
+      throw new Error('Unable to generate address, wrong mnemonic and index.');
     }
   }
 
@@ -213,7 +212,7 @@ export class ScryptaBlockchainService {
         response(parsed)
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError(`${e.message}`, `blockchain.error.code`);
+        throw new Error(`${e.message}`);
       }
     })
   }
@@ -249,7 +248,7 @@ export class ScryptaBlockchainService {
         response(parsed)
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError(`${e.message}`, `blockchain.error.code`);
+        throw new Error(`${e.message}`);
       }
     })
   }
@@ -269,7 +268,7 @@ export class ScryptaBlockchainService {
       try {
         let utxo = await this.scrypta.get('/utxo/' + hash + '/' + index)
         if (utxo === false) {
-          throw new TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');
+          throw new Error('No such UTXO for transaction and index.');
         }
         response({
           txid: utxo.txid,
@@ -281,7 +280,7 @@ export class ScryptaBlockchainService {
         });
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError('No such UTXO for transaction and index.', 'tx.hash.index.spent');
+        throw new Error('No such UTXO for transaction and index.');
       }
     })
   }
@@ -301,12 +300,12 @@ export class ScryptaBlockchainService {
       try {
         let rawtx = await this.scrypta.get('/rawtransaction/' + txHash)
         if (rawtx === false) {
-          throw new TatumError('No such transaction.', 'tx.hash');
+          throw new Error('No such transaction.');
         }
         response(rawtx)
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError('No such transaction.', 'tx.hash');
+        throw new Error('No such transaction.');
       }
     })
   }
@@ -326,14 +325,14 @@ export class ScryptaBlockchainService {
       try {
         let sendrawtransaction = await this.scrypta.post('/sendrawtransaction', { rawtransaction: txData })
         if (sendrawtransaction.data === null) {
-          throw new TatumError('Transaction not accepted by network.', 'tx.broadcast');
+          throw new Error('Transaction not accepted by network.');
         } else {
           let txid = <string>sendrawtransaction['data']
           response({ txId: txid, failed: false })
         }
       } catch (e) {
         this.logger.error(e);
-        throw new TatumError('Can\'t send transaction.', 'tx.broadcast');
+        throw new Error('Can\'t send transaction.');
       }
 
     })
