@@ -41,6 +41,7 @@ RUN rm lyra-2.0.1-linux-server.zip
 # BLOCKCHAIN BOOTSTRAP SCRIPT
 WORKDIR /opt
 RUN echo "#!/bin/bash" > bootstrap_blockchain.sh
+RUN echo "touch /opt/scrypta-idanodejs/.BOOTSTRAPPING" >> bootstrap_blockchain.sh
 RUN echo "pkill lyrad" >> bootstrap_blockchain.sh
 RUN echo "cd /opt/data/lyra" >> bootstrap_blockchain.sh
 RUN echo "wget https://bs.scryptachain.org/latest.zip" >> bootstrap_blockchain.sh
@@ -48,11 +49,13 @@ RUN echo "pkill lyrad" >> bootstrap_blockchain.sh
 RUN echo "rm- -rf blocks chainstate database" >> bootstrap_blockchain.sh
 RUN echo "unzip -o latest.zip" >> bootstrap_blockchain.sh
 RUN echo "lyrad -datadir=/opt/data/lyra &" >> bootstrap_blockchain.sh
+RUN echo "rm /opt/scrypta-idanodejs/.BOOTSTRAPPING" >> bootstrap_blockchain.sh
 
 # IDANODE BOOTSTRAP SCRIPT
 WORKDIR /opt
 RUN echo "#!/bin/bash" > bootstrap_idanode.sh
 RUN echo "lyra-cli stop" >> bootstrap_idanode.sh
+RUN echo "touch /opt/scrypta-idanodejs/.BOOTSTRAPPING" >> bootstrap_blockchain.sh
 RUN echo "rm idanode_bootstrap.gz" >> bootstrap_idanode.sh
 RUN echo "wget https://sfo2.digitaloceanspaces.com/scrypta/idanode_bootstrap.gz" >> bootstrap_idanode.sh
 RUN echo "lyra-cli stop" >> bootstrap_blockchain.sh
@@ -65,6 +68,7 @@ RUN echo "mongorestore --db idanodejs --drop idanodejs" >> bootstrap_idanode.sh
 RUN echo "sleep 20s" >> bootstrap_idanode.sh
 RUN echo "rm -rf idanodejs" >> bootstrap_idanode.sh
 RUN echo "lyrad -datadir=/opt/data/lyra &" >> bootstrap_idanode.sh
+RUN echo "rm /opt/scrypta-idanodejs/.BOOTSTRAPPING" >> bootstrap_blockchain.sh
 RUN chmod 777 bootstrap_idanode.sh
 
 WORKDIR /opt/scrypta-idanodejs
