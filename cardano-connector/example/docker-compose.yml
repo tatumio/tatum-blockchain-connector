@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13.2-alpine
+    environment:
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    ports:
+      - 5432:5432
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: on-failure
+  cardano-node:
+    image: inputoutput/cardano-node:1.25.1
+    environment:
+      - NETWORK=testnet
+    volumes:
+      - node-db:/data
+      - node-ipc:/ipc
+      - node-config:/nix/store
+    restart: on-failure
+  cardano-db-sync:
+    image: inputoutput/cardano-db-sync:8.0.0
+    environment:
+      - NETWORK=testnet
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    secrets:
+      - postgres_password
+      - postgres_user
+      - postgres_db
+    volumes:
+      - db-sync-data:/var/lib/cdbsync
+      - node-ipc:/node-ipc
+    depends_on:
+      - cardano-node
+      - postgres
+    restart: on-failure
+  hasura:
+    image: inputoutput/cardano-graphql-hasura:3.2.0
+    ports:
+      - 8090:8080
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    depends_on:
+      - postgres
+    restart: on-failure
+  cardano-graphql:
+    image: inputoutput/cardano-graphql:3.2.0
+    environment:
+      - NETWORK=testnet
+      - ALLOW_INTROSPECTION=true
+      - CACHE_ENABLED=true
+    ports:
+      - 3100:3100
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    volumes:
+      - node-ipc:/node-ipc
+    restart: on-failure
+  cardano-wallet:
+    image: inputoutput/cardano-wallet:2021.2.15-shelley
+    environment:
+      - NETWORK=testnet
+    ports:
+      - 8000:8090
+    entrypoint: []
+    command: cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0 --testnet /config/0gdqdymj06c31f35xshw1g85bgrbh3wl-testnet-byron-genesis.json
+    volumes:
+      - wallet-db:/wallet-db
+      - node-ipc:/ipc
+      - node-config:/config
+    depends_on:
+      - cardano-node
+    restart: on-failure
+secrets:
+  postgres_db:
+    file: ./secrets/postgres_db
+  postgres_password:
+    file: ./secrets/postgres_password
+  postgres_user:
+    file: ./secrets/postgres_user
+volumes:
+  db-sync-data:
+  node-db:
+  node-ipc:
+  node-config:
+  postgres-data:
+  wallet-db:

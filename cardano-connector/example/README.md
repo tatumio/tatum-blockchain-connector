@@ -1,3 +1,3 @@
 # Setup
 
-1. Setup https://github.com/input-output-hk/cardano-graphql locally, to run required Docker containers.
+1. Run `docker-compsose up` to start the required Cardano containers (testnet).
