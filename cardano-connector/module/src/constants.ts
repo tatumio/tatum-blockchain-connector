@@ -4,3 +4,5 @@ export type CardanoBlockchainInfo = {
   testnet: boolean;
   tip: Block;
 };
+
+export type WalletId = string;

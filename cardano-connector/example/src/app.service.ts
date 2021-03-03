@@ -9,12 +9,19 @@ export class AppService extends CardanoService {
     super(logger);
   }
 
-  protected getNodesUrl(): Promise<string[]> {
-    // https://github.com/input-output-hk/cardano-graphql
-    return Promise.resolve(['http://127.0.0.1:3100']);
-  }
-
   protected isTestnet(): Promise<boolean> {
     return Promise.resolve(true);
+  }
+
+  protected getNodesUrl(): Promise<string[]> {
+    return Promise.resolve(['http://127.0.0.1']);
+  }
+
+  protected getCardanoGraphQLPort(): Promise<number> {
+    return Promise.resolve(3100);
+  }
+
+  protected getCardanoWalletPort(): Promise<number> {
+    return Promise.resolve(8000);
   }
 }

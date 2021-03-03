@@ -1,7 +1,15 @@
-import { Get } from '@nestjs/common';
+import { Get, Post, Body } from '@nestjs/common';
 import { CardanoError } from './CardanoError';
 import { CardanoService } from './CardanoService';
 import { CardanoBlockchainInfo } from './constants';
+import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
+
+function throwError(e) {
+  throw new CardanoError(
+    `Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`,
+    'cardano.error',
+  );
+}
 
 export abstract class CardanoController {
   protected constructor(protected readonly service: CardanoService) {}
@@ -11,12 +19,16 @@ export abstract class CardanoController {
     try {
       return await this.service.getBlockChainInfo();
     } catch (e) {
-      throw new CardanoError(
-        `Unexpected error occurred. Reason: ${
-          e.message || e.response?.data || e
-        }`,
-        'cardano.error',
-      );
+      throwError(e);
+    }
+  }
+
+  @Post('v3/cardano/wallet')
+  async generateWallet(@Body() body: GenerateWalletMnemonic): Promise<string> {
+    try {
+      return await this.service.generateWallet(body);
+    } catch (e) {
+      throwError(e);
     }
   }
 }
