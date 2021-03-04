@@ -1,7 +1,8 @@
+import { Block, Transaction } from '@cardano-graphql/client-ts';
 import { Get, Post, Body, Param } from '@nestjs/common';
 import { CardanoError } from './CardanoError';
 import { CardanoService } from './CardanoService';
-import { CardanoBlockchainInfo, CardanoBlockInfo, CardanoTransactionInfo } from './constants';
+import { CardanoBlockchainInfo } from './constants';
 import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
 
 function throwError(e) {
@@ -32,19 +33,19 @@ export abstract class CardanoController {
     }
   }
 
-  @Get('/v3/cardano/block/info/:hash')
-  async getBlockInfoByHash(@Param('hash') hash): Promise<CardanoBlockInfo> {
+  @Get('/v3/cardano/block/:hash')
+  async getBlockInfoByHash(@Param('hash') hash): Promise<Block> {
     try {
-      return await this.service.getBlockInfoByHash(hash);
+      return await this.service.getBlock(hash);
     } catch (e) {
       throwError(e);
     }
   }
 
-  @Get('/v3/cardano/transaction/info/:hash')
-  async getTransactinInfoByHash(@Param('hash') hash): Promise<CardanoTransactionInfo> {
+  @Get('/v3/cardano/transaction/:hash')
+  async getTransactinInfoByHash(@Param('hash') hash): Promise<Transaction> {
     try {
-      return await this.service.getTransactionInfoByHash(hash);
+      return await this.service.getTransaction(hash);
     } catch (e) {
       throwError(e);
     }

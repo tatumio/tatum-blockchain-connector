@@ -1,11 +1,11 @@
 import { Block, Transaction } from '@cardano-graphql/client-ts';
 import axios from 'axios';
 import { PinoLogger } from 'nestjs-pino';
-import { CardanoBlockchainInfo, WalletId, CardanoBlockInfo, CardanoTransactionInfo } from './constants';
+import { CardanoBlockchainInfo, WalletId } from './constants';
 import { GenerateWalletMnemonic } from './dto/GenerateWalletMnemonic';
 
 export abstract class CardanoService {
-  protected constructor(protected readonly logger: PinoLogger) { }
+  protected constructor(protected readonly logger: PinoLogger) {}
 
   protected abstract isTestnet(): Promise<boolean>;
 
@@ -17,12 +17,17 @@ export abstract class CardanoService {
 
   protected abstract getCardanoWalletUrls(): Promise<string[]>;
 
+  protected abstract getGraphQLEndpoint(): Promise<string>;
+
   public async getBlockChainInfo(): Promise<CardanoBlockchainInfo> {
-    const testnet = await this.isTestnet();
-    const [url] = await this.getNodesUrl();
-    const port = await this.getCardanoGraphQLPort();
+    const [testnet, [url], port, endpoint] = await Promise.all([
+      this.isTestnet(),
+      this.getNodesUrl(),
+      this.getCardanoGraphQLPort(),
+      this.getGraphQLEndpoint(),
+    ])
     const { tip } = (
-      await axios.post(`${url}:${port}/graphql`, {
+      await axios.post(`${url}:${port}/${endpoint}`, {
         query: '{ cardano { tip { number slotNo epoch { number } }} }',
       })
     ).data.data.cardano;
@@ -38,12 +43,14 @@ export abstract class CardanoService {
     return (await axios.post(`${url}:${port}/v2/wallets`, req)).data.id;
   }
 
-  public async getBlockInfoByHash(hash: string): Promise<CardanoBlockInfo> {
-    const testnet = await this.isTestnet();
-    const [url] = await this.getNodesUrl();
-    const port = await this.getCardanoGraphQLPort();
+  public async getBlock(hash: string): Promise<Block> {
+    const [[url], port, endpoint] = await Promise.all([
+      this.getNodesUrl(),
+      this.getCardanoGraphQLPort(),
+      this.getGraphQLEndpoint(),
+    ])
     const [block] = (
-      await axios.post(`${url}:${port}/graphql`, {
+      await axios.post(`${url}:${port}/${endpoint}`, {
         query: `{ blocks (where: { hash: { _eq: "${hash}" } }) {
           epoch { nonce number }
           epochNo
@@ -66,18 +73,17 @@ export abstract class CardanoService {
         } }`,
       })
     ).data.data.blocks;
-    return {
-      testnet,
-      block,
-    }
+    return block;
   }
 
-  public async getTransactionInfoByHash(hash: string): Promise<CardanoTransactionInfo> {
-    const testnet = await this.isTestnet();
-    const [url] = await this.getNodesUrl();
-    const port = await this.getCardanoGraphQLPort();
+  public async getTransaction(hash: string): Promise<Transaction> {
+    const [[url], port, endpoint] = await Promise.all([
+      this.getNodesUrl(),
+      this.getCardanoGraphQLPort(),
+      this.getGraphQLEndpoint(),
+    ])
     const [transaction] = (
-      await axios.post(`${url}:${port}/graphql`, {
+      await axios.post(`${url}:${port}/${endpoint}`, {
         query: `{ transactions (where: { hash: { _eq: "${hash}" } }) {
           block { hash number }
           blockIndex
@@ -99,9 +105,6 @@ export abstract class CardanoService {
         } }`,
       })
     ).data.data.transactions;
-    return {
-      testnet,
-      transaction,
-    }
+    return transaction;
   }
 }

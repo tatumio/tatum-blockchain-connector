@@ -24,4 +24,8 @@ export class AppService extends CardanoService {
   protected getCardanoWalletPort(): Promise<number> {
     return Promise.resolve(8000);
   }
+
+  protected getGraphQLEndpoint(): Promise<string> {
+    return Promise.resolve('graphql');
+  }
 }
