@@ -24,4 +24,12 @@ export class AppService extends CardanoService {
   protected getCardanoWalletPort(): Promise<number> {
     return Promise.resolve(8000);
   }
+
+  protected async getGraphQLEndpoint(): Promise<string> {
+    const [[url], port] = await Promise.all([
+      this.getNodesUrl(),
+      this.getCardanoGraphQLPort(),
+    ]);
+    return Promise.resolve(`${url}:${port}/graphql`);
+  }
 }
