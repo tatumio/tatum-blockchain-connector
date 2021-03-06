@@ -1,6 +1,6 @@
 import { Block, Transaction, PaymentAddress } from '@cardano-graphql/client-ts';
 import { Get, Post, Body, Param, Query } from '@nestjs/common';
-import * as Tatum from '@tatumio/tatum';
+import { Wallet, AdaUTxo, TransferAda } from '@tatumio/tatum';
 import { CardanoError } from './CardanoError';
 import { CardanoService } from './CardanoService';
 import { CardanoBlockchainInfo } from './constants';
@@ -31,7 +31,7 @@ export abstract class CardanoController {
   @Post('/v3/cardano/wallet')
   async generateWallet(
     @Body() body: GenerateWalletMnemonic,
-  ): Promise<Tatum.Wallet> {
+  ): Promise<Wallet> {
     try {
       return await this.service.generateWallet(body.mnemonic);
     } catch (e) {
@@ -118,9 +118,20 @@ export abstract class CardanoController {
     }
   }
 
+  @Get('/v3/cardano/:address/utxos')
+  async getUTxosByAddress(
+    @Param('address') address: string
+  ): Promise<AdaUTxo[]> {
+    try {
+      return await this.service.getUTxosByAddress(address);
+    } catch (e) {
+      throwError(e);
+    }
+  }
+
   @Post('/v3/cardano/transaction')
   async sendTransaction(
-    @Body() body: Tatum.TransferAda,
+    @Body() body: TransferAda,
   ): Promise<{ txId: string }> {
     try {
       return await this.service.sendTransaction(body);

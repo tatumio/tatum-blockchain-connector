@@ -1,6 +1,7 @@
 import { Block, PaymentAddress, Transaction } from '@cardano-graphql/client-ts';
 import {
   Wallet,
+  AdaUTxo,
   Currency,
   TransferAda,
   generateAdaWallet,
@@ -200,30 +201,29 @@ export abstract class CardanoService {
     return { txId: txId };
   }
 
+  public async getUTxosByAddress(
+    address: string,
+  ): Promise<AdaUTxo[]> {
+    const graphQLUrl = await this.getGraphQLEndpoint();
+    const utxos = (await axios.post(graphQLUrl, {
+      query: `{ utxos (where: {
+        address: {
+          _eq: "${address}"
+        }
+      }) {
+        txHash
+        index
+        value
+      }
+    }`,
+    })).data.data.utxos;
+    return utxos;
+  }
+
   public async sendTransaction(
     body: TransferAda,
   ): Promise<{ txId: string }> {
-    const graphQLUrl = await this.getGraphQLEndpoint();
-    const [
-      { data: { data: { utxos } } },
-      { tip: { slotNo } }
-    ] = await Promise.all([
-      axios.post(graphQLUrl, {
-        query: `{ utxos (where: {
-            address: {
-              _eq: "${body.from}"
-            }
-          }) {
-            txHash
-            index
-            value
-          }
-        }`,
-      }),
-      this.getBlockChainInfo()
-    ]);
-
-    const transaction = await prepareADATransaction(body, utxos, slotNo);
+    const transaction = await prepareADATransaction(body);
     return await this.broadcast(transaction);
   }
 }
