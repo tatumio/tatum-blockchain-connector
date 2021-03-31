@@ -605,7 +605,7 @@ paths:
       summary: Burn Celo ERC20
       tags:
         - Blockchain / Celo
-  /v3/celo/erc20/balance/{address}/{contractAddress}:
+  /v3/celo/account/balance/erc20/{address}/{contractAddress}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get Celo ERC20 Account balance. Returns number of tokens Account holds.</p>"
       operationId: CeloGetBalanceErc20
