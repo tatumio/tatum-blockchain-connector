@@ -1,3 +1,3 @@
-# Celo Connector
+# NFT Connector
 
-Celo is fork of Celo with more then 1000 tps and possibility to pay for transactions in it's own stable coin, cUSD.
+NFT conenctor is used to provide most common NFT features like deploy, mint and trnasfer NFT tokens based on ERC-721 standard.
