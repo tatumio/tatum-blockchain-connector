@@ -15,7 +15,6 @@ import {
 } from '@tatumio/tatum';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
-import {PathChain} from './dto/PathChain';
 import {PathChainTxId} from './dto/PathChainTxId';
 
 export abstract class NftController {
@@ -58,6 +57,9 @@ export abstract class NftController {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
             }
+            if (e.constructor.name === 'NftError') {
+                throw new BadRequestException(e);
+            }
             throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
         }
     }
@@ -69,6 +71,9 @@ export abstract class NftController {
             return await this.service.mintErc721(body);
         } catch (e) {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'NftError') {
                 throw new BadRequestException(e);
             }
             throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
@@ -84,6 +89,9 @@ export abstract class NftController {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
             }
+            if (e.constructor.name === 'NftError') {
+                throw new BadRequestException(e);
+            }
             throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
         }
     }
@@ -97,6 +105,9 @@ export abstract class NftController {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
             }
+            if (e.constructor.name === 'NftError') {
+                throw new BadRequestException(e);
+            }
             throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
         }
     }
@@ -108,6 +119,9 @@ export abstract class NftController {
             return await this.service.deployErc721(body);
         } catch (e) {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'NftError') {
                 throw new BadRequestException(e);
             }
             throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');

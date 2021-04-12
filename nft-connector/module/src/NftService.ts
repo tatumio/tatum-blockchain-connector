@@ -99,6 +99,8 @@ export abstract class NftService {
             case Currency.CELO:
                 txData = await prepareCeloTransferErc721SignedTransaction(testnet, body as CeloTransferErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            default:
+                throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
@@ -121,6 +123,8 @@ export abstract class NftService {
             case Currency.CELO:
                 txData = await prepareCeloMintErc721SignedTransaction(testnet, body as CeloMintErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            default:
+                throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
@@ -143,6 +147,8 @@ export abstract class NftService {
             case Currency.CELO:
                 txData = await prepareCeloMintMultipleErc721SignedTransaction(testnet, body as CeloMintMultipleErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            default:
+                throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
@@ -165,6 +171,8 @@ export abstract class NftService {
             case Currency.CELO:
                 txData = await prepareCeloBurnErc721SignedTransaction(testnet, body as CeloBurnErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            default:
+                throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
@@ -187,6 +195,8 @@ export abstract class NftService {
             case Currency.CELO:
                 txData = await prepareCeloDeployErc721SignedTransaction(testnet, body as CeloDeployErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            default:
+                throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};

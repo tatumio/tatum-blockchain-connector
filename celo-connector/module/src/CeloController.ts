@@ -7,14 +7,10 @@ import {PathXpubI} from './dto/PathXpubI';
 import {
     BroadcastTx,
     BurnCeloErc20,
-    CeloBurnErc721,
+    Currency,
     DeployCeloErc20,
-    CeloDeployErc721,
     MintCeloErc20,
-    CeloMintErc721,
-    CeloMintMultipleErc721,
     TransferCeloOrCeloErc20Token,
-    CeloTransferErc721, Currency,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressI} from './dto/PathAddressContractAddressI';
 import {PathTokenContractAddress} from './dto/PathTokenContractAddress';
@@ -126,6 +122,9 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.transferErc721(req.body);
         } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -137,6 +136,9 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.mintErc721(req.body);
         } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -148,6 +150,9 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.mintMultipleErc721(req.body);
         } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -159,6 +164,9 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.burnErc721(req.body);
         } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
@@ -170,6 +178,9 @@ export abstract class CeloController {
             req.body.chain = Currency.CELO;
             return await this.service.deployErc721(req.body);
         } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
