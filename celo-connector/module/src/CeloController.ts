@@ -1,4 +1,4 @@
-import {Body, Get, HttpCode, HttpStatus, Param, Post, Query} from '@nestjs/common';
+import {Body, Get, HttpCode, HttpStatus, Param, Post, Query, Req} from '@nestjs/common';
 import {CeloService} from './CeloService';
 import {PathAddress} from './dto/PathAddress';
 import {CeloError} from './CeloError';
@@ -7,20 +7,21 @@ import {PathXpubI} from './dto/PathXpubI';
 import {
     BroadcastTx,
     BurnCeloErc20,
-    BurnErc721,
+    CeloBurnErc721,
     DeployCeloErc20,
-    DeployErc721,
+    CeloDeployErc721,
     MintCeloErc20,
-    MintErc721,
-    MintMultipleErc721,
+    CeloMintErc721,
+    CeloMintMultipleErc721,
     TransferCeloOrCeloErc20Token,
-    TransferErc721
+    CeloTransferErc721, Currency,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressI} from './dto/PathAddressContractAddressI';
 import {PathTokenContractAddress} from './dto/PathTokenContractAddress';
 import {PathAddressContractAddress} from './dto/PathAddressContractAddress';
 import {QueryMnemonic} from './dto/QueryMnemonic';
 import {GeneratePrivateKey} from './dto/GeneratePrivateKey';
+import {Request} from 'express';
 
 export abstract class CeloController {
     protected constructor(protected readonly service: CeloService) {
@@ -120,9 +121,10 @@ export abstract class CeloController {
 
     @Post('/v3/celo/erc721/transaction')
     @HttpCode(HttpStatus.OK)
-    public async transactionErc721(@Body() body: TransferErc721) {
+    public async transactionErc721(@Req() req: Request) {
         try {
-            return await this.service.transferErc721(body);
+            req.body.chain = Currency.CELO;
+            return await this.service.transferErc721(req.body);
         } catch (e) {
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
@@ -130,9 +132,10 @@ export abstract class CeloController {
 
     @Post('/v3/celo/erc721/mint')
     @HttpCode(HttpStatus.OK)
-    public async mintErc721(@Body() body: MintErc721) {
+    public async mintErc721(@Req() req: Request) {
         try {
-            return await this.service.mintErc721(body);
+            req.body.chain = Currency.CELO;
+            return await this.service.mintErc721(req.body);
         } catch (e) {
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
@@ -140,9 +143,10 @@ export abstract class CeloController {
 
     @Post('/v3/celo/erc721/mint/batch')
     @HttpCode(HttpStatus.OK)
-    public async mintMultipleErc721(@Body() body: MintMultipleErc721) {
+    public async mintMultipleErc721(@Req() req: Request) {
         try {
-            return await this.service.mintMultipleErc721(body);
+            req.body.chain = Currency.CELO;
+            return await this.service.mintMultipleErc721(req.body);
         } catch (e) {
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
@@ -150,9 +154,10 @@ export abstract class CeloController {
 
     @Post('/v3/celo/erc721/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnErc721(@Body() body: BurnErc721) {
+    public async burnErc721(@Req() req: Request) {
         try {
-            return await this.service.burnErc721(body);
+            req.body.chain = Currency.CELO;
+            return await this.service.burnErc721(req.body);
         } catch (e) {
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
@@ -160,9 +165,10 @@ export abstract class CeloController {
 
     @Post('/v3/celo/erc721/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployErc721(@Body() body: DeployErc721) {
+    public async deployErc721(@Req() req: Request) {
         try {
-            return await this.service.deployErc721(body);
+            req.body.chain = Currency.CELO;
+            return await this.service.deployErc721(req.body);
         } catch (e) {
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }

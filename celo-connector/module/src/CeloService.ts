@@ -4,16 +4,16 @@ import {CeloProvider} from '@celo-tools/celo-ethers-wrapper';
 import {CeloError} from './CeloError';
 import {
     BurnCeloErc20,
-    BurnErc721,
+    CeloBurnErc721,
     Currency,
     DeployCeloErc20,
-    DeployErc721,
+    CeloDeployErc721,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
     generateWallet,
     MintCeloErc20,
-    MintErc721,
-    MintMultipleErc721,
+    CeloMintErc721,
+    CeloMintMultipleErc721,
     prepareCeloBurnErc721SignedTransaction,
     prepareCeloDeployErc721SignedTransaction,
     prepareCeloMintErc721SignedTransaction,
@@ -26,7 +26,7 @@ import {
     prepareCeloTransferErc20SignedTransaction,
     TransactionHash,
     TransferCeloOrCeloErc20Token,
-    TransferErc721
+    CeloTransferErc721
 } from '@tatumio/tatum';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
 import token_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
@@ -228,7 +228,7 @@ export abstract class CeloService {
         }
     }
 
-    public async transferErc721(body: TransferErc721): Promise<TransactionHash | { signatureId: string }> {
+    public async transferErc721(body: CeloTransferErc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloTransferErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
@@ -238,7 +238,7 @@ export abstract class CeloService {
         }
     }
 
-    public async mintErc721(body: MintErc721): Promise<TransactionHash | { signatureId: string }> {
+    public async mintErc721(body: CeloMintErc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloMintErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
@@ -248,7 +248,7 @@ export abstract class CeloService {
         }
     }
 
-    public async mintMultipleErc721(body: MintMultipleErc721): Promise<TransactionHash | { signatureId: string }> {
+    public async mintMultipleErc721(body: CeloMintMultipleErc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloMintMultipleErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
@@ -258,7 +258,7 @@ export abstract class CeloService {
         }
     }
 
-    public async burnErc721(body: BurnErc721): Promise<TransactionHash | { signatureId: string }> {
+    public async burnErc721(body: CeloBurnErc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloBurnErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
@@ -268,7 +268,7 @@ export abstract class CeloService {
         }
     }
 
-    public async deployErc721(body: DeployErc721): Promise<TransactionHash | { signatureId: string }> {
+    public async deployErc721(body: CeloDeployErc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloDeployErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
