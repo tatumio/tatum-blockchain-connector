@@ -27,6 +27,7 @@ export class AppService extends NftService {
     txData: string,
     currency: string,
     signatureId: string[],
+    index: number,
   ): Promise<string> {
     return Promise.resolve(txData);
   }

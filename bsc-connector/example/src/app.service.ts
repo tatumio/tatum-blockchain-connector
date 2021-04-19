@@ -9,9 +9,7 @@ export class AppService extends BscService {
     super(logger);
   }
   protected getNodesUrl(testnet: boolean): Promise<string[]> {
-    return Promise.resolve([
-      'https://data-seed-prebsc-1-s1.binance.org:8545/',
-    ]);
+    return Promise.resolve(['https://data-seed-prebsc-1-s1.binance.org:8545/']);
   }
 
   protected isTestnet(): Promise<boolean> {
@@ -22,6 +20,7 @@ export class AppService extends BscService {
     txData: string,
     currency: string,
     signatureId: string[],
+    index: number,
   ): Promise<string> {
     this.logger.info(txData);
     return txData;

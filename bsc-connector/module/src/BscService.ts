@@ -79,7 +79,7 @@ export abstract class BscService {
 
     protected abstract getNodesUrl(testnet: boolean): Promise<string[]>
 
-    protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string>;
+    protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[], index?: number): Promise<string>;
 
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
@@ -175,10 +175,14 @@ export abstract class BscService {
         }
     }
 
-    private async broadcastOrStoreKMSTransaction({transactionData, signatureId}: BroadcastOrStoreKMSTransaction) {
+    private async broadcastOrStoreKMSTransaction({
+                                                     transactionData,
+                                                     signatureId,
+                                                     index
+                                                 }: BroadcastOrStoreKMSTransaction) {
         if (signatureId) {
             return {
-                signatureId: await this.storeKMSTransaction(transactionData, Currency.BSC, [signatureId]),
+                signatureId: await this.storeKMSTransaction(transactionData, Currency.BSC, [signatureId], index),
             };
         }
         return this.broadcast(transactionData);
@@ -230,12 +234,18 @@ export abstract class BscService {
 
     public async sendBscOrBep20Transaction(transfer: TransferBscBep20): Promise<TransactionHash | SignatureId> {
         const transactionData = await prepareBscOrBep20SignedTransaction(transfer, await this.getFirstNodeUrl(await this.isTestnet()));
-        return this.broadcastOrStoreKMSTransaction({transactionData, signatureId: transfer.signatureId});
+        return this.broadcastOrStoreKMSTransaction({
+            transactionData, signatureId: transfer.signatureId,
+            index: transfer.index
+        });
     }
 
     public async sendCustomBep20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionHash | SignatureId> {
         const transactionData = await prepareCustomBep20SignedTransaction(transferCustomErc20, await this.getFirstNodeUrl(await this.isTestnet()));
-        return this.broadcastOrStoreKMSTransaction({transactionData, signatureId: transferCustomErc20.signatureId});
+        return this.broadcastOrStoreKMSTransaction({
+            transactionData, signatureId: transferCustomErc20.signatureId,
+            index: transferCustomErc20.index
+        });
     }
 
     public async getTransactionCount(address: string) {
@@ -252,12 +262,16 @@ export abstract class BscService {
         const transactionData = await prepareBscSmartContractWriteMethodInvocation(smartContractMethodInvocation, node);
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
-            signatureId: smartContractMethodInvocation.signatureId
+            signatureId: smartContractMethodInvocation.signatureId,
+            index: smartContractMethodInvocation.index
         });
     }
 
     public async deployBep20(deploy: DeployEthErc20) {
         const transactionData = await prepareDeployBep20SignedTransaction(deploy, await this.getFirstNodeUrl(await this.isTestnet()));
-        return this.broadcastOrStoreKMSTransaction({transactionData, signatureId: deploy.signatureId});
+        return this.broadcastOrStoreKMSTransaction({
+            transactionData, signatureId: deploy.signatureId,
+            index: deploy.index
+        });
     }
 }

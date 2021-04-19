@@ -28,6 +28,7 @@ export class AppService extends CeloService {
     txData: string,
     currency: string,
     signatureId: string[],
+    index: number,
   ): Promise<string> {
     return Promise.resolve(txData);
   }

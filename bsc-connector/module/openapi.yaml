@@ -1235,6 +1235,10 @@ components:
           maximum: 30
           minimum: 1
           type: number
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1348,6 +1352,10 @@ components:
           items:
             type: object
           description: Parameters of the method to be invoked.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1531,6 +1539,10 @@ components:
           example: "100000"
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1645,6 +1657,10 @@ components:
           minLength: 42
           example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36

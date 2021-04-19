@@ -38,7 +38,7 @@ export abstract class NftService {
     protected constructor(protected readonly logger: PinoLogger) {
     }
 
-    protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string>;
+    protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[], index?: number): Promise<string>;
 
     protected abstract isTestnet(): Promise<boolean>;
 
@@ -103,7 +103,7 @@ export abstract class NftService {
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -127,7 +127,7 @@ export abstract class NftService {
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -151,7 +151,7 @@ export abstract class NftService {
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -175,7 +175,7 @@ export abstract class NftService {
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -199,7 +199,7 @@ export abstract class NftService {
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }

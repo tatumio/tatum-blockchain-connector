@@ -40,7 +40,7 @@ export abstract class CeloService {
     protected constructor(protected readonly logger: PinoLogger) {
     }
 
-    protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string>;
+    protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[], index?: number): Promise<string>;
 
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
@@ -112,7 +112,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloOrCUsdSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -122,7 +122,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloTransferErc20SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -132,7 +132,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloMintErc20SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -142,7 +142,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloBurnErc20SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -152,7 +152,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloDeployErc20SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -232,7 +232,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloTransferErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -242,7 +242,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloMintErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -252,7 +252,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloMintMultipleErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -262,7 +262,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloBurnErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }
@@ -272,7 +272,7 @@ export abstract class CeloService {
         const testnet = await this.isTestnet();
         const txData = await prepareCeloDeployErc721SignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId])};
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
         } else {
             return this.broadcast(txData);
         }

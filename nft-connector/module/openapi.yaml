@@ -175,7 +175,9 @@ paths:
           application/json:
             schema:
               oneOf:
+                - $ref: "#/components/schemas/TransferNft"
                 - $ref: "#/components/schemas/TransferNftCelo"
+                - $ref: "#/components/schemas/TransferNftKMS"
                 - $ref: "#/components/schemas/TransferNftKMSCelo"
         required: true
       responses:
@@ -330,8 +332,8 @@ paths:
           schema:
             type: string
             enum:
-              - CELO
               - ETH
+              - CELO
               - BSC
         - description: "Transaction hash"
           in: path
@@ -380,8 +382,8 @@ paths:
           schema:
             type: string
             enum:
-              - CELO
               - ETH
+              - CELO
               - BSC
         - description: "Account address"
           in: path
@@ -438,8 +440,8 @@ paths:
           schema:
             type: string
             enum:
-              - CELO
               - ETH
+              - CELO
               - BSC
         - description: "Token ID"
           in: path
@@ -671,6 +673,10 @@ components:
           maxLength: 30
           minLength: 1
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -731,6 +737,10 @@ components:
           description: Address of ERC721 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -818,6 +828,10 @@ components:
           description: Address of ERC721 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -867,6 +881,10 @@ components:
           description: Address of ERC721 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -977,6 +995,10 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1138,6 +1160,10 @@ components:
           maxLength: 30
           minLength: 1
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1198,6 +1224,10 @@ components:
           description: Address of ERC721 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1264,6 +1294,10 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1331,6 +1365,10 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1476,6 +1514,10 @@ components:
           description: Address of ERC721 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
@@ -1587,6 +1629,10 @@ components:
           description: Address of ERC721 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         signatureId:
           type: string
           minLength: 36
