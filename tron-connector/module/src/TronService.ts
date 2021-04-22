@@ -56,6 +56,8 @@ export abstract class TronService {
 
     protected abstract getApiKey(): string;
 
+    protected abstract getScanningApiKey(): string;
+
     protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string>;
 
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
@@ -78,19 +80,36 @@ export abstract class TronService {
     }
 
     public async getBlockChainInfo(testnet?: boolean): Promise<{ testnet: boolean, hash: string, blockNumber: number }> {
-        const t = testnet !== undefined ? testnet : await this.isTestnet();
+        let t: boolean;
+        let apiKey: string;
+        if (testnet !== undefined) {
+            t = testnet;
+            apiKey = this.getScanningApiKey();
+        } else {
+            t = await this.isTestnet();
+            apiKey = this.getApiKey();
+        }
         const urls = await this.getNodesUrl(t);
-        const block = (await axios.post(urls[0] + '/wallet/getnowblock', undefined, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
+        const block = (await axios.post(urls[0] + '/wallet/getnowblock', undefined, {headers: {'TRON-PRO-API-KEY': apiKey}})).data;
         return {testnet: t, hash: block.blockID, blockNumber: block.block_header.raw_data.number};
     }
 
     public async getBlock(hashOrHeight: string, testnet?: boolean): Promise<TronBlock> {
-        const url = (await this.getNodesUrl(testnet !== undefined ? testnet : await this.isTestnet()))[0];
+        let t: boolean;
+        let apiKey: string;
+        if (testnet !== undefined) {
+            t = testnet;
+            apiKey = this.getScanningApiKey();
+        } else {
+            t = await this.isTestnet();
+            apiKey = this.getApiKey();
+        }
+        const url = (await this.getNodesUrl(t))[0];
         let block;
         if (hashOrHeight.length > 32) {
-            block = (await axios.post(`${url}/wallet/getblockbyid`, {value: hashOrHeight}, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
+            block = (await axios.post(`${url}/wallet/getblockbyid`, {value: hashOrHeight}, {headers: {'TRON-PRO-API-KEY': apiKey}})).data;
         } else {
-            block = (await axios.post(`${url}/wallet/getblockbynum`, {num: parseInt(hashOrHeight)}, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
+            block = (await axios.post(`${url}/wallet/getblockbynum`, {num: parseInt(hashOrHeight)}, {headers: {'TRON-PRO-API-KEY': apiKey}})).data;
         }
         return {
             blockNumber: block.block_header.raw_data.number,
@@ -105,8 +124,16 @@ export abstract class TronService {
 
     public async getTransaction(txId: string, testnet?: boolean): Promise<TronTransaction> {
         const url = (await this.getNodesUrl(testnet !== undefined ? testnet : await this.isTestnet()))[0];
-        const [{data: tx}, {data: info}] = await Promise.all([axios.post(`${url}/wallet/gettransactionbyid`, {value: txId}, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}}),
-            axios.post(`${url}/wallet/gettransactioninfobyid`, {value: txId}, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})]);
+        let apiKey1, apiKey2: string;
+        if (testnet !== undefined) {
+            apiKey1 = this.getScanningApiKey();
+            apiKey2 = this.getScanningApiKey();
+        } else {
+            apiKey1 = this.getApiKey();
+            apiKey2 = this.getApiKey();
+        }
+        const [{data: tx}, {data: info}] = await Promise.all([axios.post(`${url}/wallet/gettransactionbyid`, {value: txId}, {headers: {'TRON-PRO-API-KEY': apiKey1}}),
+            axios.post(`${url}/wallet/gettransactioninfobyid`, {value: txId}, {headers: {'TRON-PRO-API-KEY': apiKey2}})]);
         return TronService.mapTransaction({...tx, ...info.receipt, blockNumber: info.blockNumber});
     }
 

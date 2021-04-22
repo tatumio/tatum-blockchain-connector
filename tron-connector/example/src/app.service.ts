@@ -16,6 +16,10 @@ export class AppService extends TronService {
     return '25f66928-0b70-48cd-9ac6-da6f8247c663';
   }
 
+  protected getScanningApiKey() {
+    return '25f66928-0b70-48cd-9ac6-da6f8247c663';
+  }
+
   protected isTestnet(): Promise<boolean> {
     return Promise.resolve(true);
   }
