@@ -1,0 +1,265 @@
+version: '3.8'
+
+volumes:
+  node_data:
+  client_data:
+
+services:
+  node:
+    image: tezos/tezos:master
+    hostname: node
+    command: tezos-node --net-addr :9732 --network edo2net
+    ports:
+      - 9732:9732
+      - 5001:8732
+    expose:
+      - 8732
+    volumes:
+      - node_data:/var/run/tezos/node
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  upgrader:
+    image: tezos/tezos:master
+    hostname: node
+    command: tezos-upgrade-storage
+    volumes:
+      - node_data:/var/run/tezos/node
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  taas-graphql:
+    image: tezoslive/taas-graphql
+    hostname: taas-graphql
+    environment:
+      - PORT=3100
+      - TEZOS_NODE=http://node:8732
+      - GRAPHQL_ENABLE_PLAYGROUND=true
+      - GRAPHQL_ENABLE_INTROSPECTION=true
+    ports:
+      - 3100:3100
+    expose:
+      - 3100
+    restart: on-failure
+
+  baker-008-PtEdo2Zk:
+    image: tezos/tezos:master
+    hostname: baker-008-PtEdo2Zk
+    environment:
+      - PROTOCOL=008-PtEdo2Zk
+    command: tezos-baker --max-priority 128
+    links:
+      - node
+    volumes:
+      - node_data:/var/run/tezos/node:ro
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  endorser-008-PtEdo2Zk:
+    image: tezos/tezos:master
+    hostname: endorser-008-PtEdo2Zk
+    environment:
+      - PROTOCOL=008-PtEdo2Zk
+    command: tezos-endorser
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  accuser-008-PtEdo2Zk:
+    image: tezos/tezos:master
+    hostname: accuser-008-PtEdo2Zk
+    environment:
+      - PROTOCOL=008-PtEdo2Zk
+    command: tezos-accuser
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  baker-008-PtEdo2Zk-test:
+    image: tezos/tezos:master
+    hostname: baker-008-PtEdo2Zk-test
+    environment:
+      - PROTOCOL=008-PtEdo2Zk
+    command: tezos-baker-test --max-priority 128
+    links:
+      - node
+    volumes:
+      - node_data:/var/run/tezos/node:ro
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  endorser-008-PtEdo2Zk-test:
+    image: tezos/tezos:master
+    hostname: endorser-008-PtEdo2Zk-test
+    environment:
+      - PROTOCOL=008-PtEdo2Zk
+    command: tezos-endorser-test
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  accuser-008-PtEdo2Zk-test:
+    image: tezos/tezos:master
+    hostname: accuser-008-PtEdo2Zk-test
+    environment:
+      - PROTOCOL=008-PtEdo2Zk
+    command: tezos-accuser-test
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  baker-009-PsFLoren:
+    image: tezos/tezos:master
+    hostname: baker-009-PsFLoren
+    environment:
+      - PROTOCOL=009-PsFLoren
+    command: tezos-baker --max-priority 128
+    links:
+      - node
+    volumes:
+      - node_data:/var/run/tezos/node:ro
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  endorser-009-PsFLoren:
+    image: tezos/tezos:master
+    hostname: endorser-009-PsFLoren
+    environment:
+      - PROTOCOL=009-PsFLoren
+    command: tezos-endorser
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  accuser-009-PsFLoren:
+    image: tezos/tezos:master
+    hostname: accuser-009-PsFLoren
+    environment:
+      - PROTOCOL=009-PsFLoren
+    command: tezos-accuser
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  baker-009-PsFLoren-test:
+    image: tezos/tezos:master
+    hostname: baker-009-PsFLoren-test
+    environment:
+      - PROTOCOL=009-PsFLoren
+    command: tezos-baker-test --max-priority 128
+    links:
+      - node
+    volumes:
+      - node_data:/var/run/tezos/node:ro
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  endorser-009-PsFLoren-test:
+    image: tezos/tezos:master
+    hostname: endorser-009-PsFLoren-test
+    environment:
+      - PROTOCOL=009-PsFLoren
+    command: tezos-endorser-test
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  accuser-009-PsFLoren-test:
+    image: tezos/tezos:master
+    hostname: accuser-009-PsFLoren-test
+    environment:
+      - PROTOCOL=009-PsFLoren
+    command: tezos-accuser-test
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  baker-alpha:
+    image: tezos/tezos:master
+    hostname: baker-alpha
+    environment:
+      - PROTOCOL=alpha
+    command: tezos-baker --max-priority 128
+    links:
+      - node
+    volumes:
+      - node_data:/var/run/tezos/node:ro
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  endorser-alpha:
+    image: tezos/tezos:master
+    hostname: endorser-alpha
+    environment:
+      - PROTOCOL=alpha
+    command: tezos-endorser
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  accuser-alpha:
+    image: tezos/tezos:master
+    hostname: accuser-alpha
+    environment:
+      - PROTOCOL=alpha
+    command: tezos-accuser
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  baker-alpha-test:
+    image: tezos/tezos:master
+    hostname: baker-alpha-test
+    environment:
+      - PROTOCOL=alpha
+    command: tezos-baker-test --max-priority 128
+    links:
+      - node
+    volumes:
+      - node_data:/var/run/tezos/node:ro
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  endorser-alpha-test:
+    image: tezos/tezos:master
+    hostname: endorser-alpha-test
+    environment:
+      - PROTOCOL=alpha
+    command: tezos-endorser-test
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
+
+  accuser-alpha-test:
+    image: tezos/tezos:master
+    hostname: accuser-alpha-test
+    environment:
+      - PROTOCOL=alpha
+    command: tezos-accuser-test
+    links:
+      - node
+    volumes:
+      - client_data:/var/run/tezos/client
+    restart: on-failure
