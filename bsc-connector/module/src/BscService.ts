@@ -62,6 +62,7 @@ export abstract class BscService {
             value: new BigNumber(tx.value).toString(),
             gasUsed: new BigNumber(tx.gasUsed).toString(),
             cumulativeGasUsed: new BigNumber(tx.cumulativeGasUsed).toString(),
+            transactionHash: tx.hash,
             status: parseInt(tx.status || '1', 16),
             logs: (tx.logs || []).map(l => ({
                 ...l,
@@ -91,7 +92,7 @@ export abstract class BscService {
         return nodes[0];
     }
 
-    private async getClient(testnet: boolean): Promise<Web3> {
+    public async getClient(testnet: boolean): Promise<Web3> {
         return new Web3(await this.getFirstNodeUrl(testnet));
     }
 
