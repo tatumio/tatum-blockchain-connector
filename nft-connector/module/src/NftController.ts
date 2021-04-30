@@ -1,4 +1,4 @@
-import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post} from '@nestjs/common';
+import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Put} from '@nestjs/common';
 import {NftService} from './NftService';
 import {NftError} from './NftError';
 import {
@@ -16,6 +16,8 @@ import {
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
 import {PathChainTxId} from './dto/PathChainTxId';
+import {UpdateCashbackErc721} from '@tatumio/tatum/dist/src/model/request/UpdateCashbackErc721';
+import {CeloUpdateCashbackErc721} from '@tatumio/tatum/dist/src/model/request/CeloUpdateCashbackErc721';
 
 export abstract class NftController {
     protected constructor(protected readonly service: NftService) {
@@ -48,6 +50,15 @@ export abstract class NftController {
         }
     }
 
+    @Get('/v3/nft/royalty/:chain/:contractAddress/:tokenId')
+    public async getRoyaltyErc721(@Param() path: PathTokenIdContractAddressChain) {
+        try {
+            return await this.service.getRoyaltyErc721(path.chain, path.tokenId, path.contractAddress);
+        } catch (e) {
+            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+        }
+    }
+
     @Post('/v3/nft/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc721(@Body() body: CeloTransferErc721 | EthTransferErc721) {
@@ -69,6 +80,22 @@ export abstract class NftController {
     public async mintErc721(@Body() body: CeloMintErc721 | EthMintErc721) {
         try {
             return await this.service.mintErc721(body);
+        } catch (e) {
+            if (['Array', 'NftError', 'ValidationError'].includes(e.constructor.name)) {
+                throw new BadRequestException(e);
+            }
+            if (e.constructor.name === 'TatumError') {
+                throw e;
+            }
+            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+        }
+    }
+
+    @Put('/v3/nft/royalty')
+    @HttpCode(HttpStatus.OK)
+    public async updateRoyaltyErc721(@Body() body: CeloUpdateCashbackErc721 | UpdateCashbackErc721) {
+        try {
+            return await this.service.updateCashbackForAuthor(body);
         } catch (e) {
             if (['Array', 'NftError', 'ValidationError'].includes(e.constructor.name)) {
                 throw new BadRequestException(e);

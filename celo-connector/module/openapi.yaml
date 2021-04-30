@@ -1257,6 +1257,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - contractAddress
@@ -1303,6 +1304,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - contractAddress
@@ -1350,6 +1352,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - url
@@ -1403,6 +1406,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - url
@@ -1446,6 +1450,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - amount
@@ -1493,6 +1498,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - amount
@@ -1547,6 +1553,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - contractAddress
@@ -1607,6 +1614,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - contractAddress
@@ -1644,6 +1652,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - contractAddress
         - feeCurrency
@@ -1684,6 +1693,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - feeCurrency
         - contractAddress
@@ -1719,6 +1729,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - contractAddress
         - feeCurrency
@@ -1759,6 +1770,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - feeCurrency
         - contractAddress
@@ -1788,12 +1800,14 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
         feeCurrency:
           type: string
           description: Currency to pay for transaction gas
           enum:
             - CELO
             - CUSD
+            - CEUR
         amount:
           description: Amount to be sent in Celoer.
           example: "100000"
@@ -1829,6 +1843,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
         to:
           description: Blockchain address to send assets
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -1841,6 +1856,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
         amount:
           description: Amount to be sent in Celoer.
           example: "100000"
@@ -2066,6 +2082,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - name
         - symbol
@@ -2106,6 +2123,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - name
         - symbol
@@ -2161,6 +2179,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - name
         - symbol
@@ -2224,6 +2243,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - name
         - symbol
@@ -2274,6 +2294,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - contractAddress
@@ -2328,6 +2349,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - to
         - contractAddress

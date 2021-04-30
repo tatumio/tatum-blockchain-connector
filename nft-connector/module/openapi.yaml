@@ -320,6 +320,63 @@ paths:
       summary: Burn NFT
       tags:
         - Blockchain / NFT
+  /v3/nft/royalty:
+    put:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Update royalty cashback value for one NFT Token. This method updates the first royalty value of specific author for 1 token.
+        If royalty value is set to 0, it will disable the royalty system for the token. Only from author's address of the royalty can change it's royalty value, not the owner of the token.<br/><br/>
+        Tatum now supports NFT these blockchains:<br/>
+        <ul>
+        <li><b>Ethereum</b></li>
+        <li><b>Celo</b></li>
+        <li><b>Binance Smart Chain</b></li>
+        </ul>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        </p>
+      operationId: NftUpdateCashbackErc721
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorNftCelo"
+                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorNftKMSCelo"
+                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorNft"
+                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorNftKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403Celo"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Update Royalty NFT
+      tags:
+        - Blockchain / NFT
   /v3/nft/transaction/{chain}/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get NFT transaction by transaction hash.</p>"
@@ -488,6 +545,74 @@ paths:
       summary: Get NFT Token Metadata
       tags:
         - Blockchain / NFT
+  /v3/nft/royalty/{chain}/{contractAddress}/{token}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/><p>Get NFT token royalty.</p>"
+      operationId: NftGetRoyaltyErc721
+      parameters:
+        - description: Blockchain to work with
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum:
+              - ETH
+              - CELO
+              - BSC
+        - description: "Token ID"
+          in: path
+          name: token
+          required: true
+          schema:
+            type: string
+            example: "1"
+            maxLength: 32
+        - description: "ERC721 contract address"
+          in: path
+          name: contractAddress
+          required: true
+          schema:
+            type: string
+            example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addresses:
+                    type: array
+                    description: Addresses of the authors where cashback will be paid.
+                    items:
+                      type: string
+                      example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+                  values:
+                    type: array
+                    description: Values of the royalties, which will be paid to the authors with every token transfer. Amount is in native asset of the blockchain.
+                    items:
+                      type: string
+                      example: "0.2"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403Celo"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get NFT Token Royalty information
+      tags:
+        - Blockchain / NFT
 components:
   securitySchemes:
     X-Api-Key:
@@ -502,6 +627,10 @@ components:
     TransferNftCelo:
       type: object
       properties:
+        value:
+          type: string
+          description: If token to be transferred is Royalty NFT token, this is a value to be paid as a cashback to the authors of the token.
+          example: "1"
         chain:
           type: string
           example: CELO
@@ -541,6 +670,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - to
@@ -579,6 +709,26 @@ components:
           items:
             type: string
             maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses for every token, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency CELO.
+          items:
+            type: array
+            items:
+              type: string
+              minLength: 42
+              maxLength: 42
+              description: Blockchain address to send royalties to
+              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values for every token, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: array
+            items:
+              type: string
+              description: Value of the royalty to be paid.
+              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -601,6 +751,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - to
@@ -646,6 +797,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - name
@@ -693,6 +845,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - name
@@ -731,6 +884,26 @@ components:
           items:
             type: string
             maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses for every token, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency CELO.
+          items:
+            type: array
+            items:
+              type: string
+              minLength: 42
+              maxLength: 42
+              description: Blockchain address to send royalties to
+              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values for every token, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: array
+            items:
+              type: string
+              description: Value of the royalty to be paid.
+              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -758,6 +931,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - to
@@ -802,6 +976,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - contractAddress
@@ -849,15 +1024,135 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - feeCurrency
         - contractAddress
         - tokenId
         - signatureId
+    UpdateCashbackValueForAuthorNftCelo:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
+        tokenId:
+          description: ID of token to be updated.
+          example: "100000"
+          type: string
+          maxLength: 32
+        author:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        cashbackValue:
+          type: string
+          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
+          example: "0.1"
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC721 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - chain
+        - contractAddress
+        - feeCurrency
+        - fromPrivateKey
+        - tokenId
+        - author
+        - cashbackValue
+    UpdateCashbackValueForAuthorNftKMSCelo:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
+        tokenId:
+          description: ID of token to be updated.
+          example: "100000"
+          type: string
+          maxLength: 32
+        author:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        cashbackValue:
+          type: string
+          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
+          example: "0.1"
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC721 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - chain
+        - feeCurrency
+        - contractAddress
+        - tokenId
+        - signatureId
+        - author
+        - cashbackValue
     TransferNftKMSCelo:
       type: object
       properties:
+        value:
+          type: string
+          description: If token to be transferred is Royalty NFT token, this is a value to be paid as a cashback to the authors of the token.
+          example: "1"
         chain:
           type: string
           example: CELO
@@ -902,6 +1197,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - to
@@ -940,6 +1236,22 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency CELO.
+          items:
+            type: string
+            minLength: 42
+            maxLength: 42
+            description: Blockchain address to send royalties to
+            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: string
+            description: Value of the royalty to be paid.
+            example: "0.5"
         fromPrivateKey:
           type: string
           maxLength: 66
@@ -956,6 +1268,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - to
@@ -995,6 +1308,22 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency CELO.
+          items:
+            type: string
+            minLength: 42
+            maxLength: 42
+            description: Blockchain address to send royalties to
+            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: string
+            description: Value of the royalty to be paid.
+            example: "0.5"
         index:
           type: number
           minimum: 0
@@ -1016,6 +1345,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - to
@@ -1027,6 +1357,10 @@ components:
     TransferNft:
       type: object
       properties:
+        value:
+          type: string
+          description: If token to be transferred is Royalty NFT token, this is a value to be paid as a cashback to the authors of the token.
+          example: "1"
         chain:
           type: string
           example: ETH
@@ -1200,6 +1534,10 @@ components:
     TransferNftKMS:
       type: object
       properties:
+        value:
+          type: string
+          description: If token to be transferred is Royalty NFT token, this is a value to be paid as a cashback to the authors of the token.
+          example: "1"
         chain:
           type: string
           example: ETH
@@ -1294,6 +1632,22 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency, like BSC or ETH.
+          items:
+            type: string
+            minLength: 42
+            maxLength: 42
+            description: Blockchain address to send royalties to
+            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: string
+            description: Value of the royalty to be paid.
+            example: "0.5"
         index:
           type: number
           minimum: 0
@@ -1365,6 +1719,22 @@ components:
           example: "https://my_token_data.com"
           type: string
           maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency, like BSC or ETH.
+          items:
+            type: string
+            minLength: 42
+            maxLength: 42
+            description: Blockchain address to send royalties to
+            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: string
+            description: Value of the royalty to be paid.
+            example: "0.5"
         index:
           type: number
           minimum: 0
@@ -1436,6 +1806,26 @@ components:
           items:
             type: string
             maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses for every token, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency, ETH or BSC.
+          items:
+            type: array
+            items:
+              type: string
+              minLength: 42
+              maxLength: 42
+              description: Blockchain address to send royalties to
+              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values for every token, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: array
+            items:
+              type: string
+              description: Value of the royalty to be paid.
+              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -1508,6 +1898,26 @@ components:
           items:
             type: string
             maxLength: 256
+        authorAddresses:
+          type: array
+          description: List of addresses for every token, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency, ETH or BSC.
+          items:
+            type: array
+            items:
+              type: string
+              minLength: 42
+              maxLength: 42
+              description: Blockchain address to send royalties to
+              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+        cashbackValues:
+          type: array
+          description: List of values for every token, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          items:
+            type: array
+            items:
+              type: string
+              description: Value of the royalty to be paid.
+              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -1605,6 +2015,145 @@ components:
         - to
         - chain
         - url
+        - contractAddress
+        - fromPrivateKey
+        - tokenId
+    UpdateCashbackValueForAuthorNftKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH
+            - BSC
+        tokenId:
+          description: ID of token to be updated.
+          example: "100000"
+          type: string
+          maxLength: 32
+        author:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        cashbackValue:
+          type: string
+          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
+          example: "0.1"
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC721 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - to
+        - chain
+        - url
+        - contractAddress
+        - tokenId
+        - author
+        - cashbackValue
+        - signatureId
+    UpdateCashbackValueForAuthorNft:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH
+            - BSC
+        tokenId:
+          description: ID of token to be updated.
+          example: "100000"
+          type: string
+          maxLength: 32
+        author:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        cashbackValue:
+          type: string
+          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
+          example: "0.1"
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC721 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - to
+        - chain
+        - url
+        - author
+        - cashbackValue
         - contractAddress
         - fromPrivateKey
         - tokenId
