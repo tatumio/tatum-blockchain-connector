@@ -103,6 +103,15 @@ export abstract class TronController {
         }
     }
 
+    @Get('/v3/tron/transaction/account/:address/trc20')
+    async getTransactions20ByAccount(@Param() path: PathAddress, @Query('next') next?: string) {
+        try {
+            return await this.service.getTrc20TransactionsByAccount(path.address, next);
+        } catch (e) {
+            throw new TronError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'tron.error');
+        }
+    }
+
     @Post('/v3/tron/transaction')
     @HttpCode(HttpStatus.OK)
     async sendTransaction(@Body() body: TransferTron) {

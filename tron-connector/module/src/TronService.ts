@@ -28,6 +28,7 @@ import {
     TronTransaction,
     TronTrc10
 } from '@tatumio/tatum';
+import {Trc20Tx} from './dto/Trc20Tx';
 
 export abstract class TronService {
 
@@ -44,6 +45,17 @@ export abstract class TronService {
             energyUsageTotal: t.energy_usage_total,
             internalTransactions: t.internal_transactions,
             rawData: t.raw_data,
+        };
+    }
+
+    private static mapTransaction20(t: any): Trc20Tx {
+        return {
+            txID: t.transaction_id,
+            tokenInfo: t.token_info,
+            from: t.from,
+            to: t.to,
+            type: t.type,
+            value: t.value,
         };
     }
 
@@ -138,7 +150,7 @@ export abstract class TronService {
     }
 
     public async getAccount(address: string): Promise<TronAccount> {
-        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
+        const url = (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
         const {data} = (await axios.get(`${url}/v1/accounts/${address}`, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (!data?.length) {
             throw new Error('no such account.');
@@ -157,7 +169,7 @@ export abstract class TronService {
     }
 
     public async getTransactionsByAccount(address: string, next?: string): Promise<{ transactions: TronTransaction[], next?: string }> {
-        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
+        const url = (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
         let u = `${url}/v1/accounts/${address}/transactions?limit=200`;
         if (next) {
             u += '&fingerprint=' + next;
@@ -165,6 +177,19 @@ export abstract class TronService {
         const result = (await axios.get(u, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         return {
             transactions: result.data.map(TronService.mapTransaction),
+            next: result.meta?.fingerprint
+        };
+    }
+
+    public async getTrc20TransactionsByAccount(address: string, next?: string): Promise<{ transactions: Trc20Tx[], next?: string }> {
+        const url = (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
+        let u = `${url}/v1/accounts/${address}/transactions/trc20?limit=200`;
+        if (next) {
+            u += '&fingerprint=' + next;
+        }
+        const result = (await axios.get(u, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
+        return {
+            transactions: result.data.map(TronService.mapTransaction20),
             next: result.meta?.fingerprint
         };
     }
