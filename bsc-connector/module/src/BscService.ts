@@ -60,11 +60,11 @@ export abstract class BscService {
             nonce: parseInt(tx.nonce, 16),
             transactionIndex: parseInt(tx.transactionIndex, 16),
             value: new BigNumber(tx.value).toString(),
-            gasUsed: new BigNumber(tx.gasUsed).toString(),
-            cumulativeGasUsed: new BigNumber(tx.cumulativeGasUsed).toString(),
+            gasUsed: tx.gasUsed !== undefined ? new BigNumber(tx.gasUsed).toString() : undefined,
+            cumulativeGasUsed: tx.cumulativeGasUsed !== undefined ? new BigNumber(tx.cumulativeGasUsed).toString() : undefined,
             transactionHash: tx.hash,
-            status: parseInt(tx.status || '1', 16),
-            logs: (tx.logs || []).map(l => ({
+            status: tx.status !== undefined ? parseInt(tx.status, 16) : undefined,
+            logs: tx.logs?.map(l => ({
                 ...l,
                 logIndex: parseInt(l.logIndex, 16),
                 transactionIndex: parseInt(l.transactionIndex, 16),

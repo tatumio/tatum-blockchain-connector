@@ -299,7 +299,7 @@ export abstract class CeloService {
         return {key: await generatePrivateKeyFromMnemonic(Currency.CELO, await this.isTestnet(), mnemonic, index)};
     }
 
-    private async getClient(testnet: boolean) {
+    protected async getClient(testnet: boolean) {
         return new Web3((await this.getNodesUrl(testnet))[0]);
     }
 }
