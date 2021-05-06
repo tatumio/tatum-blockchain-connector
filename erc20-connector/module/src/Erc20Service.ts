@@ -7,10 +7,8 @@ import {
     BurnCeloErc20,
     DeployCeloErc20,
     Currency,
-    // getClient,
     ethBroadcast,
-    BurnEthErc20,
-    DeployEthErc20,
+    DeployErc20,
     MintErc20,
     BurnErc20,
     TransferEthErc20,
@@ -18,7 +16,6 @@ import {
     prepareEthMintErc20SignedTransaction,
     prepareEthOrErc20SignedTransaction,
     prepareEthBurnErc20SignedTransaction,
-    // getBscClient,
     bscBroadcast,
     TransferBscBep20,
     TransferCeloOrCeloErc20Token,
@@ -26,7 +23,6 @@ import {
     prepareMintBep20SignedTransaction,
     prepareBurnBep20SignedTransaction,
     prepareBscOrBep20SignedTransaction,
-    // getCeloClient,
     celoBroadcast,
     prepareCeloBurnErc20SignedTransaction,
     prepareCeloDeployErc20SignedTransaction,
@@ -67,7 +63,7 @@ export abstract class Erc20Service {
         return new Web3((await this.getFirstNodeUrl(chain, testnet)));
       }
       
-      return null
+      throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
     }
 
     protected broadcast(chain: Currency, txData: string, signatureId?: string) {
@@ -133,18 +129,18 @@ export abstract class Erc20Service {
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'] || 0)};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
         } else {
             return this.broadcast(chain, txData);
         }
     }
 
-    public async burnErc20(chain: Currency, body: BurnEthErc20 | BurnCeloErc20): Promise<TransactionHash | { signatureId: string }> {
+    public async burnErc20(chain: Currency, body: BurnErc20 | BurnCeloErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         switch (chain) {
             case Currency.ETH:
-                txData = await prepareEthBurnErc20SignedTransaction(body as BurnEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareEthBurnErc20SignedTransaction(body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareBurnBep20SignedTransaction(body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -159,7 +155,7 @@ export abstract class Erc20Service {
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -185,21 +181,21 @@ export abstract class Erc20Service {
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'] || 0)};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
         } else {
             return this.broadcast(chain, txData);
         }
     }
 
-    public async deployErc20(chain: Currency, body: DeployEthErc20 | DeployCeloErc20 | CreateTronTrc20): Promise<TransactionHash | { signatureId: string }> {
+    public async deployErc20(chain: Currency, body: DeployErc20 | DeployCeloErc20 | CreateTronTrc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         switch (chain) {
             case Currency.ETH:
-                txData = await prepareDeployErc20SignedTransaction(body as DeployEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareDeployErc20SignedTransaction(body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
-                txData = await prepareDeployBep20SignedTransaction(body as DeployEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareDeployBep20SignedTransaction(body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.CELO:
                 txData = await prepareCeloDeployErc20SignedTransaction(testnet, body as DeployCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -215,7 +211,7 @@ export abstract class Erc20Service {
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'] || 0)};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
         } else {
             return this.broadcast(chain, txData);
         }

@@ -2,24 +2,19 @@ import { BadRequestException, Body, Param, Get, Post, HttpCode, HttpStatus } fro
 import { Erc20Service } from './Erc20Service';
 import { Erc20Error } from './Erc20Error';
 import {
-    BurnEthErc20,
-    DeployEthErc20,
+    BurnErc20,
+    DeployErc20,
     MintErc20,
     TransferEthErc20,
-    // EthGetBalance,
     TransferBscBep20,
     BurnCeloErc20,
     DeployCeloErc20,
     MintCeloErc20,
-    // CeloTransferErc20,
-    // CeloGetBalance,
     TransferCeloOrCeloErc20Token,
     TransferTronTrc20,
     CreateTronTrc20,
   } from '@tatumio/tatum';
 import { PathAddressContractAddressChain } from './dto/PathAddressContractAddressChain';
-// import { PathTokenIdContractAddressChain } from './dto/PathTokenIdContractAddressChain';
-// import { PathChainTxId } from './dto/PathChainTxId';
 import { PathChain } from './dto/PathChain';
 
 export abstract class Erc20Controller {
@@ -55,7 +50,7 @@ export abstract class Erc20Controller {
 
     @Post('/v3/blockchain/token/:chain/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnErc20(@Param() path: PathChain, @Body() body: BurnEthErc20 | BurnCeloErc20) {
+    public async burnErc20(@Param() path: PathChain, @Body() body: BurnErc20 | BurnCeloErc20) {
         try {
             return await this.service.burnErc20(path.chain, body);
         } catch (e) {
@@ -87,7 +82,7 @@ export abstract class Erc20Controller {
 
     @Post('/v3/blockchain/token/:chain/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployErc20(@Param() path: PathChain, @Body() body: DeployEthErc20 | DeployCeloErc20 | CreateTronTrc20) {
+    public async deployErc20(@Param() path: PathChain, @Body() body: DeployErc20 | DeployCeloErc20 | CreateTronTrc20) {
         try {
             return await this.service.deployErc20(path.chain, body);
         } catch (e) {

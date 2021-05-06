@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PinoLogger } from 'pino-logger';
 import { InjectPinoLogger } from 'nestjs-pino';
-import { NftService } from '../../module';
+import { Erc20Service } from '../../module';
 import { celoBroadcast, Currency } from '@tatumio/tatum';
 
 @Injectable()
-export class AppService extends NftService {
+export class AppService extends Erc20Service {
   protected broadcast(chain: Currency, txData: string, signatureId?: string) {
     // enter your test API KEY here to make broadcast work
     // process.env.TATUM_API_KEY = '';

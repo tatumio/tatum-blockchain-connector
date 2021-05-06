@@ -1,9 +1,9 @@
 import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
-import { NftController } from '../../module';
+import { Erc20Controller } from '../../module';
 
 @Controller()
-export class AppController extends NftController {
+export class AppController extends Erc20Controller {
   constructor(private readonly myService: AppService) {
     super(myService);
   }
