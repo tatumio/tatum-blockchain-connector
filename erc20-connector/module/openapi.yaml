@@ -17,7 +17,7 @@ tags:
       </p>
     name: Blockchain / token
 paths:
-  /v3/blockchain/token/{chain}/deploy:
+  /v3/blockchain/token/deploy:
     post:
       description: |
         <p>Deploy Ethereum ERC20 Smart Contract. This method creates new ERC20 (Fungible Tokens) Smart Contract on the blockchain. Smart contract is standardized and audited. It is possible to mint and burn tokens.
@@ -31,22 +31,14 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Deploy
-      parameters:
-        - description: "Network name"
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            example: "CELO"
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/DeployErc20"
-                - $ref: "#/components/schemas/DeployCeloErc20"
-                # - $ref: "#/components/schemas/CreateTronTrc20"
+                - $ref: "#/components/schemas/ChainDeployErc20"
+                - $ref: "#/components/schemas/ChainDeployCeloErc20"
+                # - $ref: "#/components/schemas/ChainCreateTronTrc20"
         required: true
       responses:
         200:
@@ -90,7 +82,7 @@ paths:
       summary: Deploy ERC20 Smart Contract.
       tags:
         - Blockchain / token
-  /v3/blockchain/token/{chain}/mint:
+  /v3/blockchain/token/mint:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
@@ -103,21 +95,13 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Mint
-      parameters:
-        - description: "Network name"
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            example: "CELO"
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/MintErc20"
-                - $ref: "#/components/schemas/MintCeloErc20"
+                - $ref: "#/components/schemas/ChainMintErc20"
+                - $ref: "#/components/schemas/ChainMintCeloErc20"
         required: true
       responses:
         200:
@@ -147,7 +131,7 @@ paths:
       summary: Mint ERC20
       tags:
         - Blockchain / token
-  /v3/blockchain/token/{chain}/burn:
+  /v3/blockchain/token/burn:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
@@ -160,21 +144,13 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Burn
-      parameters:
-        - description: "Network name"
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            example: "CELO"
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/BurnErc20"
-                - $ref: "#/components/schemas/BurnCeloErc20"
+                - $ref: "#/components/schemas/ChainBurnErc20"
+                - $ref: "#/components/schemas/ChainBurnCeloErc20"
         required: true
       responses:
         200:
@@ -204,7 +180,7 @@ paths:
       summary: Burn ERC20
       tags:
         - Blockchain / token
-  /v3/blockchain/token/{chain}/transaction:
+  /v3/blockchain/token/transaction:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
@@ -217,22 +193,14 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Transfer
-      parameters:
-        - description: "Network name"
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            example: "CELO"
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/TransferEthErc20"
-                - $ref: "#/components/schemas/TransferBscBep20"
-                - $ref: "#/components/schemas/TransferCeloOrCeloErc20Token"
+                - $ref: "#/components/schemas/ChainTransferEthErc20"
+                - $ref: "#/components/schemas/ChainTransferBscBep20"
+                - $ref: "#/components/schemas/ChainTransferCeloErc20Token"
                 # - $ref: "#/components/schemas/TransferTronTrc20"
         required: true
       responses:
@@ -332,9 +300,15 @@ components:
       name: x-api-key
       type: apiKey
   schemas:
-    DeployErc20:
+    ChainDeployErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, BSC
         symbol:
           description: Symbol of the ERC20 token
           example: ERC_SYMBOL
@@ -400,15 +374,22 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
+        - chain
         - name
         - symbol
         - address
         - supply
         - fromPrivateKey
         - digits
-    DeployCeloErc20:
+    ChainDeployCeloErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
         symbol:
           description: Symbol of the ERC20 token
           example: ERC_SYMBOL
@@ -463,6 +444,7 @@ components:
             - CELO
             - CUSD
       required:
+        - chain
         - name
         - symbol
         - address
@@ -470,9 +452,15 @@ components:
         - fromPrivateKey
         - digits
         - feeCurrency
-    # CreateTronTrc20:
+    # ChainCreateTronTrc20:
     #   type: object
     #   properties:
+    #     chain:
+    #       type: string
+    #       example: TRON
+    #       description: Chain to work with.
+    #       enum:
+    #         - TRON
     #     fromPrivateKey:
     #       type: string
     #       minLength: 64
@@ -509,15 +497,22 @@ components:
     #       description: Number of decimal places of the token.
     #       example: 10
     #   required:
+    #     - chain
     #     - fromPrivateKey
     #     - name
     #     - recipient
     #     - symbol
     #     - totalSupply
     #     - decimals
-    MintErc20:
+    ChainMintErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, BSC
         amount:
           description: Amount to be minted and transfered to the recipient.
           example: "100000"
@@ -546,13 +541,20 @@ components:
           minimum: 0
           description: Nonce to be set to transaction. If not present, last known nonce will be used.
       required:
+        - chain
         - to
         - amount
         - contractAddress
         - fromPrivateKey
-    MintCeloErc20:
+    ChainMintCeloErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
         amount:
           description: Amount to be minted and transfered to the recipient.
           example: "100000"
@@ -588,14 +590,21 @@ components:
             - CUSD
             - CEUR
       required:
+        - chain
         - to
         - amount
         - feeCurrency
         - contractAddress
         - fromPrivateKey
-    BurnErc20:
+    ChainBurnErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, BSC
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"
@@ -618,12 +627,19 @@ components:
           minimum: 0
           description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
       required:
+        - chain
         - contractAddress
         - fromPrivateKey
         - amount
-    BurnCeloErc20:
+    ChainBurnCeloErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"
@@ -653,13 +669,20 @@ components:
             - CUSD
             - CEUR
       required:
+        - chain
         - contractAddress
         - feeCurrency
         - fromPrivateKey
         - amount
-    TransferEthErc20:
+    ChainTransferEthErc20:
       type: object
       properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH
         to:
           maxLength: 50
           minLength: 1
@@ -711,14 +734,21 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
+        - chain
         - to
         - contractAddress
         - digits
         - fromPrivateKey
         - amount
-    TransferBscBep20:
+    ChainTransferBscBep20:
       type: object
       properties:
+        chain:
+          type: string
+          example: BSC
+          description: Chain to work with.
+          enum:
+            - BSC
         to:
           maxLength: 50
           minLength: 1
@@ -770,14 +800,21 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
+        - chain
         - to
         - contractAddress
         - digits
         - fromPrivateKey
         - amount
-    TransferCeloOrCeloErc20Token:
+    ChainTransferCeloErc20Token:
       type: object
       properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
         to:
           maxLength: 50
           minLength: 1
@@ -819,15 +856,22 @@ components:
             - CUSD
             - CEUR
       required:
+        - chain
         - to
         - contractAddress
         - digits
         - feeCurrency
         - fromPrivateKey
         - amount
-    # TransferTronTrc20:
+    # ChainTransferTronTrc20:
     #   type: object
     #   properties:
+    #     chain:
+    #       type: string
+    #       example: TRON
+    #       description: Chain to work with.
+    #       enum:
+    #         - TRON
     #     fromPrivateKey:
     #       type: string
     #       minLength: 64
@@ -857,6 +901,7 @@ components:
     #       pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
     #       type: string
     #   required:
+    #     - chain
     #     - fromPrivateKey
     #     - tokenAddress
     #     - to

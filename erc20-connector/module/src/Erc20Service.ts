@@ -3,6 +3,19 @@ import {Transaction, TransactionReceipt} from 'web3-eth';
 import {PinoLogger} from 'nestjs-pino';
 import {Erc20Error} from './Erc20Error';
 import {
+  ChainBurnErc20,
+  ChainDeployErc20,
+  ChainMintErc20,
+  ChainTransferEthErc20,
+  ChainTransferBscBep20,
+  ChainBurnCeloErc20,
+  ChainDeployCeloErc20,
+  ChainMintCeloErc20,
+  ChainTransferCeloErc20Token,
+  ChainTransferTronTrc20,
+  ChainCreateTronTrc20,
+} from './Erc20Base';
+import {
     MintCeloErc20,
     BurnCeloErc20,
     DeployCeloErc20,
@@ -37,7 +50,6 @@ import {
     TransactionHash
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
-// import { CONTRACT_ADDRESSES } from '@tatumio/tatum/dist/src/constants';
 
 export abstract class Erc20Service {
 
@@ -108,22 +120,23 @@ export abstract class Erc20Service {
         return { balance: await contract.methods.balanceOf(address).call() }
     }
   
-    public async transferErc20(chain: Currency, body: TransferEthErc20 | TransferBscBep20 | TransferCeloOrCeloErc20Token | TransferTronTrc20):
+    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferTronTrc20):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
+        const { chain, ..._body } = body;
         let txData;
         switch (chain) {
             case Currency.ETH:
-                txData = await prepareEthOrErc20SignedTransaction(body as TransferEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareEthOrErc20SignedTransaction(_body as TransferEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
-                txData = await prepareBscOrBep20SignedTransaction(body as TransferBscBep20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareBscOrBep20SignedTransaction(_body as TransferBscBep20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.CELO:
-                txData = await prepareCeloTransferErc20SignedTransaction(testnet, body as TransferCeloOrCeloErc20Token, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareCeloTransferErc20SignedTransaction(testnet, _body as TransferCeloOrCeloErc20Token, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             // case Currency.TRON:
-            //     txData = await prepareTronTrc20SignedTransaction(testnet, body as TransferTronTrc20);
+            //     txData = await prepareTronTrc20SignedTransaction(testnet, _body as TransferTronTrc20);
             //     break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
@@ -135,18 +148,19 @@ export abstract class Erc20Service {
         }
     }
 
-    public async burnErc20(chain: Currency, body: BurnErc20 | BurnCeloErc20): Promise<TransactionHash | { signatureId: string }> {
+    public async burnErc20(body: ChainBurnErc20 | ChainBurnCeloErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
+        const { chain, ..._body } = body;
         let txData;
         switch (chain) {
             case Currency.ETH:
-                txData = await prepareEthBurnErc20SignedTransaction(body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareEthBurnErc20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
-                txData = await prepareBurnBep20SignedTransaction(body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareBurnBep20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.CELO:
-                txData = await prepareCeloBurnErc20SignedTransaction(testnet, body as BurnCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareCeloBurnErc20SignedTransaction(testnet, _body as BurnCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             // case Currency.TRON:
             //     // TODO!!!
@@ -161,18 +175,19 @@ export abstract class Erc20Service {
         }
     }
 
-    public async mintErc20(chain: Currency, body: MintErc20 | MintCeloErc20): Promise<TransactionHash | { signatureId: string }> {
+    public async mintErc20(body: ChainMintErc20 | ChainMintCeloErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
+        const { chain, ..._body } = body;
         let txData;
         switch (chain) {
             case Currency.ETH:
-                txData = await prepareEthMintErc20SignedTransaction(body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareEthMintErc20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
-                txData = await prepareMintBep20SignedTransaction(body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareMintBep20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.CELO:
-                txData = await prepareCeloMintErc20SignedTransaction(testnet, body as MintCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareCeloMintErc20SignedTransaction(testnet, _body as MintCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             // case Currency.TRON:
             //     // TODO!!!
@@ -187,24 +202,25 @@ export abstract class Erc20Service {
         }
     }
 
-    public async deployErc20(chain: Currency, body: DeployErc20 | DeployCeloErc20 | CreateTronTrc20): Promise<TransactionHash | { signatureId: string }> {
+    public async deployErc20(body: ChainDeployErc20 | ChainDeployCeloErc20 | ChainCreateTronTrc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
+        const { chain, ..._body } = body;
         let txData;
         switch (chain) {
             case Currency.ETH:
-                txData = await prepareDeployErc20SignedTransaction(body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareDeployErc20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
-                txData = await prepareDeployBep20SignedTransaction(body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareDeployBep20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.CELO:
-                txData = await prepareCeloDeployErc20SignedTransaction(testnet, body as DeployCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareCeloDeployErc20SignedTransaction(testnet, _body as DeployCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             // case Currency.TRON:
             //     if (body.signatureId) {
-            //         txData = await prepareTronCreateTrc20SignedKMSTransaction(testnet, body as CreateTronTrc20);
+            //         txData = await prepareTronCreateTrc20SignedKMSTransaction(testnet, _body as CreateTronTrc20);
             //     } else {
-            //         txData = await prepareTronCreateTrc20SignedTransaction(testnet, body as CreateTronTrc20);
+            //         txData = await prepareTronCreateTrc20SignedTransaction(testnet, _body as CreateTronTrc20);
             //     }
             //     break;
             default:

@@ -2,18 +2,18 @@ import { BadRequestException, Body, Param, Get, Post, HttpCode, HttpStatus } fro
 import { Erc20Service } from './Erc20Service';
 import { Erc20Error } from './Erc20Error';
 import {
-    BurnErc20,
-    DeployErc20,
-    MintErc20,
-    TransferEthErc20,
-    TransferBscBep20,
-    BurnCeloErc20,
-    DeployCeloErc20,
-    MintCeloErc20,
-    TransferCeloOrCeloErc20Token,
-    TransferTronTrc20,
-    CreateTronTrc20,
-  } from '@tatumio/tatum';
+    ChainBurnErc20,
+    ChainDeployErc20,
+    ChainMintErc20,
+    ChainTransferEthErc20,
+    ChainTransferBscBep20,
+    ChainBurnCeloErc20,
+    ChainDeployCeloErc20,
+    ChainMintCeloErc20,
+    ChainTransferCeloErc20Token,
+    ChainTransferTronTrc20,
+    ChainCreateTronTrc20,
+  } from './Erc20Base';
 import { PathAddressContractAddressChain } from './dto/PathAddressContractAddressChain';
 import { PathChain } from './dto/PathChain';
 
@@ -30,13 +30,13 @@ export abstract class Erc20Controller {
         }
     }
 
-    @Post('/v3/blockchain/token/:chain/transaction')
+    @Post('/v3/blockchain/token/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc20(
-      @Param() path: PathChain, @Body() body: TransferEthErc20 | TransferBscBep20 | TransferCeloOrCeloErc20Token | TransferTronTrc20
+      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferTronTrc20
     ) {
         try {
-            return await this.service.transferErc20(path.chain, body);
+            return await this.service.transferErc20(body);
         } catch (e) {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
@@ -48,11 +48,11 @@ export abstract class Erc20Controller {
         }
     }
 
-    @Post('/v3/blockchain/token/:chain/burn')
+    @Post('/v3/blockchain/token/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnErc20(@Param() path: PathChain, @Body() body: BurnErc20 | BurnCeloErc20) {
+    public async burnErc20(@Body() body: ChainBurnErc20 | ChainBurnCeloErc20) {
         try {
-            return await this.service.burnErc20(path.chain, body);
+            return await this.service.burnErc20(body);
         } catch (e) {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
@@ -64,11 +64,11 @@ export abstract class Erc20Controller {
         }
     }
 
-    @Post('/v3/blockchain/token/:chain/mint')
+    @Post('/v3/blockchain/token/mint')
     @HttpCode(HttpStatus.OK)
-    public async mintErc20(@Param() path: PathChain, @Body() body: MintErc20 | MintCeloErc20) {
+    public async mintErc20(@Body() body: ChainMintErc20 | ChainMintCeloErc20) {
         try {
-            return await this.service.mintErc20(path.chain, body);
+            return await this.service.mintErc20(body);
         } catch (e) {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
@@ -80,11 +80,11 @@ export abstract class Erc20Controller {
         }
     }
 
-    @Post('/v3/blockchain/token/:chain/deploy')
+    @Post('/v3/blockchain/token/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployErc20(@Param() path: PathChain, @Body() body: DeployErc20 | DeployCeloErc20 | CreateTronTrc20) {
+    public async deployErc20(@Body() body: ChainDeployErc20 | ChainDeployCeloErc20 | ChainCreateTronTrc20) {
         try {
-            return await this.service.deployErc20(path.chain, body);
+            return await this.service.deployErc20(body);
         } catch (e) {
             if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
                 throw new BadRequestException(e);
