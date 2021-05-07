@@ -13,15 +13,16 @@ tags:
       <li><b>Ethereum</b></li>
       <li><b>Binance Smart Chain</b></li>
       <li><b>Celo</b></li>
-      <li><b>Tron</b></li>
       </ul>
       </p>
     name: Blockchain / token
 paths:
-  /v3/blockchain/token/deploy:
+  /v3/blockchain/token/{chain}/deploy:
     post:
       description: |
-        <p>This method creates new ERC20 (Fungible Tokens) Smart Contract on the blockchain. Smart contract is standardized and audited. It is possible to mint and burn tokens. It is possible to see the code of the deployed contract here. Whole predefined supply of the tokens will be transferred to the chosen address.
+        <p>Deploy Ethereum ERC20 Smart Contract. This method creates new ERC20 (Fungible Tokens) Smart Contract on the blockchain. Smart contract is standardized and audited. It is possible to mint and burn tokens.
+        It is possible to see the code of the deployed contract <a href="https://github.com/tatumio/tatum-middleware/blob/master/src/contracts/token.sol" target="_blank">here</a>.
+        Whole predefined supply of the tokens will be transferred to the chosen address.
         <br/><br/>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
@@ -30,19 +31,22 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Deploy
+      parameters:
+        - description: "Network name"
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            example: "CELO"
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/DeployEthErc20"
-                - $ref: "#/components/schemas/DeployEthErc20KMS"
-                - $ref: "#/components/schemas/DeployBep20"
-                - $ref: "#/components/schemas/DeployBep20KMS"
-                - $ref: "#/components/schemas/DeployErc20Celo"
-                - $ref: "#/components/schemas/DeployErc20KMSCelo"
-                - $ref: "#/components/schemas/CreateTronTrc20Blockchain"
-                - $ref: "#/components/schemas/CreateTronTrc20BlockchainKMS"
+                - $ref: "#/components/schemas/DeployErc20"
+                - $ref: "#/components/schemas/DeployCeloErc20"
+                # - $ref: "#/components/schemas/CreateTronTrc20"
         required: true
       responses:
         200:
@@ -50,7 +54,6 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/TransactionHash"
                   - $ref: "#/components/schemas/TransactionHashKMS"
                   - $ref: "#/components/schemas/SignatureId"
           description: OK
@@ -87,62 +90,125 @@ paths:
       summary: Deploy ERC20 Smart Contract.
       tags:
         - Blockchain / token
-  # /v3/blockchain/token/mint:
-  #   post:
-  #     description: |
-  #       <h4>2 credits per API call.</h4><br/>
-  #       <p>Create new ERC20 Smart Contract Tokens and transfer it to destination account. Create and transfer any ERC20 tokens from smart contract defined in contractAddress.
-  #       <br/><br/>
-  #       This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-  #       No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-  #       or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
-  #       <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-  #       Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
-  #       </p>
-  #     operationId: Erc20Mint
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             oneOf:
-  #               # - $ref: "#/components/schemas/MintNftCelo"
-  #               # - $ref: "#/components/schemas/MintNftKMSCelo"
-  #               # - $ref: "#/components/schemas/MintNft"
-  #               # - $ref: "#/components/schemas/MintNftKMS"
-  #       required: true
-  #     responses:
-  #       200:
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 # - $ref: "#/components/schemas/TransactionHashKMS"
-  #                 # - $ref: "#/components/schemas/SignatureId"
-  #         description: OK
-  #       400:
-  #         <<: *API400
-  #       401:
-  #         <<: *API401
-  #       403:
-  #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 - $ref: "#/components/schemas/Error403"
-  #       500:
-  #         <<: *API500
-  #     security:
-  #       - X-Api-Key: [ ]
-  #     x-code-samples:
-  #     summary: Mint ERC20
-  #     tags:
-  #       - Blockchain / token
-  /v3/blockchain/token/transaction:
+  /v3/blockchain/token/{chain}/mint:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Transfer ERC20 Smart Contract Tokens from account to account. Transfer any ERC20 token from smart contract defined in contractAddress. Only 1 specific token with specified tokenId can be transfered. This method invokes ERC20 method safeTransfer() to transfer the token.
+        <p>Create new ERC20 Smart Contract Tokens and transfer it to destination account. Create and transfer any ERC20 tokens from smart contract defined in contractAddress.
+        <br/><br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        </p>
+      operationId: Erc20Mint
+      parameters:
+        - description: "Network name"
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            example: "CELO"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/MintErc20"
+                - $ref: "#/components/schemas/MintCeloErc20"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Mint ERC20
+      tags:
+        - Blockchain / token
+  /v3/blockchain/token/{chain}/burn:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Burn one ERC20 Smart Contract Token. This method destroys ERC20 tokens from smart contract defined in contractAddress.
+        <br/><br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        </p>
+      operationId: Erc20Burn
+      parameters:
+        - description: "Network name"
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            example: "CELO"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/BurnErc20"
+                - $ref: "#/components/schemas/BurnCeloErc20"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Burn ERC20
+      tags:
+        - Blockchain / token
+  /v3/blockchain/token/{chain}/transaction:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Transfer ERC20 Smart Contract Tokens from account to account. Transfer any ERC20 tokens from smart contract defined in contractAddress. This method invokes ERC20 method transfer() to transfer tokens.
         <br/><br/>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
@@ -151,6 +217,14 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Transfer
+      parameters:
+        - description: "Network name"
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            example: "CELO"
       requestBody:
         content:
           application/json:
@@ -159,7 +233,7 @@ paths:
                 - $ref: "#/components/schemas/TransferEthErc20"
                 - $ref: "#/components/schemas/TransferBscBep20"
                 - $ref: "#/components/schemas/TransferCeloOrCeloErc20Token"
-                - $ref: "#/components/schemas/TransferTronTrc20"
+                # - $ref: "#/components/schemas/TransferTronTrc20"
         required: true
       responses:
         200:
@@ -189,106 +263,63 @@ paths:
       summary: Transfer ERC20 Token
       tags:
         - Blockchain / token
-  # /v3/blockchain/token/burn:
-  #   post:
-  #     description: |
-  #       <h4>2 credits per API call.</h4><br/>
-  #       <p>Burn one ERC20 Smart Contract Token. This method destroys ERC20 tokens from smart contract defined in contractAddress.
-  #       <br/><br/>
-  #       This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-  #       No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-  #       or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
-  #       <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-  #       Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
-  #       </p>
-  #     operationId: Erc20Burn
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             oneOf:
-  #               # - $ref: "#/components/schemas/BurnNftCelo"
-  #               # - $ref: "#/components/schemas/BurnNftKMSCelo"
-  #               # - $ref: "#/components/schemas/BurnNft"
-  #               # - $ref: "#/components/schemas/BurnNftKMS"
-  #       required: true
-  #     responses:
-  #       200:
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 # - $ref: "#/components/schemas/TransactionHashKMS"
-  #                 # - $ref: "#/components/schemas/SignatureId"
-  #         description: OK
-  #       400:
-  #         <<: *API400
-  #       401:
-  #         <<: *API401
-  #       403:
-  #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               oneOf:
-  #                 - $ref: "#/components/schemas/Error403"
-  #       500:
-  #         <<: *API500
-  #     security:
-  #       - X-Api-Key: [ ]
-  #     x-code-samples:
-  #     summary: Burn ERC20
-  #     tags:
-  #       - Blockchain / token
-  # /v3/blockchain/token/balance/{contractAddress}/{address}:
-  #   get:
-  #     description: "<h4>1 credit per API call.</h4><br/>
-  #     <p>Get ERC20 Account balance. Returns number of tokens Account holds.</p>"
-  #     operationId: Erc20GetBalance
-  #     parameters:
-  #       - description: "Account address"
-  #         in: path
-  #         name: address
-  #         required: true
-  #         schema:
-  #           type: string
-  #           example: "0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
-  #       - description: "ERC20 contract address"
-  #         in: path
-  #         name: contractAddress
-  #         required: true
-  #         schema:
-  #           type: string
-  #           example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
-  #     responses:
-  #       200:
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 type: string
-  #                 description: Token ID.
-  #                 example: "10"
-  #         description: OK
-  #       400:
-  #         <<: *API400
-  #       401:
-  #         <<: *API401
-  #       403:
-  #         description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/Error403"
-  #       500:
-  #         <<: *API500
-  #     security:
-  #       - X-Api-Key: [ ]
-  #     x-code-samples:
-  #     summary: Get ERC20 Account balance
-  #     tags:
-  #       - Blockchain / token
+  /v3/blockchain/token/balance/{chain}/{contractAddress}/{address}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/>
+      <p>Get ERC20 Account balance. Returns number of tokens Account holds.</p>"
+      operationId: Erc20GetBalance
+      parameters:
+        - description: "Network name"
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            example: "CELO"
+        - description: "Account address"
+          in: path
+          name: address
+          required: true
+          schema:
+            type: string
+            example: "0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
+        - description: "ERC20 contract address"
+          in: path
+          name: contractAddress
+          required: true
+          schema:
+            type: string
+            example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    description: Number of ERC20 tokens in smallest token unit. E.g. token has 10 decimal places, so data returned are 9*10^10.
+                    example: "10"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get ERC20 Account balance
+      tags:
+        - Blockchain / token
 
 components:
   securitySchemes:
@@ -301,7 +332,7 @@ components:
       name: x-api-key
       type: apiKey
   schemas:
-    DeployEthErc20:
+    DeployErc20:
       type: object
       properties:
         symbol:
@@ -317,8 +348,14 @@ components:
           minLength: 1
           pattern: ^[a-zA-Z0-9_]+$
           type: string
-        supply:
+        totalCap:
           description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        supply:
+          description: Supply of ERC20 token.
           maxLength: 38
           example: "10000000"
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
@@ -369,7 +406,7 @@ components:
         - supply
         - fromPrivateKey
         - digits
-    DeployEthErc20KMS:
+    DeployCeloErc20:
       type: object
       properties:
         symbol:
@@ -385,215 +422,11 @@ components:
           minLength: 1
           pattern: ^[a-zA-Z0-9_]+$
           type: string
-        supply:
+        totalCap:
           description: Max supply of ERC20 token.
           maxLength: 38
           example: "10000000"
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
-          type: string
-        digits:
-          description: Number of decimal points
-          example: 18
-          maximum: 30
-          minimum: 1
-          type: number
-        address:
-          description: Address on Ethereum blockchain, where all created ERC20 tokens will be transferred.
-          maxLength: 42
-          minLength: 42
-          example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
-          type: string
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
-        fee:
-          description: Custom defined fee. If not present, it will be calculated automatically.
-          type: object
-          required:
-            - gasLimit
-            - gasPrice
-          properties:
-            gasLimit:
-              type: string
-              description: Gas limit for transaction in gas price.
-              pattern: ^[+]?\d+$
-              example: "40000"
-            gasPrice:
-              type: string
-              description: Gas price in Gwei.
-              pattern: ^[+]?\d+$
-              example: "20"
-      required:
-        - name
-        - symbol
-        - address
-        - supply
-        - signatureId
-        - digits
-    DeployBep20:
-      type: object
-      properties:
-        symbol:
-          description: Symbol of the BEP20 token
-          example: ERC_SYMBOL
-          maxLength: 30
-          minLength: 1
-          type: string
-        name:
-          description: Name of the BEP20 token
-          example: My BEP20
-          maxLength: 100
-          minLength: 1
-          pattern: ^[a-zA-Z0-9_]+$
-          type: string
-        supply:
-          description: Max supply of BEP20 token.
-          maxLength: 38
-          example: "10000000"
-          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
-          type: string
-        digits:
-          description: Number of decimal points
-          example: 18
-          maximum: 30
-          minimum: 1
-          type: number
-        address:
-          description: Address on BSC blockchain, where all created BEP20 tokens will be transferred.
-          maxLength: 42
-          minLength: 42
-          example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
-          type: string
-        fromPrivateKey:
-          description: Private key of BSC account address, from which the fee for the deployment of BEP20 will be paid. Private key, or signature Id must be present.
-          type: string
-          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          maxLength: 66
-          minLength: 66
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
-        fee:
-          description: Custom defined fee. If not present, it will be calculated automatically.
-          type: object
-          required:
-            - gasLimit
-            - gasPrice
-          properties:
-            gasLimit:
-              type: string
-              description: Gas limit for transaction in gas price.
-              pattern: ^[+]?\d+$
-              example: "40000"
-            gasPrice:
-              type: string
-              description: Gas price in Gwei.
-              pattern: ^[+]?\d+$
-              example: "20"
-      required:
-        - name
-        - symbol
-        - address
-        - supply
-        - fromPrivateKey
-        - digits
-    DeployBep20KMS:
-      type: object
-      properties:
-        symbol:
-          description: Symbol of the BEP20 token
-          example: ERC_SYMBOL
-          maxLength: 30
-          minLength: 1
-          type: string
-        name:
-          description: Name of the BEP20 token
-          example: My BEP20
-          maxLength: 100
-          minLength: 1
-          pattern: ^[a-zA-Z0-9_]+$
-          type: string
-        supply:
-          description: Max supply of BEP20 token.
-          maxLength: 38
-          example: "10000000"
-          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
-          type: string
-        digits:
-          description: Number of decimal points
-          example: 18
-          maximum: 30
-          minimum: 1
-          type: number
-        address:
-          description: Address on BSC blockchain, where all created BEP20 tokens will be transferred.
-          maxLength: 42
-          minLength: 42
-          example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
-          type: string
-        index:
-          type: number
-          minimum: 0
-          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
-        fee:
-          description: Custom defined fee. If not present, it will be calculated automatically.
-          type: object
-          required:
-            - gasLimit
-            - gasPrice
-          properties:
-            gasLimit:
-              type: string
-              description: Gas limit for transaction in gas price.
-              pattern: ^[+]?\d+$
-              example: "40000"
-            gasPrice:
-              type: string
-              description: Gas price in Gwei.
-              pattern: ^[+]?\d+$
-              example: "20"
-      required:
-        - name
-        - symbol
-        - address
-        - supply
-        - signatureId
-        - digits
-    DeployErc20Celo:
-      type: object
-      properties:
-        symbol:
-          description: Symbol of the ERC20 token
-          example: ERC_SYMBOL
-          maxLength: 30
-          minLength: 1
-          type: string
-        name:
-          description: Name of the ERC20 token
-          example: My ERC20
-          maxLength: 100
-          minLength: 1
-          pattern: ^[a-zA-Z0-9_]+$
           type: string
         supply:
           description: Max supply of ERC20 token.
@@ -637,412 +470,395 @@ components:
         - fromPrivateKey
         - digits
         - feeCurrency
-    DeployErc20KMSCelo:
+    # CreateTronTrc20:
+    #   type: object
+    #   properties:
+    #     fromPrivateKey:
+    #       type: string
+    #       minLength: 64
+    #       maxLength: 64
+    #       description: Private key of the address, from which the TRX will be sent.
+    #       example: 842E09EB40D8175979EFB0071B28163E11AED0F14BDD84090A4CEFB936EF5701
+    #     recipient:
+    #       type: string
+    #       minLength: 34
+    #       maxLength: 34
+    #       description: Recipient address of created TRC20 tokens.
+    #       example: TYMwiDu22V6XG3yk6W9cTVBz48okKLRczh
+    #     name:
+    #       type: string
+    #       minLength: 1
+    #       maxLength: 100
+    #       description: Name of the token.
+    #       example: My token
+    #     symbol:
+    #       type: string
+    #       minLength: 1
+    #       maxLength: 100
+    #       description: Symbol of the token.
+    #       example: SYM
+    #     totalSupply:
+    #       type: number
+    #       minimum: 0
+    #       description: Total supply of the tokens.
+    #       example: 100000
+    #     decimals:
+    #       type: number
+    #       minimum: 0
+    #       maximum: 30
+    #       description: Number of decimal places of the token.
+    #       example: 10
+    #   required:
+    #     - fromPrivateKey
+    #     - name
+    #     - recipient
+    #     - symbol
+    #     - totalSupply
+    #     - decimals
+    MintErc20:
       type: object
       properties:
-        symbol:
-          description: Symbol of the ERC20 token
-          example: ERC_SYMBOL
-          maxLength: 30
-          minLength: 1
-          type: string
-        name:
-          description: Name of the ERC20 token
-          example: My ERC20
-          maxLength: 100
-          minLength: 1
-          pattern: ^[a-zA-Z0-9_]+$
-          type: string
-        supply:
-          description: Max supply of ERC20 token.
-          maxLength: 38
-          example: "10000000"
-          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
-          type: string
-        digits:
-          description: Number of decimal points
-          example: 18
-          maximum: 30
-          minimum: 1
-          type: number
-        address:
-          description: Address on Ethereum blockchain, where all created ERC20 tokens will be transferred.
-          maxLength: 42
-          minLength: 42
-          example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
-          type: string
-        index:
-          type: number
-          minimum: 0
-          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
-        feeCurrency:
-          type: string
-          description: Currency to pay for transaction gas
-          enum:
-            - CELO
-            - CUSD
-      required:
-        - name
-        - symbol
-        - address
-        - supply
-        - signatureId
-        - digits
-        - feeCurrency
-    CreateTronTrc20Blockchain:
-      type: object
-      properties:
-        fromPrivateKey:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: Private key of the address, from which the TRX will be sent.
-          example: 842E09EB40D8175979EFB0071B28163E11AED0F14BDD84090A4CEFB936EF5701
-        recipient:
-          type: string
-          minLength: 34
-          maxLength: 34
-          description: Recipient address of created TRC20 tokens.
-          example: TYMwiDu22V6XG3yk6W9cTVBz48okKLRczh
-        name:
-          type: string
-          minLength: 1
-          maxLength: 100
-          description: Name of the token.
-          example: My token
-        symbol:
-          type: string
-          minLength: 1
-          maxLength: 100
-          description: Symbol of the token.
-          example: SYM
-        totalSupply:
-          type: number
-          minimum: 0
-          description: Total supply of the tokens.
-          example: 100000
-        decimals:
-          type: number
-          minimum: 0
-          maximum: 30
-          description: Number of decimal places of the token.
-          example: 10
-      required:
-        - fromPrivateKey
-        - name
-        - recipient
-        - symbol
-        - totalSupply
-        - decimals
-    CreateTronTrc20BlockchainKMS:
-      type: object
-      properties:
-        from:
-          type: string
-          minLength: 34
-          maxLength: 34
-          description: Sender address of TRON account in Base58 format.
-          example: TYMwiDu22V6XG3yk6W9cTVBz48okKLRczh
-        signatureId:
-          type: string
-          minimum: 36
-          maximum: 36
-          format: uuid
-          example: 1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        recipient:
-          type: string
-          minLength: 34
-          maxLength: 34
-          description: Recipient address of created TRC20 tokens.
-          example: TYMwiDu22V6XG3yk6W9cTVBz48okKLRczh
-        name:
-          type: string
-          minLength: 1
-          maxLength: 100
-          description: Name of the token.
-          example: My token
-        symbol:
-          type: string
-          minLength: 1
-          maxLength: 100
-          description: Symbol of the token.
-          example: SYM
-        totalSupply:
-          type: number
-          minimum: 0
-          description: Total supply of the tokens.
-          example: 100000
-        decimals:
-          type: number
-          minimum: 0
-          maximum: 30
-          description: Number of decimal places of the token.
-          example: 10
-      required:
-        - from
-        - signatureId
-        - name
-        - recipient
-        - symbol
-        - totalSupply
-        - decimals
-
-# - $ref: "#/components/schemas/TransferEthErc20"
-# - $ref: "#/components/schemas/TransferBscBep20"
-# - $ref: "#/components/schemas/TransferCeloOrCeloErc20Token"
-# - $ref: "#/components/schemas/TransferTronTrc20"
-    TransferTronTrc20Blockchain:
-      type: object
-      properties:
-        fromPrivateKey:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: Private key of the address, from which the TRX will be sent.
-          example: 842E09EB40D8175979EFB0071B28163E11AED0F14BDD84090A4CEFB936EF5701
-        to:
-          type: string
-          minLength: 34
-          maxLength: 34
-          description: Recipient address of TRON account in Base58 format.
-          example: TYMwiDu22V6XG3yk6W9cTVBz48okKLRczh
-        tokenAddress:
-          type: string
-          minLength: 34
-          maxLength: 34
-          description: Address of the TRC20 token to transfer.
-          example: "TVAEYCmc15awaDRAjUZ1kvcHwQQaoPw2CW"
-        feeLimit:
-          type: number
-          minimum: 0
-          description: Fee in TRX to be paid.
-          example: 0.01
         amount:
-          description: Amount to be sent in TRX.
+          description: Amount to be minted and transfered to the recipient.
           example: "100000"
-          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
           type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        to:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address to send ERC-20 tokens to.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC-20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to transaction. If not present, last known nonce will be used.
       required:
-        - fromPrivateKey
-        - tokenAddress
         - to
         - amount
-        - feeLimit
-
-    # TransferNftCelo:
+        - contractAddress
+        - fromPrivateKey
+    MintCeloErc20:
+      type: object
+      properties:
+        amount:
+          description: Amount to be minted and transfered to the recipient.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        to:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address to send ERC-20 tokens to.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC-20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - to
+        - amount
+        - feeCurrency
+        - contractAddress
+        - fromPrivateKey
+    BurnErc20:
+      type: object
+      properties:
+        amount:
+          description: Amount of tokens to be destroyed.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+      required:
+        - contractAddress
+        - fromPrivateKey
+        - amount
+    BurnCeloErc20:
+      type: object
+      properties:
+        amount:
+          description: Amount of tokens to be destroyed.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - contractAddress
+        - feeCurrency
+        - fromPrivateKey
+        - amount
+    TransferEthErc20:
+      type: object
+      properties:
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send ERC20 token to
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that ERC20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - to
+        - contractAddress
+        - digits
+        - fromPrivateKey
+        - amount
+    TransferBscBep20:
+      type: object
+      properties:
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send BEP20 token to
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of BEP20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that BEP20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - to
+        - contractAddress
+        - digits
+        - fromPrivateKey
+        - amount
+    TransferCeloOrCeloErc20Token:
+      type: object
+      properties:
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send ERC20 token to
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that ERC20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - to
+        - contractAddress
+        - digits
+        - feeCurrency
+        - fromPrivateKey
+        - amount
+    # TransferTronTrc20:
     #   type: object
     #   properties:
-    #     chain:
-    #       type: string
-    #       example: CELO
-    #       description: Chain to work with.
-    #       enum:
-    #         - CELO
-    #     to:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Blockchain address to send ERC721 token to
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-    #       type: string
-    #     tokenId:
-    #       description: ID of token.
-    #       example: "100000"
-    #       type: string
-    #       maxLength: 256
-    #     contractAddress:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Address of ERC721 token
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-    #       type: string
     #     fromPrivateKey:
     #       type: string
-    #       maxLength: 66
-    #       example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-    #       minLength: 66
-    #       description: Private key of sender address. Private key, or signature Id must be present.
-    #     nonce:
-    #       type: number
-    #       example: 1
-    #       description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
-    #     feeCurrency:
-    #       type: string
-    #       description: Currency to pay for transaction gas
-    #       enum:
-    #         - CELO
-    #         - CUSD
-    #   required:
-    #     - chain
-    #     - to
-    #     - contractAddress
-    #     - tokenId
-    #     - fromPrivateKey
-    # BurnNftCelo:
-    #   type: object
-    #   properties:
-    #     chain:
-    #       type: string
-    #       example: CELO
-    #       description: Chain to work with.
-    #       enum:
-    #         - CELO
-    #     tokenId:
-    #       description: ID of token to be destroyed.
-    #       example: "100000"
-    #       type: string
-    #       maxLength: 32
-    #     contractAddress:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Address of ERC721 token
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-    #       type: string
-    #     fromPrivateKey:
-    #       type: string
-    #       maxLength: 66
-    #       example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-    #       minLength: 66
-    #       description: Private key of sender address. Private key, or signature Id must be present.
-    #     nonce:
-    #       type: number
-    #       minimum: 0
-    #       description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
-    #     feeCurrency:
-    #       type: string
-    #       description: Currency to pay for transaction gas
-    #       enum:
-    #         - CELO
-    #         - CUSD
-    #   required:
-    #     - chain
-    #     - contractAddress
-    #     - feeCurrency
-    #     - fromPrivateKey
-    #     - tokenId
-    # MintNftCelo:
-    #   type: object
-    #   properties:
-    #     chain:
-    #       type: string
-    #       example: CELO
-    #       description: Chain to work with.
-    #       enum:
-    #         - CELO
-    #     tokenId:
-    #       description: ID of token to be created.
-    #       example: "100000"
-    #       type: string
-    #       maxLength: 32
+    #       minLength: 64
+    #       maxLength: 64
+    #       description: Private key of the address, from which the TRX will be sent.
+    #       example: 842E09EB40D8175979EFB0071B28163E11AED0F14BDD84090A4CEFB936EF5701
     #     to:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Blockchain address to send ERC721 token to
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
     #       type: string
-    #     contractAddress:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Address of ERC721 token
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+    #       minLength: 34
+    #       maxLength: 34
+    #       description: Recipient address of TRON account in Base58 format.
+    #       example: TYMwiDu22V6XG3yk6W9cTVBz48okKLRczh
+    #     tokenAddress:
     #       type: string
-    #     url:
-    #       description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
-    #       example: "https://my_token_data.com"
-    #       type: string
-    #       maxLength: 256
-    #     fromPrivateKey:
-    #       type: string
-    #       maxLength: 66
-    #       example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-    #       minLength: 66
-    #       description: Private key of sender address. Private key, or signature Id must be present.
-    #     nonce:
+    #       minLength: 34
+    #       maxLength: 34
+    #       description: Address of the TRC20 token to transfer.
+    #       example: "TVAEYCmc15awaDRAjUZ1kvcHwQQaoPw2CW"
+    #     feeLimit:
     #       type: number
     #       minimum: 0
-    #       description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
-    #     feeCurrency:
-    #       type: string
-    #       description: Currency to pay for transaction gas
-    #       enum:
-    #         - CELO
-    #         - CUSD
-    #   required:
-    #     - chain
-    #     - to
-    #     - url
-    #     - feeCurrency
-    #     - contractAddress
-    #     - fromPrivateKey
-    #     - tokenId
-    # MintNftKMSCelo:
-    #   type: object
-    #   properties:
-    #     chain:
-    #       type: string
-    #       example: CELO
-    #       description: Chain to work with.
-    #       enum:
-    #         - CELO
-    #     tokenId:
-    #       description: ID of token to be created.
+    #       description: Fee in TRX to be paid.
+    #       example: 0.01
+    #     amount:
+    #       description: Amount to be sent in TRX.
     #       example: "100000"
+    #       pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
     #       type: string
-    #       maxLength: 32
-    #     to:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Blockchain address to send ERC721 token to
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-    #       type: string
-    #     contractAddress:
-    #       maxLength: 42
-    #       minLength: 42
-    #       description: Address of ERC721 token
-    #       example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-    #       type: string
-    #     url:
-    #       description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
-    #       example: "https://my_token_data.com"
-    #       type: string
-    #       maxLength: 256
-    #     index:
-    #       type: number
-    #       minimum: 0
-    #       description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
-    #     signatureId:
-    #       type: string
-    #       minLength: 36
-    #       maxLength: 36
-    #       format: uuid
-    #       example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-    #       description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-    #     nonce:
-    #       type: number
-    #       minimum: 0
-    #       description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
-    #     feeCurrency:
-    #       type: string
-    #       description: Currency to pay for transaction gas
-    #       enum:
-    #         - CELO
-    #         - CUSD
     #   required:
-    #     - chain
+    #     - fromPrivateKey
+    #     - tokenAddress
     #     - to
-    #     - url
-    #     - feeCurrency
-    #     - contractAddress
-    #     - signatureId
-    #     - tokenId
+    #     - amount
+    #     - feeLimit
