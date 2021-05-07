@@ -4,7 +4,7 @@ import {
     bscGetGasPriceInWei,
     CONTRACT_ADDRESSES,
     Currency,
-    DeployEthErc20,
+    DeployErc20,
     EstimateGasEth,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
@@ -25,7 +25,6 @@ import ERC20_TOKEN_ABI from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 import axios from 'axios';
 import {SignatureId} from '@tatumio/tatum/dist/src/model/response/common/SignatureId';
 import {BscError} from './BscError';
-import {Block} from 'web3-eth';
 import BigNumber from 'bignumber.js';
 
 export abstract class BscService {
@@ -268,7 +267,7 @@ export abstract class BscService {
         });
     }
 
-    public async deployBep20(deploy: DeployEthErc20) {
+    public async deployBep20(deploy: DeployErc20) {
         const transactionData = await prepareDeployBep20SignedTransaction(deploy, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData, signatureId: deploy.signatureId,

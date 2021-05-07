@@ -5,7 +5,7 @@ import {GeneratePrivateKey} from './dto/GeneratePrivateKey';
 import {PathXpubI} from './dto/PathXpubI';
 import {
   BroadcastTx,
-  DeployEthErc20,
+  DeployErc20,
   EstimateGasEth,
   SmartContractMethodInvocation,
   TransferBscBep20,
@@ -102,7 +102,7 @@ export abstract class BscController {
 
   @Post('v3/bsc/bep20/deploy')
   @HttpCode(HttpStatus.OK)
-  public async deployBep20(@Body() body: DeployEthErc20) {
+  public async deployBep20(@Body() body: DeployErc20) {
     try {
       return await await this.service.deployBep20(body);
     } catch (e) {
