@@ -17,7 +17,7 @@ tags:
       </p>
     name: Blockchain / token
 paths:
-  /v3/blockchain/token/{chain}/deploy:
+  /v3/blockchain/token/deploy:
     post:
       description: |
         <p>Deploy Ethereum ERC20 Smart Contract. This method creates new ERC20 (Fungible Tokens) Smart Contract on the blockchain. Smart contract is standardized and audited. It is possible to mint and burn tokens.
@@ -31,14 +31,6 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Deploy
-      parameters:
-        - description: "Network name"
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            example: "CELO"
       requestBody:
         content:
           application/json:
@@ -201,14 +193,6 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: Erc20Transfer
-      parameters:
-        - description: "Network name"
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            example: "CELO"
       requestBody:
         content:
           application/json:
