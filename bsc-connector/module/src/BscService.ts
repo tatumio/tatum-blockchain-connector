@@ -168,7 +168,7 @@ export abstract class BscService {
             } catch (_) {
                 transaction.transactionHash = hash;
             }
-            return BscService.mapTransaction({...transaction, ...receipt});
+            return BscService.mapTransaction({...transaction, ...receipt, hash});
         } catch (e) {
             this.logger.error(e);
             throw new BscError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
