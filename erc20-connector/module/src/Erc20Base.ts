@@ -11,8 +11,6 @@ import {
   DeployCeloErc20,
   MintCeloErc20,
   TransferCeloOrCeloErc20Token,
-  TransferTronTrc20,
-  CreateTronTrc20,
 } from '@tatumio/tatum';
 
 export class ChainBurnErc20 extends BurnErc20 {
@@ -66,17 +64,5 @@ export class ChainMintCeloErc20 extends MintCeloErc20 {
 export class ChainTransferCeloErc20Token extends TransferCeloOrCeloErc20Token {
   @IsNotEmpty()
   @IsIn([Currency.CELO])
-  public chain: Currency;
-}
-
-export class ChainTransferTronTrc20 extends TransferTronTrc20 {
-  @IsNotEmpty()
-  @IsIn([Currency.TRON])
-  public chain: Currency;
-}
-
-export class ChainCreateTronTrc20 extends CreateTronTrc20 {
-  @IsNotEmpty()
-  @IsIn([Currency.TRON])
   public chain: Currency;
 }

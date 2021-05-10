@@ -12,15 +12,14 @@ import {
   ChainDeployCeloErc20,
   ChainMintCeloErc20,
   ChainTransferCeloErc20Token,
-  ChainTransferTronTrc20,
-  ChainCreateTronTrc20,
+  // ChainTransferTronTrc20,
+  // ChainCreateTronTrc20,
 } from './Erc20Base';
 import {
     MintCeloErc20,
     BurnCeloErc20,
     DeployCeloErc20,
     Currency,
-    ethBroadcast,
     DeployErc20,
     MintErc20,
     BurnErc20,
@@ -29,24 +28,16 @@ import {
     prepareEthMintErc20SignedTransaction,
     prepareEthOrErc20SignedTransaction,
     prepareEthBurnErc20SignedTransaction,
-    bscBroadcast,
     TransferBscBep20,
     TransferCeloOrCeloErc20Token,
     prepareDeployBep20SignedTransaction,
     prepareMintBep20SignedTransaction,
     prepareBurnBep20SignedTransaction,
     prepareBscOrBep20SignedTransaction,
-    celoBroadcast,
     prepareCeloBurnErc20SignedTransaction,
     prepareCeloDeployErc20SignedTransaction,
     prepareCeloMintErc20SignedTransaction,
     prepareCeloTransferErc20SignedTransaction,
-    // tronBroadcast,
-    CreateTronTrc20,
-    TransferTronTrc20,
-    prepareTronCreateTrc20SignedTransaction,
-    prepareTronCreateTrc20SignedKMSTransaction,
-    prepareTronTrc20SignedTransaction,
     TransactionHash
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
@@ -61,6 +52,8 @@ export abstract class Erc20Service {
     protected abstract isTestnet(): Promise<boolean>;
 
     protected abstract getNodesUrl(chain: Currency, testnet: boolean): Promise<string[]>;
+
+    protected abstract broadcast(chain: Currency, txData: string, signatureId?: string): Promise<TransactionHash>;
 
     private async getFirstNodeUrl(chain: Currency, testnet: boolean): Promise<string> {
       const nodes = await this.getNodesUrl(chain, testnet);
@@ -78,23 +71,6 @@ export abstract class Erc20Service {
       throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
     }
 
-    protected broadcast(chain: Currency, txData: string, signatureId?: string) {
-      if (chain === Currency.ETH) {
-        return ethBroadcast(txData, signatureId)
-      } else
-      if (chain === Currency.BSC) {
-        return bscBroadcast(txData, signatureId)
-      } else
-      if (chain === Currency.CELO) {
-        return celoBroadcast(txData)
-      // } else
-      // if (chain === Currency.TRON) {
-      //  return tronBroadcast(txData)
-      }
-
-      return null
-    }
-
     public async getErc20Balance(chain: Currency, address: string, contractAddress: string): Promise<{ balance: string }> {
         let contractOrAddress;
         switch (chain) {
@@ -107,9 +83,6 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 contractOrAddress = contractAddress;
                 break;
-            // case Currency.TRON:
-            //     // TODO!!!
-            //     break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -120,7 +93,7 @@ export abstract class Erc20Service {
         return { balance: await contract.methods.balanceOf(address).call() }
     }
   
-    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferTronTrc20):
+    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const { chain, ..._body } = body;
@@ -135,14 +108,11 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloTransferErc20SignedTransaction(testnet, _body as TransferCeloOrCeloErc20Token, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
-            // case Currency.TRON:
-            //     txData = await prepareTronTrc20SignedTransaction(testnet, _body as TransferTronTrc20);
-            //     break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -162,14 +132,11 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloBurnErc20SignedTransaction(testnet, _body as BurnCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
-            // case Currency.TRON:
-            //     // TODO!!!
-            //     break
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
@@ -189,20 +156,17 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloMintErc20SignedTransaction(testnet, _body as MintCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
-            // case Currency.TRON:
-            //     // TODO!!!
-            //     break
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
     }
 
-    public async deployErc20(body: ChainDeployErc20 | ChainDeployCeloErc20 | ChainCreateTronTrc20): Promise<TransactionHash | { signatureId: string }> {
+    public async deployErc20(body: ChainDeployErc20 | ChainDeployCeloErc20): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const { chain, ..._body } = body;
         let txData;
@@ -216,18 +180,11 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloDeployErc20SignedTransaction(testnet, _body as DeployCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
-            // case Currency.TRON:
-            //     if (body.signatureId) {
-            //         txData = await prepareTronCreateTrc20SignedKMSTransaction(testnet, _body as CreateTronTrc20);
-            //     } else {
-            //         txData = await prepareTronCreateTrc20SignedTransaction(testnet, _body as CreateTronTrc20);
-            //     }
-            //     break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }

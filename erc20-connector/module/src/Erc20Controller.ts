@@ -11,8 +11,6 @@ import {
     ChainDeployCeloErc20,
     ChainMintCeloErc20,
     ChainTransferCeloErc20Token,
-    ChainTransferTronTrc20,
-    ChainCreateTronTrc20,
   } from './Erc20Base';
 import { PathAddressContractAddressChain } from './dto/PathAddressContractAddressChain';
 import { PathChain } from './dto/PathChain';
@@ -33,7 +31,7 @@ export abstract class Erc20Controller {
     @Post('/v3/blockchain/token/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc20(
-      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferTronTrc20
+      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token
     ) {
         try {
             return await this.service.transferErc20(body);
@@ -82,7 +80,7 @@ export abstract class Erc20Controller {
 
     @Post('/v3/blockchain/token/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployErc20(@Body() body: ChainDeployErc20 | ChainDeployCeloErc20 | ChainCreateTronTrc20) {
+    public async deployErc20(@Body() body: ChainDeployErc20 | ChainDeployCeloErc20 ) {
         try {
             return await this.service.deployErc20(body);
         } catch (e) {
