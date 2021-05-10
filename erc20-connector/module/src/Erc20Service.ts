@@ -136,7 +136,7 @@ export abstract class Erc20Service {
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body['index'])};
+            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
             return this.broadcast(chain, txData);
         }
