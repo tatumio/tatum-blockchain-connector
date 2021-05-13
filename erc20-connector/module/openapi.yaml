@@ -443,6 +443,7 @@ components:
           enum:
             - CELO
             - CUSD
+            - CEUR
       required:
         - chain
         - name
@@ -683,6 +684,27 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+        currency:
+          description: Currency to transfer from Ethereum Blockchain Account.
+          enum:
+            - USDT
+            - LEO
+            - LINK
+            - UNI
+            - FREE
+            - MKR
+            - USDC
+            - BAT
+            - TUSD
+            - PAX
+            - PAXG
+            - PLTC
+            - MMY
+            - WBTC
+            - XCON
+            - ETH
+          example: ETH
+          type: string
         to:
           maxLength: 50
           minLength: 1
@@ -735,6 +757,7 @@ components:
               example: "20"
       required:
         - chain
+        - currency
         - to
         - contractAddress
         - digits
