@@ -14,6 +14,8 @@ import {
   ChainTransferCeloErc20Token,
   // ChainTransferTronTrc20,
   // ChainCreateTronTrc20,
+  ChainSmartContractMethodInvocation,
+  ChainCeloSmartContractMethodInvocation,
 } from './Erc20Base';
 import {
     MintCeloErc20,
@@ -38,7 +40,12 @@ import {
     prepareCeloDeployErc20SignedTransaction,
     prepareCeloMintErc20SignedTransaction,
     prepareCeloTransferErc20SignedTransaction,
-    TransactionHash
+    TransactionHash,
+    SmartContractMethodInvocation,
+    CeloSmartContractMethodInvocation,
+    sendSmartContractMethodInvocationTransaction,
+    sendBscSmartContractMethodInvocationTransaction,
+    sendCeloSmartContractMethodInvocationTransaction,
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 
@@ -93,6 +100,25 @@ export abstract class Erc20Service {
         return { balance: await contract.methods.balanceOf(address).call() }
     }
   
+    public async invokeSmartContractMethod(body: ChainSmartContractMethodInvocation | ChainCeloSmartContractMethodInvocation) {
+      const testnet = await this.isTestnet();
+      const { chain, ..._body } = body;
+      let txData;
+      switch (chain) {
+          case Currency.ETH:
+              txData = await sendSmartContractMethodInvocationTransaction(_body as SmartContractMethodInvocation, (await this.getFirstNodeUrl(chain, testnet)));
+              break;
+          case Currency.BSC:
+              txData = await sendBscSmartContractMethodInvocationTransaction(_body as SmartContractMethodInvocation, (await this.getFirstNodeUrl(chain, testnet)));
+              break;
+          case Currency.CELO:
+              txData = await sendCeloSmartContractMethodInvocationTransaction(testnet, _body as CeloSmartContractMethodInvocation, (await this.getFirstNodeUrl(chain, testnet)));
+              break;
+          default:
+              throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
+      }
+    }
+
     public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();

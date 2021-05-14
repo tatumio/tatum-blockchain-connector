@@ -26,7 +26,9 @@ import {
     prepareCeloTransferErc20SignedTransaction,
     TransactionHash,
     TransferCeloOrCeloErc20Token,
-    CeloTransferErc721
+    CeloTransferErc721,
+    CeloSmartContractMethodInvocation,
+    sendCeloSmartContractMethodInvocationTransaction,
 } from '@tatumio/tatum';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
 import token_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
@@ -126,6 +128,11 @@ export abstract class CeloService {
         } else {
             return this.broadcast(txData);
         }
+    }
+
+    public async invokeSmartContractMethod(body: CeloSmartContractMethodInvocation) {
+        const testnet = await this.isTestnet();
+        return sendCeloSmartContractMethodInvocationTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
     }
 
     public async mintErc20(body: MintCeloErc20): Promise<TransactionHash | { signatureId: string }> {
