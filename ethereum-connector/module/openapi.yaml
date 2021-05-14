@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.1.0
+  version: 1.1.1
   title: Tatum Ethereum API
 tags:
   - description: |
