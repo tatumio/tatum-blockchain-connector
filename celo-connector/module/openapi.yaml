@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.0
+  version: 1.0.1
   title: Tatum Celo API
 tags:
   - description: |
@@ -2145,6 +2145,12 @@ components:
           minLength: 1
           pattern: ^[a-zA-Z0-9_]+$
           type: string
+        totalCap:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
         supply:
           description: Max supply of ERC20 token.
           maxLength: 38
@@ -2203,6 +2209,12 @@ components:
           maxLength: 100
           minLength: 1
           pattern: ^[a-zA-Z0-9_]+$
+          type: string
+        totalCap:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
           type: string
         supply:
           description: Max supply of ERC20 token.
