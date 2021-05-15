@@ -11,6 +11,8 @@ import {
   DeployCeloErc20,
   MintCeloErc20,
   TransferCeloOrCeloErc20Token,
+  SmartContractMethodInvocation,
+  CeloSmartContractMethodInvocation,
 } from '@tatumio/tatum';
 
 export class ChainBurnErc20 extends BurnErc20 {
@@ -62,6 +64,18 @@ export class ChainMintCeloErc20 extends MintCeloErc20 {
 }
 
 export class ChainTransferCeloErc20Token extends TransferCeloOrCeloErc20Token {
+  @IsNotEmpty()
+  @IsIn([Currency.CELO])
+  public chain: Currency;
+}
+
+export class ChainSmartContractMethodInvocation extends SmartContractMethodInvocation {
+  @IsNotEmpty()
+  @IsIn([Currency.ETH, Currency.BSC])
+  public chain: Currency;
+}
+
+export class ChainCeloSmartContractMethodInvocation extends CeloSmartContractMethodInvocation {
   @IsNotEmpty()
   @IsIn([Currency.CELO])
   public chain: Currency;

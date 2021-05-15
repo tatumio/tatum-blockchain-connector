@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.1
+  version: 1.0.2
   title: Tatum Celo API
 tags:
   - description: |
@@ -506,6 +506,60 @@ paths:
         - X-Api-Key: [ ]
       x-code-samples:
       summary: Mint Celo ERC20
+      tags:
+        - Blockchain / Celo
+  /v3/celo/smartcontract:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Invoke any method on an existing Smart Contract. It is possible to call read or write method on the Smart Contract defined via contractAddress.
+        For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
+      operationId: CeloBlockchainSmartContractInvocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/CallCeloSmartContractMethod"
+                - $ref: "#/components/schemas/CallCeloSmartContractMethodKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+                  - $ref: "#/components/schemas/Data"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403CeloBroadcast"
+                  - $ref: "#/components/schemas/Error403CeloGasPrice"
+                  - $ref: "#/components/schemas/Error403CeloScBody"
+                  - $ref: "#/components/schemas/Error403CeloGasCalculation"
+                  - $ref: "#/components/schemas/Error403CeloTxHash"
+                  - $ref: "#/components/schemas/Error403CeloTxSign"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Invoke Smart Contract method
       tags:
         - Blockchain / Celo
   /v3/celo/erc20/transaction:
@@ -2263,6 +2317,139 @@ components:
         - supply
         - signatureId
         - digits
+        - feeCurrency
+    CallCeloSmartContractMethod:
+      type: object
+      properties:
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        methodName:
+          minLength: 1
+          maxLength: 500
+          description: Name of the method to invoke on smart contract.
+          type: string
+          example: transfer
+        methodABI:
+          type: object
+          description: ABI of the method to invoke.
+        params:
+          type: array
+          items:
+            type: object
+          description: Parameters of the method to be invoked.
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - contractAddress
+        - params
+        - methodABI
+        - fromPrivateKey
+        - methodName
+        - feeCurrency
+    CallCeloSmartContractMethodKMS:
+      type: object
+      properties:
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        methodName:
+          minLength: 1
+          maxLength: 500
+          description: Name of the method to invoke on smart contract.
+          type: string
+          example: transfer
+        methodABI:
+          type: object
+          description: ABI of the method to invoke.
+        params:
+          type: array
+          items:
+            type: object
+          description: Parameters of the method to be invoked.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - contractAddress
+        - params
+        - methodABI
+        - signatureId
+        - methodName
         - feeCurrency
     TransferErc20Celo:
       type: object

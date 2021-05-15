@@ -11,6 +11,8 @@ import {
     ChainDeployCeloErc20,
     ChainMintCeloErc20,
     ChainTransferCeloErc20Token,
+    ChainSmartContractMethodInvocation,
+    ChainCeloSmartContractMethodInvocation,
   } from './Erc20Base';
 import { PathAddressContractAddressChain } from './dto/PathAddressContractAddressChain';
 import { PathChain } from './dto/PathChain';
@@ -28,6 +30,16 @@ export abstract class Erc20Controller {
         }
     }
 
+    @Post('v3/blockchain/token/smartcontract')
+    @HttpCode(HttpStatus.OK)
+    public async invokeSmartContractMethod(@Body() body: ChainSmartContractMethodInvocation | ChainCeloSmartContractMethodInvocation) {
+      try {
+        return await this.service.invokeSmartContractMethod(body);
+      } catch (e) {
+        throw new Erc20Error(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'erc20.error');
+      }
+    }
+  
     @Post('/v3/blockchain/token/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc20(

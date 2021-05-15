@@ -14,7 +14,7 @@ import {
   ETH_BASED_CURRENCIES,
   TransferCustomErc20,
   prepareCustomErc20SignedTransaction,
-  DeployEthErc20,
+  DeployErc20,
   prepareDeployErc20SignedTransaction,
   BroadcastTx,
   sendSmartContractReadMethodInvocationTransaction,
@@ -186,9 +186,9 @@ export abstract class EthereumService {
     return this.broadcastOrStoreKMSTransaction({ transactionData, signatureId: smartContractMethodInvocation.signatureId })
   }
 
-  public async deployErc20Blockchain(deployEthErc20: DeployEthErc20) {
-    const transactionData = await prepareDeployErc20SignedTransaction(deployEthErc20, await this.getFirstNodeUrl())
-    return this.broadcastOrStoreKMSTransaction({ transactionData, signatureId: deployEthErc20.signatureId })
+  public async deployErc20Blockchain(deployErc20: DeployErc20) {
+    const transactionData = await prepareDeployErc20SignedTransaction(deployErc20, await this.getFirstNodeUrl())
+    return this.broadcastOrStoreKMSTransaction({ transactionData, signatureId: deployErc20.signatureId })
 
   }
 

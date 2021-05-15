@@ -10,7 +10,7 @@ import { GeneratePrivateKey } from './dto/GeneratePrivateKey'
 import { PathXpubI } from './dto/PathXpubI'
 import {
   BroadcastTx,
-  DeployEthErc20,
+  DeployErc20,
   EstimateGasEth, EthBurnErc721, EthDeployErc721,
   EthMintErc721, EthMintMultipleErc721, EthTransferErc721, SmartContractMethodInvocation,
   TransferCustomErc20,
@@ -111,7 +111,7 @@ export abstract class EthereumController {
 
   @Post('v3/ethereum/erc20/deploy')
   @HttpCode(HttpStatus.OK)
-  public async deployErc20(@Body() body: DeployEthErc20) {
+  public async deployErc20(@Body() body: DeployErc20) {
     try {
       return await await this.service.deployErc20Blockchain(body);
     } catch (e) {
