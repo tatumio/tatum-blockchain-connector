@@ -306,7 +306,7 @@ export abstract class CeloService {
         return {key: await generatePrivateKeyFromMnemonic(Currency.CELO, await this.isTestnet(), mnemonic, index)};
     }
 
-    protected async getClient(testnet: boolean) {
+    protected async getClient(testnet: boolean): Promise<Web3> {
         return new Web3((await this.getNodesUrl(testnet))[0]);
     }
 }
