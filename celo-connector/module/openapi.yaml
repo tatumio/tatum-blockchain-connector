@@ -548,12 +548,12 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403CeloBroadcast"
-                  - $ref: "#/components/schemas/Error403CeloGasPrice"
-                  - $ref: "#/components/schemas/Error403CeloScBody"
-                  - $ref: "#/components/schemas/Error403CeloGasCalculation"
-                  - $ref: "#/components/schemas/Error403CeloTxHash"
-                  - $ref: "#/components/schemas/Error403CeloTxSign"
+                  - $ref: "#/components/schemas/Error403EthBroadcast"
+                  - $ref: "#/components/schemas/Error403EthGasPrice"
+                  - $ref: "#/components/schemas/Error403EthScBody"
+                  - $ref: "#/components/schemas/Error403EthGasCalculation"
+                  - $ref: "#/components/schemas/Error403EthTxHash"
+                  - $ref: "#/components/schemas/Error403EthTxSign"
         500:
           <<: *API500
       security:

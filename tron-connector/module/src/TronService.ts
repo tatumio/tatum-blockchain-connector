@@ -261,7 +261,7 @@ export abstract class TronService {
     }
 
     public async getTrc10Detail(id: string): Promise<TronTrc10> {
-        const url = `${(await this.getNodesUrl(await this.isTestnet()))[0]}/v1/assets/${id}`;
+        const url = `${(await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io'}/v1/assets/${id}`;
         const {data} = (await axios.get(url, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (!data?.length) {
             throw new Error('No such asset.');

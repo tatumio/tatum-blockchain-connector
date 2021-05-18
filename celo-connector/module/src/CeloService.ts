@@ -5,30 +5,30 @@ import {CeloError} from './CeloError';
 import {
     BurnCeloErc20,
     CeloBurnErc721,
+    CeloDeployErc721,
+    CeloMintErc721,
+    CeloMintMultipleErc721,
+    CeloSmartContractMethodInvocation,
+    CeloTransferErc721,
     Currency,
     DeployCeloErc20,
-    CeloDeployErc721,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
     generateWallet,
     MintCeloErc20,
-    CeloMintErc721,
-    CeloMintMultipleErc721,
+    prepareCeloBurnErc20SignedTransaction,
     prepareCeloBurnErc721SignedTransaction,
+    prepareCeloDeployErc20SignedTransaction,
     prepareCeloDeployErc721SignedTransaction,
+    prepareCeloMintErc20SignedTransaction,
     prepareCeloMintErc721SignedTransaction,
     prepareCeloMintMultipleErc721SignedTransaction,
     prepareCeloOrCUsdSignedTransaction,
-    prepareCeloTransferErc721SignedTransaction,
-    prepareCeloBurnErc20SignedTransaction,
-    prepareCeloDeployErc20SignedTransaction,
-    prepareCeloMintErc20SignedTransaction,
+    prepareCeloSmartContractWriteMethodInvocation,
     prepareCeloTransferErc20SignedTransaction,
+    prepareCeloTransferErc721SignedTransaction, sendCeloSmartContractReadMethodInvocationTransaction,
     TransactionHash,
     TransferCeloOrCeloErc20Token,
-    CeloTransferErc721,
-    CeloSmartContractMethodInvocation,
-    sendCeloSmartContractMethodInvocationTransaction,
 } from '@tatumio/tatum';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
 import token_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
@@ -132,7 +132,15 @@ export abstract class CeloService {
 
     public async invokeSmartContractMethod(body: CeloSmartContractMethodInvocation) {
         const testnet = await this.isTestnet();
-        return sendCeloSmartContractMethodInvocationTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
+        if (body.methodABI.stateMutability === 'view') {
+            return sendCeloSmartContractReadMethodInvocationTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
+        }
+        const txData = await prepareCeloSmartContractWriteMethodInvocation(testnet, body, (await this.getNodesUrl(testnet))[0]);
+        if (body.signatureId) {
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
+        } else {
+            return this.broadcast(txData);
+        }
     }
 
     public async mintErc20(body: MintCeloErc20): Promise<TransactionHash | { signatureId: string }> {

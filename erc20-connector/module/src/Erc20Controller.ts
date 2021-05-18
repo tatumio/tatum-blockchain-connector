@@ -1,21 +1,18 @@
-import { BadRequestException, Body, Param, Get, Post, HttpCode, HttpStatus } from '@nestjs/common';
-import { Erc20Service } from './Erc20Service';
-import { Erc20Error } from './Erc20Error';
+import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post} from '@nestjs/common';
+import {Erc20Service} from './Erc20Service';
+import {Erc20Error} from './Erc20Error';
 import {
-    ChainBurnErc20,
-    ChainDeployErc20,
-    ChainMintErc20,
-    ChainTransferEthErc20,
-    ChainTransferBscBep20,
     ChainBurnCeloErc20,
+    ChainBurnErc20,
     ChainDeployCeloErc20,
+    ChainDeployErc20,
     ChainMintCeloErc20,
+    ChainMintErc20,
+    ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
-    ChainSmartContractMethodInvocation,
-    ChainCeloSmartContractMethodInvocation,
-  } from './Erc20Base';
-import { PathAddressContractAddressChain } from './dto/PathAddressContractAddressChain';
-import { PathChain } from './dto/PathChain';
+    ChainTransferEthErc20,
+} from './Erc20Base';
+import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 
 export abstract class Erc20Controller {
     protected constructor(protected readonly service: Erc20Service) {
@@ -30,16 +27,6 @@ export abstract class Erc20Controller {
         }
     }
 
-    @Post('v3/blockchain/token/smartcontract')
-    @HttpCode(HttpStatus.OK)
-    public async invokeSmartContractMethod(@Body() body: ChainSmartContractMethodInvocation | ChainCeloSmartContractMethodInvocation) {
-      try {
-        return await this.service.invokeSmartContractMethod(body);
-      } catch (e) {
-        throw new Erc20Error(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'erc20.error');
-      }
-    }
-  
     @Post('/v3/blockchain/token/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc20(
