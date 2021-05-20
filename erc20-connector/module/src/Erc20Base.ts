@@ -17,25 +17,25 @@ import {
 
 export class ChainBurnErc20 extends BurnErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
   public chain: Currency;
 }
 
 export class ChainDeployErc20 extends DeployErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
   public chain: Currency;
 }
 
 export class ChainMintErc20 extends MintErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
   public chain: Currency;
 }
 
 export class ChainTransferEthErc20 extends TransferEthErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
   public chain: Currency;
 }
 
@@ -71,7 +71,7 @@ export class ChainTransferCeloErc20Token extends TransferCeloOrCeloErc20Token {
 
 export class ChainSmartContractMethodInvocation extends SmartContractMethodInvocation {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
   public chain: Currency;
 }
 

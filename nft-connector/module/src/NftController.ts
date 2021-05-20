@@ -11,13 +11,14 @@ import {
     EthDeployErc721,
     EthMintErc721,
     EthMintMultipleErc721,
-    EthTransferErc721, FlowBurnNft, FlowDeployNft, FlowMintMultipleNft, FlowMintNft, FlowTransferNft,
+    FlowBurnNft, FlowDeployNft, FlowMintMultipleNft, FlowMintNft, FlowTransferNft,
+    EthTransferErc721,
+    UpdateCashbackErc721,
+    CeloUpdateCashbackErc721,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
 import {PathChainTxId} from './dto/PathChainTxId';
-import {UpdateCashbackErc721} from '@tatumio/tatum/dist/src/model/request/UpdateCashbackErc721';
-import {CeloUpdateCashbackErc721} from '@tatumio/tatum/dist/src/model/request/CeloUpdateCashbackErc721';
 
 export abstract class NftController {
     protected constructor(protected readonly service: NftService) {
