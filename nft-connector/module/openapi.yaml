@@ -18,6 +18,7 @@ tags:
       <ul>
       <li><b>Ethereum</b></li>
       <li><b>Celo</b></li>
+      <li><b>Flow</b></li>
       <li><b>Binance Smart Chain</b></li>
       </ul>
       </p>
@@ -32,9 +33,11 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
-        It is possible to see the code of the deployed contract <a href="https://github.com/tatumio/tatum-middleware/blob/master/src/contracts/erc721/ERC721Full.sol" target="_blank">here</a>.<br/><br/>
+        It is possible to see the code of the deployed contract <a href="https://github.com/tatumio/tatum-middleware/blob/master/src/contracts/erc721/ERC721Full.sol" target="_blank">for EVM chains here</a>
+         or here <a href="https://github.com/tatumio/flow-contracts" target="_blank">for Flow</a>.<br/><br/>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
@@ -51,6 +54,9 @@ paths:
                 - $ref: "#/components/schemas/DeployNftCeloKMS"
                 - $ref: "#/components/schemas/DeployNft"
                 - $ref: "#/components/schemas/DeployNftKMS"
+                - $ref: "#/components/schemas/DeployNftFlowPK"
+                - $ref: "#/components/schemas/DeployNftFlowMnemonic"
+                - $ref: "#/components/schemas/DeployNftFlowKMS"
         required: true
       responses:
         200:
@@ -98,12 +104,13 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Create one NFT Smart Contract Token and transfer it to destination account. Create and transfer any ERC721 token from smart contract defined in contractAddress.
+        <p>Create one NFT Token and transfer it to destination account. Create and transfer any NFT token from smart contract defined in contractAddress.
         It is possible to add URL to the created token with a more detailed information about it.<br/><br/>
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -122,6 +129,9 @@ paths:
                 - $ref: "#/components/schemas/MintNftKMSCelo"
                 - $ref: "#/components/schemas/MintNft"
                 - $ref: "#/components/schemas/MintNftKMS"
+                - $ref: "#/components/schemas/MintNftFlowPK"
+                - $ref: "#/components/schemas/MintNftFlowMnemonic"
+                - $ref: "#/components/schemas/MintNftFlowKMS"
         required: true
       responses:
         200:
@@ -155,11 +165,12 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Transfer NFT Smart Contract Tokens from account to account. Transfer any ERC721 token from smart contract defined in contractAddress.
-        Only 1 specific token with specified tokenId can be transfered. This method invokes ERC721 method safeTransfer() to transfer the token.<br/><br/>
+        <p>Transfer NFT Tokens from account to account. Transfer any NFT token from smart contract defined in contractAddress.
+        Only 1 specific token with specified tokenId can be transfered. This method invokes ERC721 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Flow</b></li>
         <li><b>Celo</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
@@ -179,6 +190,9 @@ paths:
                 - $ref: "#/components/schemas/TransferNftCelo"
                 - $ref: "#/components/schemas/TransferNftKMS"
                 - $ref: "#/components/schemas/TransferNftKMSCelo"
+                - $ref: "#/components/schemas/TransferNftFlowPK"
+                - $ref: "#/components/schemas/TransferNftFlowMnemonic"
+                - $ref: "#/components/schemas/TransferNftFlowKMS"
         required: true
       responses:
         200:
@@ -212,11 +226,12 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Create multiple NFT Smart Contract Tokens and transfer them to destination account. Create and transfer any ERC721 tokens from smart contract defined in contractAddress.<br/><br/>
+        <p>Create multiple NFT Tokens and transfer them to destination account. Create and transfer any NFT tokens from smart contract defined in contractAddress.<br/><br/>
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -235,6 +250,9 @@ paths:
                 - $ref: "#/components/schemas/MintMultipleNftKMSCelo"
                 - $ref: "#/components/schemas/MintMultipleNft"
                 - $ref: "#/components/schemas/MintMultipleNftKMS"
+                - $ref: "#/components/schemas/MintMultipleNftFlowPK"
+                - $ref: "#/components/schemas/MintMultipleNftFlowMnemonic"
+                - $ref: "#/components/schemas/MintMultipleNftFlowKMS"
         required: true
       responses:
         200:
@@ -268,11 +286,12 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Burn one NFT Smart Contract Token. This method destroys any ERC721 token from smart contract defined in contractAddress.<br/><br/>
+        <p>Burn one NFT Token. This method destroys any NFT token from smart contract defined in contractAddress.<br/><br/>
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -291,6 +310,9 @@ paths:
                 - $ref: "#/components/schemas/BurnNftKMSCelo"
                 - $ref: "#/components/schemas/BurnNft"
                 - $ref: "#/components/schemas/BurnNftKMS"
+                - $ref: "#/components/schemas/BurnNftFlowPK"
+                - $ref: "#/components/schemas/BurnNftFlowMnemonic"
+                - $ref: "#/components/schemas/BurnNftFlowKMS"
         required: true
       responses:
         200:
@@ -377,6 +399,60 @@ paths:
       summary: Update Royalty NFT
       tags:
         - Blockchain / NFT
+  /v3/nft/address/{chain}/{hash}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/><p>Get NFT contract address from deploy transaction.</p>"
+      operationId: NftGetContractAddress
+      parameters:
+        - description: Blockchain to work with
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum:
+              - ETH
+              - CELO
+              - FLOW
+              - BSC
+        - description: "Transaction hash"
+          in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+            example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contractAddress:
+                    type: string
+                    description: Address of the NFT token.
+                    example: "0xc21C81ef03f98898Fb155E00C364e8a7b9D158b8"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403TxNotFound"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get Transaction
+      tags:
+        - Blockchain / NFT
   /v3/nft/transaction/{chain}/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get NFT transaction by transaction hash.</p>"
@@ -391,6 +467,7 @@ paths:
             enum:
               - ETH
               - CELO
+              - FLOW
               - BSC
         - description: "Transaction hash"
           in: path
@@ -407,6 +484,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/CeloTx"
                   - $ref: "#/components/schemas/EthTx"
+                  - $ref: "#/components/schemas/FlowTx"
           description: OK
         400:
           <<: *API400
@@ -441,6 +519,7 @@ paths:
             enum:
               - ETH
               - CELO
+              - FLOW
               - BSC
         - description: "Account address"
           in: path
@@ -449,7 +528,7 @@ paths:
           schema:
             type: string
             example: "0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
-        - description: "ERC721 contract address"
+        - description: "NFT contract address"
           in: path
           name: contractAddress
           required: true
@@ -508,13 +587,20 @@ paths:
             type: string
             example: "1"
             maxLength: 32
-        - description: "ERC721 contract address"
+        - description: "NFT contract address"
           in: path
           name: contractAddress
           required: true
           schema:
             type: string
             example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+        - description: Account holding this token. FLOW only.
+          in: query
+          required: false
+          name: account
+          schema:
+            type: string
+            example: "0xc1b45bc27b9c61c3"
       responses:
         200:
           content:
@@ -568,7 +654,7 @@ paths:
             type: string
             example: "1"
             maxLength: 32
-        - description: "ERC721 contract address"
+        - description: "NFT contract address"
           in: path
           name: contractAddress
           required: true
@@ -640,7 +726,7 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         tokenId:
@@ -651,7 +737,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -688,7 +774,7 @@ components:
             - CELO
         to:
           type: array
-          description: Blockchain address to send ERC721 token to.
+          description: Blockchain address to send NFT token to.
           example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85" ]
           items:
             maxLength: 42
@@ -730,9 +816,9 @@ components:
               description: Value of the royalty to be paid.
               example: "0.5"
         contractAddress:
-          maxLength: 42
-          minLength: 42
-          description: Address of ERC721 token
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -770,13 +856,13 @@ components:
           enum:
             - CELO
         name:
-          description: Name of the ERC721 token
+          description: Name of the NFT token
           example: My ERC721
           maxLength: 100
           minLength: 1
           type: string
         symbol:
-          description: Symbol of the ERC721 token
+          description: Symbol of the NFT token
           example: ERC_SYMBOL
           maxLength: 30
           minLength: 1
@@ -814,13 +900,13 @@ components:
           enum:
             - CELO
         name:
-          description: Name of the ERC721 token
+          description: Name of the NFT token
           example: My ERC721
           maxLength: 100
           minLength: 1
           type: string
         symbol:
-          description: Symbol of the ERC721 token
+          description: Symbol of the NFT token
           example: ERC_SYMBOL
           maxLength: 30
           minLength: 1
@@ -863,7 +949,7 @@ components:
             - CELO
         to:
           type: array
-          description: Blockchain address to send ERC721 token to.
+          description: Blockchain address to send NFT token to.
           example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85" ]
           items:
             maxLength: 42
@@ -907,7 +993,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -957,7 +1043,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -1000,7 +1086,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -1031,6 +1117,672 @@ components:
         - contractAddress
         - tokenId
         - signatureId
+    BurnNftFlowPK:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        tokenId:
+          description: ID of token to be destroyed.
+          example: "100000"
+          type: string
+          maxLength: 32
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        privateKey:
+          type: string
+          maxLength: 64
+          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 64
+          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
+      required:
+        - chain
+        - contractAddress
+        - account
+        - privateKey
+        - tokenId
+    BurnNftFlowMnemonic:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        tokenId:
+          description: ID of token to be destroyed.
+          example: "100000"
+          type: string
+          maxLength: 32
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        mnemonic:
+          type: string
+          maxLength: 500
+          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
+          minLength: 1
+          description: Mnemonic to generate private key of sender address.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - mnemonic
+        - index
+        - tokenId
+    BurnNftFlowKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        tokenId:
+          description: ID of token to be destroyed.
+          example: "100000"
+          type: string
+          maxLength: 32
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - signatureId
+        - tokenId
+    MintMultipleNftFlowPK:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: array
+          description: Blockchain address to send NFT token to.
+          example: [ "0xc1b45bc27b9c61c3" ]
+          items:
+            maxLength: 18
+            minLength: 18
+            type: string
+        url:
+          type: array
+          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
+          example: [ "https://my_token_data.com" ]
+          items:
+            type: string
+            maxLength: 256
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        privateKey:
+          type: string
+          maxLength: 64
+          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 64
+          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
+      required:
+        - chain
+        - contractAddress
+        - account
+        - privateKey
+        - to
+        - url
+    MintMultipleNftFlowMnemonic:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: array
+          description: Blockchain address to send NFT token to.
+          example: [ "0xc1b45bc27b9c61c3" ]
+          items:
+            maxLength: 18
+            minLength: 18
+            type: string
+        url:
+          type: array
+          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
+          example: [ "https://my_token_data.com" ]
+          items:
+            type: string
+            maxLength: 256
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        mnemonic:
+          type: string
+          maxLength: 500
+          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
+          minLength: 1
+          description: Mnemonic to generate private key of sender address.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - mnemonic
+        - index
+        - to
+        - url
+    MintMultipleNftFlowKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: array
+          description: Blockchain address to send NFT token to.
+          example: [ "0xc1b45bc27b9c61c3" ]
+          items:
+            maxLength: 18
+            minLength: 18
+            type: string
+        url:
+          type: array
+          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
+          example: [ "https://my_token_data.com" ]
+          items:
+            type: string
+            maxLength: 256
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - signatureId
+        - to
+        - url
+    MintNftFlowPK:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: string
+          description: Blockchain address to send NFT token to.
+          example: "0xc1b45bc27b9c61c3"
+          maxLength: 18
+          minLength: 18
+        url:
+          type: string
+          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
+          example:  "https://my_token_data.com"
+          maxLength: 256
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        privateKey:
+          type: string
+          maxLength: 64
+          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 64
+          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
+      required:
+        - chain
+        - contractAddress
+        - account
+        - privateKey
+        - to
+        - url
+    MintNftFlowMnemonic:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: string
+          description: Blockchain address to send NFT token to.
+          example: "0xc1b45bc27b9c61c3"
+          maxLength: 18
+          minLength: 18
+        url:
+          type: string
+          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
+          example:  "https://my_token_data.com"
+          maxLength: 256
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        mnemonic:
+          type: string
+          maxLength: 500
+          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
+          minLength: 1
+          description: Mnemonic to generate private key of sender address.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - mnemonic
+        - index
+        - to
+        - url
+    MintNftFlowKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: string
+          description: Blockchain address to send NFT token to.
+          example: "0xc1b45bc27b9c61c3"
+          maxLength: 18
+          minLength: 18
+        url:
+          type: string
+          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
+          example:  "https://my_token_data.com"
+          maxLength: 256
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - signatureId
+        - to
+        - url
+    DeployNftFlowPK:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        privateKey:
+          type: string
+          maxLength: 64
+          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 64
+          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
+      required:
+        - chain
+        - account
+        - privateKey
+    DeployNftFlowMnemonic:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        mnemonic:
+          type: string
+          maxLength: 500
+          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
+          minLength: 1
+          description: Mnemonic to generate private key of sender address.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - account
+        - mnemonic
+        - index
+    DeployNftFlowKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - account
+        - signatureId
+    TransferNftFlowPK:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: string
+          description: Blockchain address to send NFT token to.
+          example: "0xc1b45bc27b9c61c3"
+          maxLength: 18
+          minLength: 18
+        tokenId:
+          description: ID of token to be sent.
+          example: "100000"
+          type: string
+          maxLength: 32
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        privateKey:
+          type: string
+          maxLength: 64
+          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 64
+          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
+      required:
+        - chain
+        - contractAddress
+        - account
+        - privateKey
+        - to
+        - tokenId
+    TransferNftFlowMnemonic:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: string
+          description: Blockchain address to send NFT token to.
+          example: "0xc1b45bc27b9c61c3"
+          maxLength: 18
+          minLength: 18
+        tokenId:
+          description: ID of token to be sent.
+          example: "100000"
+          type: string
+          maxLength: 32
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        mnemonic:
+          type: string
+          maxLength: 500
+          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
+          minLength: 1
+          description: Mnemonic to generate private key of sender address.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - mnemonic
+        - index
+        - to
+        - tokenId
+    TransferNftFlowKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: FLOW
+          description: Chain to work with.
+          enum:
+            - FLOW
+        to:
+          type: string
+          description: Blockchain address to send NFT token to.
+          example: "0xc1b45bc27b9c61c3"
+          maxLength: 18
+          minLength: 18
+        tokenId:
+          description: ID of token to be sent.
+          example: "100000"
+          type: string
+          maxLength: 32
+        contractAddress:
+          maxLength: 36
+          minLength: 36
+          description: Address of NFT token
+          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
+          type: string
+        account:
+          type: string
+          maxLength: 18
+          example: "0xc1b45bc27b9c61c3"
+          minLength: 18
+          description: Blockchain address of the sender account.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          description: Derivation index of sender address.
+          example: 0
+          type: integer
+          maximum: 2147483647
+      required:
+        - chain
+        - contractAddress
+        - account
+        - signatureId
+        - to
+        - tokenId
     UpdateCashbackValueForAuthorNftCelo:
       type: object
       properties:
@@ -1058,7 +1810,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -1113,7 +1865,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -1162,7 +1914,7 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         tokenId:
@@ -1173,7 +1925,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -1222,13 +1974,13 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         url:
@@ -1294,13 +2046,13 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         url:
@@ -1371,7 +2123,7 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         tokenId:
@@ -1382,7 +2134,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -1429,13 +2181,13 @@ components:
             - ETH
             - BSC
         name:
-          description: Name of the ERC721 token
+          description: Name of the NFT token
           example: My ERC721
           maxLength: 100
           minLength: 1
           type: string
         symbol:
-          description: Symbol of the ERC721 token
+          description: Symbol of the NFT token
           example: ERC_SYMBOL
           maxLength: 30
           minLength: 1
@@ -1483,13 +2235,13 @@ components:
             - ETH
             - BSC
         name:
-          description: Name of the ERC721 token
+          description: Name of the NFT token
           example: My ERC721
           maxLength: 100
           minLength: 1
           type: string
         symbol:
-          description: Symbol of the ERC721 token
+          description: Symbol of the NFT token
           example: ERC_SYMBOL
           maxLength: 30
           minLength: 1
@@ -1548,7 +2300,7 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         tokenId:
@@ -1559,7 +2311,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -1618,13 +2370,13 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         url:
@@ -1705,13 +2457,13 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send ERC721 token to
+          description: Blockchain address to send NFT token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         url:
@@ -1786,7 +2538,7 @@ components:
             - BSC
         to:
           type: array
-          description: Blockchain address to send ERC721 token to.
+          description: Blockchain address to send NFT token to.
           example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85" ]
           items:
             maxLength: 42
@@ -1829,7 +2581,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -1878,7 +2630,7 @@ components:
             - BSC
         to:
           type: array
-          description: Blockchain address to send ERC721 token to.
+          description: Blockchain address to send NFT token to.
           example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85" ]
           items:
             maxLength: 42
@@ -1921,7 +2673,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -1981,7 +2733,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -2046,7 +2798,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:
@@ -2118,7 +2870,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -2175,7 +2927,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of ERC721 token
+          description: Address of NFT token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         index:

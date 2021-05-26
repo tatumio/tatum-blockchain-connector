@@ -4,10 +4,10 @@ import {PathChain} from './PathChain';
 export class PathAddressContractAddressChain extends PathChain{
 
     @IsNotEmpty()
-    @Length(42, 42)
+    @Length(36, 42)
     public contractAddress: string;
 
     @IsNotEmpty()
-    @Length(42, 42)
+    @Length(18, 18)
     public address: string;
 }

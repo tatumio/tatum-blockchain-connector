@@ -1,4 +1,4 @@
-import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Put} from '@nestjs/common';
+import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Put, Query} from '@nestjs/common';
 import {NftService} from './NftService';
 import {NftError} from './NftError';
 import {
@@ -11,7 +11,7 @@ import {
     EthDeployErc721,
     EthMintErc721,
     EthMintMultipleErc721,
-    EthTransferErc721,
+    EthTransferErc721, FlowBurnNft, FlowDeployNft, FlowMintMultipleNft, FlowMintNft, FlowTransferNft,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
@@ -41,10 +41,19 @@ export abstract class NftController {
         }
     }
 
-    @Get('/v3/nft/metadata/:chain/:contractAddress/:tokenId')
-    public async getMetadataErc721(@Param() path: PathTokenIdContractAddressChain) {
+    @Get('/v3/nft/address/:chain/:txId')
+    public async getContractAddress(@Param() path: PathChainTxId) {
         try {
-            return await this.service.getMetadataErc721(path.chain, path.tokenId, path.contractAddress);
+            return await this.service.getContractAddress(path.chain, path.txId);
+        } catch (e) {
+            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+        }
+    }
+
+    @Get('/v3/nft/metadata/:chain/:contractAddress/:tokenId')
+    public async getMetadataErc721(@Param() path: PathTokenIdContractAddressChain, @Query('account') account: string) {
+        try {
+            return await this.service.getMetadataErc721(path.chain, path.tokenId, path.contractAddress, account);
         } catch (e) {
             throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
         }
@@ -61,7 +70,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/transaction')
     @HttpCode(HttpStatus.OK)
-    public async transactionErc721(@Body() body: CeloTransferErc721 | EthTransferErc721) {
+    public async transactionErc721(@Body() body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft) {
         try {
             return await this.service.transferErc721(body);
         } catch (e) {
@@ -77,7 +86,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/mint')
     @HttpCode(HttpStatus.OK)
-    public async mintErc721(@Body() body: CeloMintErc721 | EthMintErc721) {
+    public async mintErc721(@Body() body: CeloMintErc721 | EthMintErc721 | FlowMintNft) {
         try {
             return await this.service.mintErc721(body);
         } catch (e) {
@@ -109,7 +118,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/mint/batch')
     @HttpCode(HttpStatus.OK)
-    public async mintMultipleErc721(@Body() body: CeloMintMultipleErc721 | EthMintMultipleErc721) {
+    public async mintMultipleErc721(@Body() body: CeloMintMultipleErc721 | EthMintMultipleErc721 | FlowMintMultipleNft) {
         try {
             return await this.service.mintMultipleErc721(body);
         } catch (e) {
@@ -125,7 +134,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnErc721(@Body() body: CeloBurnErc721 | EthBurnErc721) {
+    public async burnErc721(@Body() body: CeloBurnErc721 | EthBurnErc721 | FlowBurnNft) {
         try {
             return await this.service.burnErc721(body);
         } catch (e) {
@@ -141,7 +150,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployErc721(@Body() body: CeloDeployErc721 | EthDeployErc721) {
+    public async deployErc721(@Body() body: CeloDeployErc721 | EthDeployErc721 | FlowDeployNft) {
         try {
             return await this.service.deployErc721(body);
         } catch (e) {

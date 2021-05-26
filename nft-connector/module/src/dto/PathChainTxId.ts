@@ -4,6 +4,6 @@ import {PathChain} from './PathChain';
 export class PathChainTxId extends PathChain {
 
     @IsNotEmpty()
-    @Length(66, 66)
+    @Length(64, 66)
     public txId: string;
 }
