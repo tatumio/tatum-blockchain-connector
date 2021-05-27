@@ -29,7 +29,7 @@
   "bugs": "https://github.com/tatumio/tatum-blockchain-connector/issues",
   "peerDependencies": {
     "@nestjs/common": "^7.6.1",
-    "@tatumio/tatum": "^1.13.15",
+    "@tatumio/tatum": "^1.14.5",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "class-transformer": "^0.2.3",
@@ -43,7 +43,14 @@
     "reflect-metadata": "0.1.13"
   },
   "devDependencies": {
-    "@tatumio/tatum": "^1.11.13",
+    "@nestjs/common": "^7.6.1",
+    "@tatumio/tatum": "^1.14.5",
+    "axios": "^0.21.1",
+    "bignumber.js": "^9.0.0",
+    "class-transformer": "^0.2.3",
+    "class-validator": "0.13.0",
+    "nestjs-pino": "^1.3.0",
+    "rxjs": "^6.6.3",
     "@typescript-eslint/eslint-plugin": "4.15.2",
     "@typescript-eslint/parser": "4.15.2",
     "eslint": "7.21.0",
