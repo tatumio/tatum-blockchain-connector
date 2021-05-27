@@ -401,7 +401,7 @@ export abstract class NftService {
                 txData = await prepareCeloDeployErc721SignedTransaction(testnet, body as CeloDeployErc721, provider);
                 break;
             case Currency.FLOW:
-                await this.deployFlowNft(testnet, body as FlowDeployNft);
+                return await this.deployFlowNft(testnet, body as FlowDeployNft);
                 return;
             case Currency.XDC:
                 txData = await prepareXdcDeployErc721SignedTransaction(body as EthDeployErc721, (await this.getNodesUrl(chain, testnet))[0]);
