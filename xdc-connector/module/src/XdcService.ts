@@ -187,6 +187,10 @@ export abstract class XdcService {
         return this.broadcast(transactionData);
     }
 
+    private fromXdcAddress (xdcAddress) {
+      return xdcAddress.replace('xdc', '0x')
+    }
+
     public async web3Method(body: any) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         return (await axios.post(node, body, {headers: {'Content-Type': 'application/json'}})).data;
@@ -216,58 +220,86 @@ export abstract class XdcService {
 
     public async getBalance(address: string): Promise<{ balance: string }> {
         const client = await this.getClient(await this.isTestnet());
-        return {balance: fromWei(await client.eth.getBalance(address), 'ether')};
+        return {balance: fromWei(await client.eth.getBalance(this.fromXdcAddress(address)), 'ether')};
     }
 
-    public async getErc20Balance(address: string, contractAddress?: string): Promise<{ balance: string }> {
-        const client = await this.getClient(await this.isTestnet());
+    public async getErc20Balance(address: string, currency?: string, contractAddress?: string): Promise<{ balance: string }> {
+        const testnet = await this.isTestnet();
+        const client = await this.getClient(testnet);
+        if (testnet && currency) {
+            throw new XdcError('Unsupported ERC20 currency for testnet, only mainet supports currency parameter. Please use contractAddress instead.', 'erc20.not.supported');
+        }
+        const _contract = currency === Currency.XDC ? CONTRACT_ADDRESSES[currency] : this.fromXdcAddress(contractAddress as string);
+
         // @ts-ignore
-        const contract = new client.eth.Contract(ERC20_TOKEN_ABI, contractAddress);
+        const contract = new client.eth.Contract(ERC20_TOKEN_ABI, _contract);
         return {balance: await contract.methods.balanceOf(address).call()};
     }
 
     public async sendXdcOrErc20Transaction(transfer: TransferEthErc20): Promise<TransactionHash | SignatureId> {
-        const transactionData = await prepareXdcOrErc20SignedTransaction(transfer, await this.getFirstNodeUrl(await this.isTestnet()));
+        const tx = {
+          ...transfer,
+          to: this.fromXdcAddress(transfer.to)
+        } as TransferEthErc20;
+
+        const transactionData = await prepareXdcOrErc20SignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
-            transactionData, signatureId: transfer.signatureId,
-            index: transfer.index
+            transactionData, 
+            signatureId: tx.signatureId,
+            index: tx.index
         });
     }
 
     public async sendCustomErc20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionHash | SignatureId> {
-        const transactionData = await prepareXdcCustomErc20SignedTransaction(transferCustomErc20, await this.getFirstNodeUrl(await this.isTestnet()));
+      const tx = {
+        ...transferCustomErc20,
+        to: this.fromXdcAddress(transferCustomErc20.to),
+        contractAddress: transferCustomErc20.contractAddress ? this.fromXdcAddress(transferCustomErc20.contractAddress) : undefined,
+      } as TransferCustomErc20;
+
+      const transactionData = await prepareXdcCustomErc20SignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
-            signatureId: transferCustomErc20.signatureId,
-            index: transferCustomErc20.index
+            signatureId: tx.signatureId,
+            index: tx.index
         });
     }
 
     public async getTransactionCount(address: string) {
         const client = await this.getClient(await this.isTestnet());
-        return client.eth.getTransactionCount(address, 'pending');
+        return client.eth.getTransactionCount(this.fromXdcAddress(address), 'pending');
     }
 
     public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
+        const tx = {
+          ...smartContractMethodInvocation,
+          contractAddress: this.fromXdcAddress(smartContractMethodInvocation.contractAddress),
+        } as SmartContractMethodInvocation;
+
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {
-            return sendXdcSmartContractReadMethodInvocationTransaction(smartContractMethodInvocation, node);
+            return sendXdcSmartContractReadMethodInvocationTransaction(tx, node);
         }
 
-        const transactionData = await prepareXdcSmartContractWriteMethodInvocation(smartContractMethodInvocation, node);
+        const transactionData = await prepareXdcSmartContractWriteMethodInvocation(tx, node);
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
-            signatureId: smartContractMethodInvocation.signatureId,
-            index: smartContractMethodInvocation.index
+            signatureId: tx.signatureId,
+            index: tx.index
         });
     }
 
     public async deployErc20(deploy: DeployErc20) {
-        const transactionData = await prepareXdcDeployErc20SignedTransaction(deploy, await this.getFirstNodeUrl(await this.isTestnet()));
+      const tx = {
+        ...deploy,
+        address: this.fromXdcAddress(deploy.address),
+      } as DeployErc20;
+
+      const transactionData = await prepareXdcDeployErc20SignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
-            signatureId: deploy.signatureId,
-            index: deploy.index
+            signatureId: tx.signatureId,
+            index: tx.index
         });
     }
 }

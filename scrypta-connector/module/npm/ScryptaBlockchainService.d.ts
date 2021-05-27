@@ -23,10 +23,10 @@ export declare abstract class ScryptaBlockchainService {
     getCurrentBlock(): Promise<number>;
     getBlockHash(i: number): Promise<string>;
     getBlock(hash: string): Promise<ScryptaBlock>;
-    generateAddress(xpub: string, derivationIndex: number): Promise<string>;
+    generateAddress(xpub: string, derivationIndex: number): Promise<any>;
     generateWallet(mnem?: string): Promise<Tatum.Wallet | {
-        address: any;
-        privateKey: any;
+        address: string;
+        privateKey: string;
     } | {
         privateKey: string;
         address: string;

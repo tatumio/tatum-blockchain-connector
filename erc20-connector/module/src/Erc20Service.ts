@@ -109,7 +109,7 @@ export abstract class Erc20Service {
                 txData = await prepareCeloTransferErc20SignedTransaction(testnet, _body as TransferCeloOrCeloErc20Token, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.XDC:
-                txData = await prepareXdcOrErc20SignedTransaction(_body as TransferBscBep20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareXdcOrErc20SignedTransaction(_body as TransferEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
@@ -193,6 +193,7 @@ export abstract class Erc20Service {
                 txData = await prepareXdcDeployErc20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
+                console.log('*** DEPLOY ***', body)
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {
