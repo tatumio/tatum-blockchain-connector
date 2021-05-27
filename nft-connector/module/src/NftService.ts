@@ -257,10 +257,10 @@ export abstract class NftService {
                     return await sendFlowNftMintToken(testnet, body as FlowMintNft);
                 }
             case Currency.XDC:
-                if (!body.authorAddresses) {
-                    txData = await prepareXdcMintErc721SignedTransaction(body, provider);
+                if (!(body as EthMintErc721).authorAddresses) {
+                    txData = await prepareXdcMintErc721SignedTransaction(body as EthMintErc721, provider);
                 } else {
-                    txData = await prepareXdcMintErcCashback721SignedTransaction(body, provider);
+                    txData = await prepareXdcMintErcCashback721SignedTransaction(body as EthMintErc721, provider);
                 }
                 break;
             default:
@@ -307,10 +307,10 @@ export abstract class NftService {
                     return await sendFlowNftMintMultipleToken(testnet, body as FlowMintMultipleNft);
                 }
             case Currency.XDC:
-                if (!body.authorAddresses) {
-                    txData = await prepareXdcMintMultipleErc721SignedTransaction(body, provider);
+                if (!(body as EthMintMultipleErc721).authorAddresses) {
+                    txData = await prepareXdcMintMultipleErc721SignedTransaction(body as EthMintMultipleErc721, provider);
                 } else {
-                    txData = await prepareXdcMintMultipleCashbackErc721SignedTransaction(body, provider);
+                    txData = await prepareXdcMintMultipleCashbackErc721SignedTransaction(body as EthMintMultipleErc721, provider);
                 }
                 break;
             default:
@@ -404,7 +404,7 @@ export abstract class NftService {
                 await this.deployFlowNft(testnet, body as FlowDeployNft);
                 return;
             case Currency.XDC:
-                txData = await prepareXdcDeployErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
+                txData = await prepareXdcDeployErc721SignedTransaction(body as EthDeployErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
