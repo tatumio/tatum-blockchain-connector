@@ -212,8 +212,13 @@ export abstract class XdcService {
 
     public async estimateGas(body: EstimateGasEth): Promise<any> {
         const client = await this.getClient(await this.isTestnet());
+        const _body = {
+          ...body,
+          to: body.to ? this.fromXdcAddress(body.to) : undefined,
+          from: body.from ? this.fromXdcAddress(body.from) : undefined,
+        } as EstimateGasEth;
         return {
-            gasLimit: await client.eth.estimateGas(body),
+            gasLimit: await client.eth.estimateGas(_body),
             gasPrice: await xdcGetGasPriceInWei(),
         };
     }
@@ -221,19 +226,6 @@ export abstract class XdcService {
     public async getBalance(address: string): Promise<{ balance: string }> {
         const client = await this.getClient(await this.isTestnet());
         return {balance: fromWei(await client.eth.getBalance(this.fromXdcAddress(address)), 'ether')};
-    }
-
-    public async getErc20Balance(address: string, currency?: string, contractAddress?: string): Promise<{ balance: string }> {
-        const testnet = await this.isTestnet();
-        const client = await this.getClient(testnet);
-        if (testnet && currency) {
-            throw new XdcError('Unsupported ERC20 currency for testnet, only mainet supports currency parameter. Please use contractAddress instead.', 'erc20.not.supported');
-        }
-        const _contract = currency === Currency.XDC ? CONTRACT_ADDRESSES[currency] : this.fromXdcAddress(contractAddress as string);
-
-        // @ts-ignore
-        const contract = new client.eth.Contract(ERC20_TOKEN_ABI, _contract);
-        return {balance: await contract.methods.balanceOf(address).call()};
     }
 
     public async sendXdcOrErc20Transaction(transfer: TransferEthErc20): Promise<TransactionHash | SignatureId> {
@@ -272,8 +264,10 @@ export abstract class XdcService {
 
     public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
+        const params = smartContractMethodInvocation.params.map(e => `${e}`.startsWith('xdc') ? e.replace('xdc', '0x') : e);
         const tx = {
           ...smartContractMethodInvocation,
+          params,
           contractAddress: this.fromXdcAddress(smartContractMethodInvocation.contractAddress),
         } as SmartContractMethodInvocation;
 
@@ -282,20 +276,6 @@ export abstract class XdcService {
         }
 
         const transactionData = await prepareXdcSmartContractWriteMethodInvocation(tx, node);
-        return this.broadcastOrStoreKMSTransaction({
-            transactionData,
-            signatureId: tx.signatureId,
-            index: tx.index
-        });
-    }
-
-    public async deployErc20(deploy: DeployErc20) {
-      const tx = {
-        ...deploy,
-        address: this.fromXdcAddress(deploy.address),
-      } as DeployErc20;
-
-      const transactionData = await prepareXdcDeployErc20SignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
             signatureId: tx.signatureId,

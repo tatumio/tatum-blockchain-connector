@@ -5,14 +5,12 @@ import {GeneratePrivateKey} from './dto/GeneratePrivateKey';
 import {PathXpubI} from './dto/PathXpubI';
 import {
   BroadcastTx,
-  DeployErc20,
   EstimateGasEth,
   SmartContractMethodInvocation,
   TransferEthErc20,
   TransferCustomErc20,
 } from '@tatumio/tatum';
 import {PathAddress} from './dto/PathAddress';
-import {QueryCurrencyContractAddress} from './dto/QueryCurrencyContractAddress';
 import {PathHash} from './dto/PathHash';
 import {XdcError} from './XdcError';
 
@@ -100,16 +98,6 @@ export abstract class XdcController {
     }
   }
 
-  @Post('v3/xdc/erc20/deploy')
-  @HttpCode(HttpStatus.OK)
-  public async deployErc20(@Body() body: DeployErc20) {
-    try {
-      return await await this.service.deployErc20(body);
-    } catch (e) {
-      throw new XdcError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'xdc.error');
-    }
-  }
-
   @Post('v3/xdc/broadcast')
   @HttpCode(HttpStatus.OK)
   public async broadcast(@Body() body: BroadcastTx) {
@@ -145,16 +133,6 @@ export abstract class XdcController {
   public async getAccountBalance(@Param() path: PathAddress) {
     try {
       return await this.service.getBalance(path.address);
-    } catch (e) {
-      throw new XdcError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'xdc.error');
-    }
-  }
-
-  @Get('v3/xdc/account/balance/erc20/:address')
-  @HttpCode(HttpStatus.OK)
-  public async getErc20Balance(@Param() path: PathAddress, @Query() query: QueryCurrencyContractAddress) {
-    try {
-      return await this.service.getErc20Balance(path.address, query.contractAddress);
     } catch (e) {
       throw new XdcError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'xdc.error');
     }
