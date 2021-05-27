@@ -36,6 +36,10 @@ import {
     TransferBscBep20,
     TransferCeloOrCeloErc20Token,
     TransferEthErc20,
+    prepareXdcOrErc20SignedTransaction,
+    prepareXdcBurnErc20SignedTransaction, 
+    prepareXdcMintErc20SignedTransaction,   
+    prepareXdcDeployErc20SignedTransaction,
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 
@@ -61,7 +65,7 @@ export abstract class Erc20Service {
     }
 
     private async getClient(chain: Currency, testnet: boolean) {
-        if ([Currency.ETH, Currency.BSC, Currency.CELO].includes(chain)) {
+        if ([Currency.ETH, Currency.BSC, Currency.CELO, Currency.XDC].includes(chain)) {
             return new Web3((await this.getFirstNodeUrl(chain, testnet)));
         }
 
@@ -72,12 +76,11 @@ export abstract class Erc20Service {
         let contractOrAddress;
         switch (chain) {
             case Currency.ETH:
-                contractOrAddress = contractAddress;
-                break;
             case Currency.BSC:
+            case Currency.CELO:
                 contractOrAddress = contractAddress;
                 break;
-            case Currency.CELO:
+            case Currency.XDC:
                 contractOrAddress = contractAddress;
                 break;
             default:
@@ -105,6 +108,9 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloTransferErc20SignedTransaction(testnet, _body as TransferCeloOrCeloErc20Token, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.XDC:
+                txData = await prepareXdcOrErc20SignedTransaction(_body as TransferEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -128,6 +134,9 @@ export abstract class Erc20Service {
                 break;
             case Currency.CELO:
                 txData = await prepareCeloBurnErc20SignedTransaction(testnet, _body as BurnCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
+            case Currency.XDC:
+                txData = await prepareXdcBurnErc20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
@@ -153,6 +162,9 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloMintErc20SignedTransaction(testnet, _body as MintCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.XDC:
+                txData = await prepareXdcMintErc20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -177,7 +189,11 @@ export abstract class Erc20Service {
             case Currency.CELO:
                 txData = await prepareCeloDeployErc20SignedTransaction(testnet, _body as DeployCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.XDC:
+                txData = await prepareXdcDeployErc20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             default:
+                console.log('*** DEPLOY ***', body)
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
         if (body.signatureId) {

@@ -4,6 +4,6 @@ import {IsIn, IsNotEmpty} from 'class-validator';
 export class PathChain {
 
     @IsNotEmpty()
-    @IsIn([Currency.ETH, Currency.CELO, Currency.BSC, Currency.FLOW])
+    @IsIn([Currency.ETH, Currency.CELO, Currency.BSC, Currency.FLOW, Currency.XDC])
     public chain: Currency;
 }

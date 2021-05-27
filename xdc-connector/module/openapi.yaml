@@ -1,0 +1,1588 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://api-eu1.tatum.io'
+info:
+  version: 1.0.0
+  title: Tatum XinFin API
+tags:
+  - description: |
+      <p>XinBin is enterprise ready hybrid blockchain for global trade and finance, combining the power of Public & Private blockchains with interoperable Smart Contracts.
+      <br/>
+      Tatum supports 2 chains:
+      <ul><li>Mainnet - a regular live chain
+      <li>Testnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
+      a faucet, e.g. <a target="_blank" href="https://apothem.network/#getTestXDC">https://apothem.network/#getTestXDC</a></li></ul></p>
+    name: Blockchain / XDC
+paths:
+  /v3/xdc/wallet:
+    get:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>Tatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. 
+        Mnemonic phrase consists of 24 special words in defined order and can restore access to all generated addresses and private keys.
+        <br/>
+        Each address is identified by 3 main values:
+        <ul><li>Private Key - your secret value, which should never be revealed</li>
+        <li>Public Key - public address to be published</li>
+        <li>Derivation index - index of generated address</li></ul>
+        </p>
+        <p>Tatum follows BIP44 specification and generates for XDC wallet with derivation path m'/44'/550'/0'/0. 
+        More about BIP44 HD wallets can be found here - <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki</a>.
+        Generate BIP44 compatible XDC wallet.</p>
+      operationId: XdcGenerateWallet
+      parameters:
+        - description: "Mnemonic to use for generation of extended public and private keys."
+          in: query
+          name: mnemonic
+          required: false
+          schema:
+            type: string
+            maxLength: 500
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wallet"
+          description: OK
+        400: &API400
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error400"
+          description: Bad Request. Validation failed for the given object in the HTTP Body or Request parameters.
+        401: &API401
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error401NotActive"
+                  - $ref: "#/components/schemas/Error401Invalid"
+          description: Unauthorized. Not valid or inactive subscription key present in the HTTP Header.
+        500: &API500
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500"
+          description: Internal server error. There was an error on the server during the processing of the request.
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Generate XDC wallet
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/address/{xpub}/{index}:
+    get:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>Generate XDC account deposit address from Extended public key. Deposit address is generated for the specific 
+        index - each extended public key can generate up to 2^31 addresses starting from index 0 until 2^31.</p>
+      operationId: XdcGenerateAddress
+      parameters:
+        - description: "Extended public key of wallet."
+          in: path
+          name: xpub
+          required: true
+          schema:
+            type: string
+            example: xpub6EsCk1uU6cJzqvP9CdsTiJwT2rF748YkPnhv5Qo8q44DG7nn2vbyt48YRsNSUYS44jFCW9gwvD9kLQu9AuqXpTpM1c5hgg9PsuBLdeNncid
+        - description: "Derivation index of desired address to be generated."
+          in: path
+          name: index
+          required: true
+          schema:
+            type: number
+            example: 0
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: XDC address
+                    example: "xdca7673161CbfE0116A4De9E341f8465940c2211d4"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Generate XDC account address from Extended public key
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/wallet/priv:
+    post:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>Generate private key of address from mnemonic for given derivation path index. Private key is generated for the specific index - each mnemonic
+        can generate up to 2^31 private keys starting from index 0 until 2^31.</p>
+      operationId: XdcGenerateAddressPrivateKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrivKeyRequest"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrivKey"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Generate XDC private key
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/web3/{xApiKey}:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Use this endpoint URL as a http-based web3 driver to connect directly to the XDC node provided by Tatum.
+        To learn more about XDC Web3, please visit <a href="https://howto.xinfin.org/" target="_blank">XDC developer's guide.</a></p>
+      operationId: XdcWeb3Driver
+      parameters:
+        - description: "Tatum X-API-Key used for authorization."
+          in: path
+          name: xApiKey
+          required: true
+          schema:
+            type: string
+            example: asdlkfjnqunalkwjfnq2oi303294857k
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Any valid Web3 method content body.
+              example: { "jsonrpc": "2.0","method": "web3_clientVersion","params": [ ],"id": 2 }
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Any valid Web3 response.
+                example: { "jsonrpc": "2.0","id": 2,"result": "Geth/v1.9.9-omnibus-e320ae4c-20191206/linux-amd64/go1.13.4" }
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      x-code-samples:
+      summary: Web3 HTTP driver
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/block/current:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/>
+        <p>Get XDC current block number. This is the number of the latest block in the blockchain.</p>"
+      operationId: XdcGetCurrentBlock
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: number
+                description: Current block number
+                example: 649127
+          description: OK
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get current block number
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/block/{hash}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/>
+        <p>Get XDC block by block hash or block number.</p>"
+      operationId: XdcGetBlock
+      parameters:
+        - description: "Block hash or block number"
+          in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+            example: 647065
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XdcBlock"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get XDC block by hash
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/account/balance/{address}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/>
+        <p>Get account balance in XDC. This method does not prints any balance of the ERC20 or ERC721 tokens on the account.</p>"
+      operationId: XdcGetBalance
+      parameters:
+        - description: "Account address"
+          in: path
+          name: address
+          required: true
+          schema:
+            type: string
+            example: "xdc3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    description: Balance in XDC
+                    example: "10.52"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get XDC Account balance
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/account/balance/erc20/{address}:
+    get:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>Get XDC ERC20 Account balance in the smallest ERC20 unit. Result value is balance * 10^decimals.
+        It is possible to obtain the balance of any ERC20 token, either supported by Tatum natively or via the address of the ERC20 token.</p>
+      operationId: XdcErc20GetBalance
+      parameters:
+        - description: "Account address"
+          in: path
+          name: address
+          required: true
+          schema:
+            type: string
+            example: "xdc3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
+        - description: ERC20 contract address to get balance of.
+          in: query
+          name: contractAddress
+          schema:
+            type: string
+            maxLength: 42
+            minLength: 42
+            example: "xcddac17f958d2ee523a2206206994597c13d831ec7"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  balance:
+                    type: string
+                    description: Balance in ERC20 smallest unit
+                    example: "1000000"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get XDC ERC20 Account balance
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/transaction/{hash}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/>
+        <p>Get XDC transaction by transaction hash.</p>"
+      operationId: XdcGetTransaction
+      parameters:
+        - description: "Transaction hash"
+          in: path
+          name: hash
+          required: true
+          schema:
+            type: string
+            example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XdcTx"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403XdcBroadcast"
+                  - $ref: "#/components/schemas/Error403XdcGasCalculation"
+                  - $ref: "#/components/schemas/Error403XdcTxHash"
+                  - $ref: "#/components/schemas/Error403XdcTxSign"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get XDC Transaction
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/transaction/count/{address}:
+    get:
+      description: |
+        <h4>1 credit per API call.</h4><br/>
+        <p>Get a number of outgoing XDC transactions for the address. When a transaction is sent, there can be multiple outgoing transactions,
+        which are not yet processed by the blockchain. To distinguish between them, there is a counter called a nonce, which represents
+        the order of the transaction in the list of outgoing transactions.</p>
+      operationId: XdcGetTransactionCount
+      parameters:
+        - description: "address"
+          in: path
+          name: address
+          required: true
+          schema:
+            type: string
+            maxLength: 42
+            minLength: 42
+            example: "0xdac17f958d2ee523a2206206994597c13d831ec7"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: number
+                example: 5
+                description: Number of transactions, that were made from this address. Can be used as a nonce parameter in send transaction calls.
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get count of outgoing XDC transactions
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/transaction:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Send XDC or Tatum supported ERC20 token from account to account.<br/><br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        </p>
+      operationId: XdcBlockchainTransfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/TransferXdcBlockchain"
+                - $ref: "#/components/schemas/TransferXdcBlockchainKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403XdcBroadcast"
+                  - $ref: "#/components/schemas/Error403XdcGasCalculation"
+                  - $ref: "#/components/schemas/Error403XdcTxHash"
+                  - $ref: "#/components/schemas/Error403XdcTxSign"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Send XDC / ERC20 from account to account
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/gas:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Estimate gasLimit and gasPrice of the XDC transaction. Gas price is obtained from <a href="https://rpc.xinfin.network/gasPrice" target="_blank">https://rpc.xinfin.network/gasPrice</a>.
+        </p>
+      operationId: XdcEstimateGas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/XdcEstimateGas"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - gasLimit
+                  - gasPrice
+                properties:
+                  gasLimit:
+                    type: string
+                    description: Gas limit for transaction in gas price.
+                    example: "40000"
+                  gasPrice:
+                    type: string
+                    description: Gas price in wei.
+                    example: "5"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403XdcGasCalculation"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Estimate XDC transaction fees
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/smartcontract:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Invoke any method on an existing Smart Contract. It is possible to call read or write method on the Smart Contract defined via contractAddress.
+        For read operations, data is returned, for write operations, transaction Id of the associated transaction is returned.<br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
+      operationId: XdcBlockchainSmartContractInvocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/CallXdxSmartContractMethod"
+                - $ref: "#/components/schemas/CallXdxSmartContractMethodKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+                  - $ref: "#/components/schemas/Data"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403XdcBroadcast"
+                  - $ref: "#/components/schemas/Error403XdcScBody"
+                  - $ref: "#/components/schemas/Error403XdcGasCalculation"
+                  - $ref: "#/components/schemas/Error403XdcTxHash"
+                  - $ref: "#/components/schemas/Error403XdcTxSign"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Invoke Smart Contract method
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/erc20/deploy:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Deploy XDC ERC20 Smart Contract. This method creates new ERC20 (Fungible Tokens) Smart Contract on the blockchain. Smart contract is standardized and audited. It is possible to mint and burn tokens.
+        It is possible to see the code of the deployed contract <a href="https://github.com/tatumio/tatum-middleware/blob/master/src/contracts/token.sol" target="_blank">here</a>.
+        Whole predefined supply of the tokens will be transferred to the chosen address.<br/><br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        </p>
+      operationId: XdcDeployErc20Blockchain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/DeployErc20"
+                - $ref: "#/components/schemas/DeployErc20KMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403XdcBroadcast"
+                  - $ref: "#/components/schemas/Error403XdcGasCalculation"
+                  - $ref: "#/components/schemas/Error403XdcErc20TxSign"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Deploy XDC ERC20 Smart Contract.
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/erc20/transaction:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Transfer XDC ERC20 Smart Contract Tokens from account to account. Transfer any ERC20 tokens from smart contract defined in contractAddress. This method invokes ERC20 method transfer() to transfer tokens.<br/><br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
+        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
+        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
+        </p>
+      operationId: XdcBlockchainTransferErc20
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/TransferErc20Blockchain"
+                - $ref: "#/components/schemas/TransferErc20BlockchainKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/SignatureId"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403XdcBroadcast"
+                  - $ref: "#/components/schemas/Error403XdcGasCalculation"
+                  - $ref: "#/components/schemas/Error403XdcTxHash"
+                  - $ref: "#/components/schemas/Error403XdcTxSign"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Transfer XDC ERC20
+      tags:
+        - Blockchain / XDC
+  /v3/xdc/broadcast:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Broadcast signed transaction to XDC blockchain. This method is used internally from Tatum KMS, Tatum Middleware or Tatum client libraries.
+        It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
+      operationId: XdcBroadcast
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BroadcastKMS"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionHashKMS"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403XdcBroadcast"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Broadcast signed XDC transaction
+      tags:
+        - Blockchain / XDC
+components:
+  securitySchemes:
+    X-Api-Key:
+      description: |
+        To maintain the highest security level, Tatum requires X-API-Key HTTP header.
+        This X-API-Key represents identification of the plan and can be used by 1 developer or per environment.
+        Each X-API-Key is bound to the test or production blockchains.
+      in: header
+      name: x-api-key
+      type: apiKey
+  schemas:
+    XdcBlock:
+      type: object
+      properties:
+        number:
+          description: The block number. 'null' when its pending block.
+          type: number
+          example: 6470657
+        hash:
+          description: Hash of the block. 'null' when its pending block.
+          type: string
+          example: "0x5d40698ee1b1ec589035f2a39c6162287e9056868cc79d66cfb248ba9f66c3fc"
+        parentHash:
+          description: Hash of the parent block.
+          type: string
+          example: "0xd34aab8a455027086ac54034e68608c84d984401a883b7b5d91f9ae0bbefda15"
+        nonce:
+          description: Hash of the generated proof-of-work. 'null' when its pending block.
+          type: string
+          example: "0xfa1692f52a7ac672"
+        sha3Uncles:
+          description: SHA3 of the uncles data in the block.
+          type: string
+          example: "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+        logsBloom:
+          description: The bloom filter for the logs of the block. 'null' when its pending block.
+          type: string
+          example: "0x042080004210492080800001610060ad9600005bc81502020800000043e302020381a404000100409102040240300641108004000400007000008000c049558055a800000a0001800748900806502004200400108205005418c0218802281a0408060000533210462021050470810a010140102809011814018281115020090201068401847000a04010000c00084062000485640d00020220181150020008589105a41c0880001112034100010882545410240011402a3480050104004c310204000002009490d0012022a040c20c20011020401020140250805100410060008280200008181a220114102800001648640828200c00a94c1003a2060e001000"
+        transactionsRoot:
+          description: The root of the transaction trie of the block.
+          type: string
+          example: "0x5990081ef8515d561b50255af03c5d505f7725ddef27405dc67d23bfd0f47704"
+        stateRoot:
+          description: The root of the final state trie of the block.
+          type: string
+          example: "0x32757c92f10c6c5a106c6fb4b9ca3ff301e413a59ca3d0513b4bf98c72efddba"
+        receiptsRoot:
+          description: The root of the transaction trie of the block.
+          type: string
+          example: "0x5990081ef8515d561b50255af03c5d505f7725ddef27405dc67d23bfd0f47704"
+        miner:
+          description: The address of the beneficiary to whom the mining rewards were given.
+          type: string
+          example: "0xD8869d9E3d497323561Fbca2319a9FC3F6f10c4B"
+        difficulty:
+          description: Difficulty for this block.
+          type: string
+          example: "3296820833"
+        totalDifficulty:
+          description: Total difficulty of the chain until this block.
+          type: string
+          example: "23329673338013873"
+        extraData:
+          description: The 'extra data' field of this block.
+          type: string
+          example: "0x"
+        size:
+          description: The size of this block in bytes.
+          type: number
+          example: 15296
+        gasLimit:
+          description: The maximum gas allowed in this block.
+          type: number
+          example: 8000000
+        gasUsed:
+          description: The total used gas by all transactions in this block.
+          type: number
+          example: 7985124
+        timestamp:
+          description: The unix timestamp for when the block was collated.
+          type: number
+          example: 1569600592
+        transactions:
+          description: Array of transactions.
+          type: array
+          items:
+            $ref: "#/components/schemas/XdcTx"
+        uncles:
+          description: 'Array of uncle hashes.'
+          type: array
+          example: ["0x7a44a1f56f12ae825fdc04550d7c3af2344daab987691771c06235f25fafcaa6"]
+    XdcTx:
+      type: object
+      properties:
+        hash:
+          type: string
+          description: Hash of the transaction.
+          example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
+        nonce:
+          type: number
+          description: The number of transactions made by the sender prior to this one.
+          example: 26836405
+        blockHash:
+          description: Hash of the block where this transaction was in.
+          type: string
+          example: "0xcf2c40f475e78c7c19778e1ae999a0e371c9319b38182ea15dc94536f13f9137"
+        blockNumber:
+          type: number
+          description: Block number where this transaction was in.
+          example: 6470854
+        transactionIndex:
+          type: number
+          description: Integer of the transactions index position in the block.
+          example: 3
+        from:
+          type: string
+          description: Address of the sender.
+          example: "0x81b7E08F65Bdf5648606c89998A9CC8164397647"
+        to:
+          type: string
+          description: Address of the receiver. 'null' when its a contract creation transaction.
+          example: "0xbC546fa1716Ed886967cf73f40e8F2F5e623a92d"
+        value:
+          type: string
+          description: Value transferred in wei.
+          example: "1000000000000000000"
+        gas:
+          type: number
+          description: Gas provided by the sender.
+          example: 21000
+        gasPrice:
+          type: string
+          description: Gas price provided by the sender in wei.
+          example: "1000000000"
+        input:
+          type: string
+          description: The data sent along with the transaction.
+          example: "0x"
+        status:
+          type: boolean
+          example: true
+          description: TRUE if the transaction was successful, FALSE, if the EVM reverted the transaction.
+        gasUsed:
+          type: number
+          description: The amount of gas used by this specific transaction alone.
+          example: 21000
+        cumulativeGasUsed:
+          type: number
+          description: The total amount of gas used when this transaction was executed in the block.
+          example: 314159
+        contractAddress:
+          type: string
+          description: The contract address created, if the transaction was a contract creation, otherwise null.
+          example: "0x81b7E08F65Bdf5648606c89998A9CC8164397647"
+        logs:
+          type: array
+          description: Log events, that happened in this transaction.
+          items:
+            type: object
+            properties:
+              address:
+                type: string
+                description: From which this event originated from.
+                example: "0x81b7E08F65Bdf5648606c89998A9CC8164397647"
+              topics:
+                type: array
+                description: An array with max 4 32 Byte topics, topic 1-3 contains indexed parameters of the log.
+                items:
+                  type: string
+                  example: "0x033456732123ffff2342342dd12342434324234234fd234fd23fd4f23d4234"
+              data:
+                type: string
+                description: The data containing non-indexed log parameter.
+              logIndex:
+                type: number
+                description: Integer of the event index position in the block.
+              blockNumber:
+                type: number
+                description: Block number where this transaction was in.
+                example: 6470854
+              blockHash:
+                description: Hash of the block.
+                type: string
+                example: "0x5d40698ee1b1ec589035f2a39c6162287e9056868cc79d66cfb248ba9f66c3fc"
+              transactionIndex:
+                type: number
+                description: Integer of the transaction’s index position, the event was created in.
+              transactionHash:
+                type: string
+                description: Hash of the transaction this event was created in.
+                example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
+        logsBloom:
+          type: DATA, 256 Bytes
+          description: Bloom filter for light clients to quickly retrieve related logs.
+          example:
+        root: 
+          type: string
+          description: 32 bytes of post-transaction stateroot (pre Byzantium)
+          example:
+    Error403XdcBroadcast:
+      properties:
+        errorCode:
+          description: xdc.broadcast.failed
+          example: xdc.broadcast.failed
+          type: string
+        message:
+          description: Unable to broadcast transaction due to ${error}.
+          example: Unable to broadcast transaction due to ${error}.
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403TxNotFound:
+      properties:
+        errorCode:
+          description: tx.missing
+          example: tx.missing
+          type: string
+        message:
+          description: No such tx.
+          example: No such tx.
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403XdcErc20Set:
+      properties:
+        errorCode:
+          description: erc20.address.set
+          example: erc20.address.set
+          type: string
+        message:
+          description: ERC20 address was already set.
+          example: ERC20 address was already set.
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403XdcMnemonicPrivateKey:
+      properties:
+        errorCode:
+          description: private.mnemonic.missing
+          example: private.mnemonic.missing
+          type: string
+        message:
+          description: Either mnemonic and index or private key must be present.
+          example: Either mnemonic and index or private key must be present.
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403XdcTxHash:
+      properties:
+        errorCode:
+          description: xdc.transaction.hash
+          example: xdc.transaction.hash
+          type: string
+        message:
+          description: Unable to calculate transaction hash. ${error}
+          example: Unable to calculate transaction hash. ${error}
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403XdcTxSign:
+      properties:
+        errorCode:
+          description: xdc.transaction.sign
+          example: xdc.transaction.sign
+          type: string
+        message:
+          description: Unable to sign transaction. ${error}
+          example: Unable to sign transaction. ${error}
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403XdcErc20TxSign:
+      properties:
+        errorCode:
+          description: xdc.erc20.sign
+          example: xdc.erc20.sign
+          type: string
+        message:
+          description: Unable to sign transaction for contract creation. ${error}
+          example: Unable to sign transaction for contract creation. ${error}
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    Error403XdcGasCalculation:
+      properties:
+        errorCode:
+          description: xdc.transaction.gas
+          example: xdc.transaction.gas
+          type: string
+        message:
+          description: Unable to calculate gas limit for transaction. ${error}
+          example: Unable to calculate gas limit for transaction. ${error}
+          type: string
+        statusCode:
+          description: "403"
+          example: 403
+          type: number
+      required:
+        - errorCode
+        - message
+        - statusCode
+      type: object
+    TransferErc20Blockchain:
+      type: object
+      properties:
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send ERC20 token to
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC20 token
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that ERC20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - to
+        - contractAddress
+        - digits
+        - fromPrivateKey
+        - amount
+    TransferErc20BlockchainKMS:
+      type: object
+      properties:
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send ERC20 token to
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC20 token
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that ERC20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - to
+        - contractAddress
+        - signatureId
+        - digits
+        - amount
+    CallXdxSmartContractMethod:
+      type: object
+      properties:
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC20 token
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        methodName:
+          minLength: 1
+          maxLength: 500
+          description: Name of the method to invoke on smart contract.
+          type: string
+          example: transfer
+        methodABI:
+          type: object
+          description: ABI of the method to invoke.
+        params:
+          type: array
+          items:
+            type: object
+          description: Parameters of the method to be invoked.
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - contractAddress
+        - params
+        - methodABI
+        - fromPrivateKey
+        - methodName
+    CallXdxSmartContractMethodKMS:
+      type: object
+      properties:
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC20 token
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        methodName:
+          minLength: 1
+          maxLength: 500
+          description: Name of the method to invoke on smart contract.
+          type: string
+          example: transfer
+        methodABI:
+          type: object
+          description: ABI of the method to invoke.
+        params:
+          type: array
+          items:
+            type: object
+          description: Parameters of the method to be invoked.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - contractAddress
+        - params
+        - methodABI
+        - signatureId
+        - methodName
+    TransferXdcBlockchain:
+      type: object
+      properties:
+        data:
+          type: string
+          maxLength: 50000
+          description: Additinal data, that can be passed to blockchain transaction as data property. Only for ETH transactions.
+          example: My note to recipient.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        to:
+          description: Blockchain address to send assets
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          maxLength: 43
+          minLength: 42
+          type: string
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              example: "40000"
+              pattern: ^[+]?\d+$
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              example: "20"
+              pattern: ^[+]?\d+$
+        amount:
+          description: Amount to be sent in Ether.
+          example: "100000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        fromPrivateKey:
+          type: string
+          maxLength: 66
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          minLength: 66
+          description: Private key of sender address. Private key, or signature Id must be present.
+      required:
+        - to
+        - amount
+        - fromPrivateKey
+    XdcEstimateGas:
+      type: object
+      properties:
+        from:
+          type: string
+          maxLength: 66
+          example: "xdcfb99f8ae9b70a0c8cd96ae665bbaf85a7e01a2ef"
+          minLength: 66
+          description: Sender address.
+        to:
+          description: Blockchain address to send assets
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          maxLength: 43
+          minLength: 42
+          type: string
+        amount:
+          description: Amount to be sent in Ether.
+          example: "100000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        data:
+          type: string
+          maxLength: 50000
+          description: Additinal data, that can be passed to blockchain transaction as data property. Only for ETH transactions.
+          example: My note to recipient.
+          pattern: ^(0x|0h)?[0-9A-F]+$
+      required:
+        - to
+        - amount
+        - from
+    TransferXdcBlockchainKMS:
+      type: object
+      properties:
+        data:
+          type: string
+          maxLength: 50000
+          description: Additinal data, that can be passed to blockchain transaction as data property. Only for ETH transactions.
+          example: My note to recipient.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        to:
+          description: Blockchain address to send assets
+          example: "xdc687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          maxLength: 43
+          minLength: 42
+          type: string
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              example: "40000"
+              pattern: ^[+]?\d+$
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              example: "20"
+              pattern: ^[+]?\d+$
+        amount:
+          description: Amount to be sent in Ether.
+          example: "100000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+      required:
+        - to
+        - amount
+        - signatureId
+    DeployErc20:
+      type: object
+      properties:
+        symbol:
+          description: Symbol of the ERC20 token
+          example: ERC_SYMBOL
+          maxLength: 30
+          minLength: 1
+          type: string
+        name:
+          description: Name of the ERC20 token
+          example: My ERC20
+          maxLength: 100
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_]+$
+          type: string
+        totalCap:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        supply:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        digits:
+          description: Number of decimal points
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        address:
+          description: Address on XDC blockchain, where all created ERC20 tokens will be transferred.
+          maxLength: 43
+          minLength: 42
+          example: "xdca0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
+          type: string
+        fromPrivateKey:
+          description: Private key of XDC account address, from which the fee for the deployment of ERC20 will be paid. Private key, or signature Id must be present.
+          type: string
+          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
+          maxLength: 66
+          minLength: 66
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - name
+        - symbol
+        - address
+        - supply
+        - fromPrivateKey
+        - digits
+    DeployErc20KMS:
+      type: object
+      properties:
+        symbol:
+          description: Symbol of the ERC20 token
+          example: ERC_SYMBOL
+          maxLength: 30
+          minLength: 1
+          type: string
+        name:
+          description: Name of the ERC20 token
+          example: My ERC20
+          maxLength: 100
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_]+$
+          type: string
+        totalCap:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        supply:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        digits:
+          description: Number of decimal points
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        address:
+          description: Address on XDC blockchain, where all created ERC20 tokens will be transferred.
+          maxLength: 43
+          minLength: 42
+          example: "xdca0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
+          type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to XDC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - name
+        - symbol
+        - address
+        - supply
+        - signatureId
+        - digits
