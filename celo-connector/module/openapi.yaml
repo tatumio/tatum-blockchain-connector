@@ -103,7 +103,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    description: Celo addres
+                    description: Celo address
                     example: "0xa7673161CbfE0116A4De9E341f8465940c2211d4"
           description: OK
         400:

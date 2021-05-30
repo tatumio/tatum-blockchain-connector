@@ -140,6 +140,7 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/FlowMintedResult"
                   - $ref: "#/components/schemas/SignatureId"
           description: OK
         400:
@@ -261,6 +262,7 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/TransactionHashKMS"
+                  - $ref: "#/components/schemas/FlowMintedMultipleResult"
                   - $ref: "#/components/schemas/SignatureId"
           description: OK
         400:
@@ -450,7 +452,7 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get Transaction
+      summary: Get contract address from transaction
       tags:
         - Blockchain / NFT
   /v3/nft/transaction/{chain}/{hash}:
@@ -578,6 +580,7 @@ paths:
             enum:
               - ETH
               - CELO
+              - FLOW
               - BSC
         - description: "Token ID"
           in: path
@@ -763,6 +766,31 @@ components:
         - contractAddress
         - tokenId
         - fromPrivateKey
+    type: object
+    FlowMintedMultipleResult:
+      type: object
+      properties:
+        txId:
+          type: string
+          description: Transaction ID
+          example: "d67787399d205139f4d6f42c2aa4fffdf6f247411fae3706e874fbba0ce04b1b"
+        tokenId:
+          type: array
+          items:
+            type: number
+            description: ID of the minted token
+            example: 12345
+    FlowMintedResult:
+      type: object
+      properties:
+        txId:
+          type: string
+          description: Transaction ID
+          example: "d67787399d205139f4d6f42c2aa4fffdf6f247411fae3706e874fbba0ce04b1b"
+        tokenId:
+          type: number
+          description: ID of the minted token
+          example: 12345
     MintMultipleNftCelo:
       type: object
       properties:
