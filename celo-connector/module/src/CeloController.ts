@@ -19,6 +19,7 @@ import {PathAddressContractAddress} from './dto/PathAddressContractAddress';
 import {QueryMnemonic} from './dto/QueryMnemonic';
 import {GeneratePrivateKey} from './dto/GeneratePrivateKey';
 import {Request} from 'express';
+import { TransferMultiToken, MintMultiToken, EthDeployMultiToken } from '@tatumio/tatum';
 
 export abstract class CeloController {
     protected constructor(protected readonly service: CeloService) {
@@ -76,6 +77,141 @@ export abstract class CeloController {
         try {
             return await this.service.getBalanceErc721(path.address, path.contractAddress);
         } catch (e) {
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Get('/v3/celo/multitoken/balance/:address/:contractAddress')
+    public async getBalanceMultiToken(@Param() path: PathAddressContractAddress) {
+        try {
+            return await this.service.getBalanceMultiToken(path.address, path.contractAddress);
+        } catch (e) {
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Get('/v3/celo/multitoken/owner/:token/:contractAddress')
+    public async getOwnerMultiToken(@Param() path: PathTokenContractAddress) {
+        try {
+            return await this.service.getOwnerMultiToken(path.token, path.contractAddress);
+        } catch (e) {
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Get('/v3/celo/multitoken/metadata/:token/:contractAddress')
+    public async getMetadataMultiToken(@Param() path: PathTokenContractAddress) {
+        try {
+            return await this.service.getMetadataMultiToken(path.token, path.contractAddress);
+        } catch (e) {
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Get('/v3/celo/multitoken/token/:address/:i/:contractAddress')
+    public async getTokenMultiToken(@Param() path: PathAddressContractAddressI) {
+        try {
+            return await this.service.getTokenMultiToken(path.address, parseInt(path.i), path.contractAddress);
+        } catch (e) {
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Post('/v3/celo/multitoken/transaction')
+    @HttpCode(HttpStatus.OK)
+    public async transactionMultiToken(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            return await this.service.TransferMultiToken(req.body);
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Post('/v3/celo/multitoken/transaction')
+    @HttpCode(HttpStatus.OK)
+    public async transactionMultiTokenBatch(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            return await this.service.TransferMultiTokenBatch(req.body);
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Post('/v3/celo/multitoken/mint')
+    @HttpCode(HttpStatus.OK)
+    public async mintMultiToken(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            if(req.body.authorAddresses){
+                return await this.service.mintMultiTokenCashback(req.body);
+            }else{
+                return await this.service.mintMultiToken(req.body);
+            }
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+
+    @Post('/v3/celo/multitoken/mint/batch')
+    @HttpCode(HttpStatus.OK)
+    public async mintMultiTokenBatch(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            if(req.body.authorAddresses){
+                return await this.service.mintMultiTokenBatchCashback(req.body);
+            }else{
+                return await this.service.mintMultiTokenBatch(req.body);
+            }
+            
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+
+    @Post('/v3/celo/multitoken/burn')
+    @HttpCode(HttpStatus.OK)
+    public async burnMultToken(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            return await this.service.burnMultiToken(req.body);
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+    @Post('/v3/celo/multitoken/burn/batch')
+    @HttpCode(HttpStatus.OK)
+    public async burnMultTokenBatch(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            return await this.service.burnMultiTokenBatch(req.body);
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
+            throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
+        }
+    }
+
+    @Post('/v3/celo/multitoken/deploy')
+    @HttpCode(HttpStatus.OK)
+    public async deployMultiToken(@Req() req: Request) {
+        try {
+            req.body.chain = Currency.CELO;
+            return await this.service.deployMultiToken(req.body);
+        } catch (e) {
+            if (e.constructor.name === 'Array' || e.constructor.name === 'ValidationError') {
+                throw e;
+            }
             throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
         }
     }
