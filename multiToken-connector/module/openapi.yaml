@@ -103,9 +103,9 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Create one NFT Token and transfer it to destination account. Create and transfer any NFT token from smart contract defined in contractAddress.
+        <p>Create a fixed amount of MultiToken and transfer it to destination account. Create and transfer any MultiToken token from smart contract defined in contractAddress.
         It is possible to add URL to the created token with a more detailed information about it.<br/><br/>
-        Tatum now supports NFT these blockchains:<br/>
+        Tatum now supports MultiToken these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
@@ -161,12 +161,12 @@ paths:
       summary: Mint MultiToken
       tags:
         - Blockchain / MultiToken
-  /v3/nft/mint/batch:
+  /v3/multiToken/mint/batch:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Create multiple NFT Tokens and transfer them to destination account. Create and transfer any NFT tokens from smart contract defined in contractAddress.<br/><br/>
-        Tatum now supports NFT these blockchains:<br/>
+        <p>Create multiple MultiTokens Tokens and transfer them to destination account. Create and transfer MultiTokens tokens from smart contract defined in contractAddress.<br/><br/>
+        Tatum now supports MultiTokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
@@ -179,6 +179,14 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
+        <ul>Following is an example how you can mint multiple tokens with multiple users and multiple cashbackValues
+        <li>Add the addresses to which token is to be minted in</li>
+        to: ['0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f', '0x9115849471F177938A98607D0BE51128Db666775']
+        <li>Add the cashback recipents for each address respectively</li>
+        authorAddresses: [[["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]], [["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]]],
+        <li>Finally add the cashback values wrt each address of author</li>
+        cashbackValues: [[["1", "1"], ["1", "1"]], [["1", "1"], ["1", "1"]]],
+        </ul>
       operationId: MintMultiTokenBatch
       requestBody:
         content:
@@ -226,8 +234,8 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Burn NFT Tokens. This method destroys any NFT token from smart contract defined in contractAddress.<br/><br/>
-        Tatum now supports NFT these blockchains:<br/>
+        <p>Burn NMultiToken. This method destroys MultiTokens from smart contract defined in contractAddress.<br/><br/>
+        Tatum now supports MultiToken these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
@@ -286,8 +294,8 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Burn multiple MultiToken Tokens. This method destroys any NFT token from smart contract defined in contractAddress.<br/><br/>
-        Tatum now supports NFT these blockchains:<br/>
+        <p>Burn multiple MultiToken Tokens. This method destroys any MultiTokens token from smart contract defined in contractAddress.<br/><br/>
+        Tatum now supports MultiTokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
@@ -346,9 +354,9 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Transfer MultiToken Tokens from account to account. Transfer any NFT token from smart contract defined in contractAddress.
+        <p>Transfer MultiToken Tokens from account to account. Transfer MultiTokens token from smart contract defined in contractAddress.
         Only 1 specific token with specified tokenId and value can be transfered. This method invokes ERC721 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
-        Tatum now supports NFT these blockchains:<br/>
+        Tatum now supports MultiToken these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Flow</b></li>
@@ -407,7 +415,7 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Transfer MultiToken Tokens from account to account. Transfer any NFT token from smart contract defined in contractAddress.
+        <p>Transfer MultiToken Batch from account to account. Transfer multiple MultiTokens token from smart contract defined in contractAddress.
         Multiple token with specified tokenIds and values can be transfered. This method invokes ERC721 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
         Tatum now supports MultiTokens these blockchains:<br/>
         <ul>
@@ -523,7 +531,7 @@ paths:
         - Blockchain / MultiToken
   /v3/multitoken/address/{chain}/{hash}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get NFT contract address from deploy transaction.</p>"
+      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken contract address from deploy transaction.</p>"
       operationId: MultiTokenGetContractAddress
       parameters:
         - description: Blockchain to work with
@@ -553,7 +561,7 @@ paths:
                 properties:
                   contractAddress:
                     type: string
-                    description: Address of the NFT token.
+                    description: Address of the MultiToken token.
                     example: "0xc21C81ef03f98898Fb155E00C364e8a7b9D158b8"
           description: OK
         400:
@@ -577,7 +585,7 @@ paths:
         - Blockchain / MultiToken
   /v3/multitoken/transaction/{chain}/{hash}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get NFT transaction by transaction hash.</p>"
+      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken transaction by transaction hash.</p>"
       operationId: MultiTokenGetTransact
       parameters:
         - description: Blockchain to work with
@@ -629,7 +637,7 @@ paths:
         - Blockchain / MultiToken
   /v3/multitoken/balance/{chain}/{contractAddress}/{address}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get NFTs on Account. Returns tokenIDs of tokens Account holds.</p>"
+      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiTokens on Account. Returns tokenIDs of tokens Account holds.</p>"
       operationId: MultiTokenGetBalance
       parameters:
         - description: Blockchain to work with
@@ -688,7 +696,7 @@ paths:
         - Blockchain / MultiToken
   /v3/multitoken/metadata/{chain}/{contractAddress}/{token}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get NFT token metadata.</p>"
+      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken metadata.</p>"
       operationId: MultiTokenGetMetadata
       parameters:
         - description: Blockchain to work with
@@ -755,7 +763,7 @@ paths:
         - Blockchain / MultiToken
   /v3/multitoken/royalty/{chain}/{contractAddress}/{token}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get NFT token royalty.</p>"
+      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken token royalty.</p>"
       operationId: MultiTokenGetRoyalty
       parameters:
         - description: Blockchain to work with
@@ -818,7 +826,7 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get NFT Token Royalty information
+      summary: Get MultiToken Token Royalty information
       tags:
         - Blockchain / MultiToken
 components:
@@ -837,7 +845,7 @@ components:
       properties:
         value:
           type: string
-          description: If token to be transferred is Royalty NFT token, this is a value to be paid as a cashback to the authors of the token.
+          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
           example: "1"
         chain:
           type: string
@@ -848,7 +856,7 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send NFT token to
+          description: Blockchain address to send MultiToken token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         tokenId:
@@ -864,7 +872,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of NFT token
+          description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -895,7 +903,7 @@ components:
       properties:
         value:
           type: string
-          description: If token to be transferred is Royalty NFT token, this is a value to be paid as a cashback to the authors of the token.
+          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
           example: "1"
         chain:
           type: string
@@ -906,7 +914,7 @@ components:
         to:
           maxLength: 42
           minLength: 42
-          description: Blockchain address to send NFT token to
+          description: Blockchain address to send MultiToken token to
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         tokenId:
@@ -926,7 +934,7 @@ components:
         contractAddress:
           maxLength: 42
           minLength: 42
-          description: Address of NFT token
+          description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         fromPrivateKey:
@@ -962,7 +970,7 @@ components:
           enum:
             - CELO
         uri:
-          description: URI of the NFT token
+          description: URI of the MultiToken token
           example: example.com
           maxLength: 100
           minLength: 1
@@ -1043,7 +1051,7 @@ components:
             - CELO
         to:
           type: array
-          description: Blockchain address to send NFT token to.
+          description: Blockchain address to send MultiToken token to.
           example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85" ]
           items:
             maxLength: 42
@@ -1065,7 +1073,7 @@ components:
             maxLength: 32
         authorAddresses:
           type: array
-          description: List of addresses for every token, where royalty cashback for every transfer of this NFT will be send. Royalties are paid in native blockchain currency CELO.
+          description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
           items:
             type: array
             items:
@@ -1076,7 +1084,7 @@ components:
               example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
         cashbackValues:
           type: array
-          description: List of values for every token, which will be paid as a royalty for author of the NFT token with every token transfer. This is exact value in native blockhain currency.
+          description: List of values for every token, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
           items:
             type: array
             items:
@@ -2669,50 +2677,55 @@ components:
             - CELO
         tokenId:
           description: ID of token to be created.
-          example: ["100000"]
+          example: ['121002', '121001', '121000']
           type: array
           items:
             type: string
             maxLength: 32          
         amounts:
           description: amounts of token to be created.
-          example: ["100"]
+          example: [['10', '10'], ['10', '10']]
           type: array
           items:
-            type: string
+            type: array
+            items: 
+              type: string
         to:
           maxLength: 42
           minLength: 42
           description: Blockchain address to send MultiToken token to
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
+          example: ['0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f', '0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f']
+          type: array
+          items:
+            type: string
         contractAddress:
           maxLength: 42
           minLength: 42
           description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
-        url:
-          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
-          example: "https://my_token_data.com"
-          type: string
-          maxLength: 256
         authorAddresses:
           type: array
           description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
           items:
-            type: string
-            minLength: 42
-            maxLength: 42
-            description: Blockchain address to send royalties to
-            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+            type: array
+            items:
+              type: array
+              items: string  
+              minLength: 42
+              maxLength: 42
+              description: Blockchain address to send royalties to
+            example: [[["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]], [["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]]]
         cashbackValues:
           type: array
           description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
           items:
-            type: string
-            description: Value of the royalty to be paid.
-            example: "0.5"
+            type: array
+            items:
+              type: array
+              items: string
+              description: Value of the royalty to be paid.
+              example: [[["1", "1"], ["1", "1"]], [["1", "1"], ["1", "1"]]]
         fromPrivateKey:
           type: string
           maxLength: 66
