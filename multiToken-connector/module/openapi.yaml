@@ -2172,7 +2172,11 @@ components:
           maxLength: 256
           items:
             type: string
-            maxLength: 32          
+            maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2217,6 +2221,8 @@ components:
         - contractAddress
         - signatureId
         - tokenId
+        - amount
+        - data
     MintMultiToken:
       type: object
       properties:
@@ -2249,6 +2255,10 @@ components:
           example: "100000"
           type: string
           maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         authorAddresses:
           type: array
           description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, like BSC or ETH.
@@ -2304,6 +2314,8 @@ components:
         - contractAddress
         - fromPrivateKey
         - tokenId
+        - amount
+        - data
     MintMultiTokenKMS:
       type: object
       properties:
@@ -2336,6 +2348,10 @@ components:
           example: "100000"
           type: string
           maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         authorAddresses:
           type: array
           description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, like BSC or ETH.
@@ -2391,6 +2407,8 @@ components:
         - contractAddress
         - signatureId
         - tokenId
+        - amount
+        - data
     MintMultiTokenBatch:
       type: object
       properties:
@@ -2423,6 +2441,10 @@ components:
           items:
             type: string
             maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         authorAddresses:
           type: array
           description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, ETH or BSC.
@@ -2483,6 +2505,8 @@ components:
         - contractAddress
         - fromPrivateKey
         - tokenId
+        - amounts
+        - data
     MintMultiTokenBatchKMS:
       type: object
       properties:
@@ -2515,6 +2539,10 @@ components:
           items:
             type: string
             maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         authorAddresses:
           type: array
           description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, ETH or BSC.
@@ -2580,6 +2608,8 @@ components:
         - tokenId
         - url
         - signatureId
+        - amounts
+        - data
     BurnMultiToken:
       type: object
       properties:
