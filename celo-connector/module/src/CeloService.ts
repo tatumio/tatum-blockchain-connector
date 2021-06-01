@@ -26,7 +26,8 @@ import {
     prepareCeloOrCUsdSignedTransaction,
     prepareCeloSmartContractWriteMethodInvocation,
     prepareCeloTransferErc20SignedTransaction,
-    prepareCeloTransferErc721SignedTransaction, sendCeloSmartContractReadMethodInvocationTransaction,
+    prepareCeloTransferErc721SignedTransaction,
+    sendCeloSmartContractReadMethodInvocationTransaction,
     TransactionHash,
     TransferCeloOrCeloErc20Token,
 } from '@tatumio/tatum';
