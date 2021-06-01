@@ -18,7 +18,6 @@ tags:
       <ul>
       <li><b>Ethereum</b></li>
       <li><b>Celo</b></li>
-      <li><b>Flow</b></li>
       <li><b>Binance Smart Chain</b></li>
       </ul>
       </p>
@@ -27,13 +26,12 @@ paths:
   /v3/multitoken/deploy:
     post:
       description: |
-        <p>Deploy MultiToken Smart Contract. This method creates new ERC1155 Smart Contract (Non-Fungible MultiTokens) on the blockchain. Smart contract is standardized and audited.
+        <p>Deploy MultiToken Smart Contract. This method creates new ERC1155 Smart Contract (MultiTokens) on the blockchain. Smart contract is standardized and audited.
         It is possible to mint, burn and transfer tokens. It is also possible to mint multiple tokens at once.<br/>
         Tatum now supports MultiTokens on these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
-        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
 
@@ -49,13 +47,10 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/DeployMultiTokenCelo"
-                - $ref: "#/components/schemas/DeployMultiTokenCeloKMS"
                 - $ref: "#/components/schemas/DeployMultiToken"
                 - $ref: "#/components/schemas/DeployMultiTokenKMS"
-                - $ref: "#/components/schemas/DeployMultiTokenFlowPK"
-                - $ref: "#/components/schemas/DeployMultiTokenFlowMnemonic"
-                - $ref: "#/components/schemas/DeployMultiTokenFlowKMS"
+                - $ref: "#/components/schemas/DeployMultiTokenCelo"
+                - $ref: "#/components/schemas/DeployMultiTokenCeloKMS"
         required: true
       responses:
         200:
@@ -103,13 +98,12 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Create a fixed amount of MultiToken and transfer it to destination account. Create and transfer any MultiToken token from smart contract defined in contractAddress.
-        It is possible to add URL to the created token with a more detailed information about it.<br/><br/>
+        <p>Mint a fixed amount of MultiToken and transfer it to destination account. Create and transfer any MultiToken token from smart contract defined in contractAddress.
+        It is possible to add Metadata to the created token with a more detailed information about it.<br/><br/>
         Tatum now supports MultiToken these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
-        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -124,13 +118,10 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/MintMultiTokenCelo"
-                - $ref: "#/components/schemas/MintMultiTokenKMSCelo"
                 - $ref: "#/components/schemas/MintMultiToken"
                 - $ref: "#/components/schemas/MintMultiTokenKMS"
-                - $ref: "#/components/schemas/MintMultiTokenFlowPK"
-                - $ref: "#/components/schemas/MintMultiTokenFlowMnemonic"
-                - $ref: "#/components/schemas/MintMultiTokenFlowKMS"
+                - $ref: "#/components/schemas/MintMultiTokenCelo"
+                - $ref: "#/components/schemas/MintMultiTokenKMSCelo"
         required: true
       responses:
         200:
@@ -139,7 +130,6 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/TransactionHashKMS"
-                  - $ref: "#/components/schemas/FlowMintedResult"
                   - $ref: "#/components/schemas/SignatureId"
           description: OK
         400:
@@ -165,12 +155,11 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Create multiple MultiTokens Tokens and transfer them to destination account. Create and transfer MultiTokens tokens from smart contract defined in contractAddress.<br/><br/>
+        <p>Create a fixed amount of multiple MultiTokens Tokens and transfer them to destination account in one transaction. Create and transfer MultiTokens tokens from smart contract defined in contractAddress.<br/><br/>
         Tatum now supports MultiTokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
-        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -193,13 +182,10 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/MintMultiTokenBatchCelo"
-                - $ref: "#/components/schemas/MintMultiTokenBatchKMSCelo"
                 - $ref: "#/components/schemas/MintMultiTokenBatch"
                 - $ref: "#/components/schemas/MintMultiTokenBatchKMS"
-                - $ref: "#/components/schemas/MintMultiTokenBatchFlowPK"
-                - $ref: "#/components/schemas/MintMultiTokenBatchFlowMnemonic"
-                - $ref: "#/components/schemas/MintMultiTokenBatchFlowKMS"
+                - $ref: "#/components/schemas/MintMultiTokenBatchCelo"
+                - $ref: "#/components/schemas/MintMultiTokenBatchKMSCelo"
         required: true
       responses:
         200:
@@ -208,7 +194,6 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/TransactionHashKMS"
-                  - $ref: "#/components/schemas/FlowMintedMultipleResult"
                   - $ref: "#/components/schemas/SignatureId"
           description: OK
         400:
@@ -234,12 +219,11 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Burn NMultiToken. This method destroys MultiTokens from smart contract defined in contractAddress.<br/><br/>
+        <p>Burn a fixed amount of MultiTokens by id. This method destroys MultiTokens from smart contract defined in contractAddress.<br/><br/>
         Tatum now supports MultiToken these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
-        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -254,13 +238,10 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/BurnMultiTokenCelo"
-                - $ref: "#/components/schemas/BurnMultiTokenKMSCelo"
                 - $ref: "#/components/schemas/BurnMultiToken"
                 - $ref: "#/components/schemas/BurnMultiTokenKMS"
-                - $ref: "#/components/schemas/BurnMultiTokenFlowPK"
-                - $ref: "#/components/schemas/BurnMultiTokenFlowMnemonic"
-                - $ref: "#/components/schemas/BurnMultiTokenFlowKMS"
+                - $ref: "#/components/schemas/BurnMultiTokenCelo"
+                - $ref: "#/components/schemas/BurnMultiTokenKMSCelo"
         required: true
       responses:
         200:
@@ -294,12 +275,11 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Burn multiple MultiToken Tokens. This method destroys any MultiTokens token from smart contract defined in contractAddress.<br/><br/>
+        <p>Burn multiple MultiToken Tokens by id assigned to same address in one transaction. This method destroys any MultiTokens token from smart contract defined in contractAddress.<br/><br/>
         Tatum now supports MultiTokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
-        <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
@@ -314,13 +294,10 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/BurnMultiTokenBatchCelo"
-                - $ref: "#/components/schemas/BurnMultiTokenBatchKMSCelo"
                 - $ref: "#/components/schemas/BurnMultiTokenBatch"
                 - $ref: "#/components/schemas/BurnMultiTokenBatchKMS"
-                - $ref: "#/components/schemas/BurnMultiTokenBatchFlowPK"
-                - $ref: "#/components/schemas/BurnMultiTokenBatchFlowMnemonic"
-                - $ref: "#/components/schemas/BurnMultiTokenBatchFlowKMS"
+                - $ref: "#/components/schemas/BurnMultiTokenBatchCelo"
+                - $ref: "#/components/schemas/BurnMultiTokenBatchKMSCelo"
         required: true
       responses:
         200:
@@ -354,12 +331,11 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Transfer MultiToken Tokens from account to account. Transfer MultiTokens token from smart contract defined in contractAddress.
-        Only 1 specific token with specified tokenId and value can be transfered. This method invokes ERC721 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
+        <p>Transfer a certain amount of MultiToken from account to another account. Transfer MultiTokens token from smart contract defined in contractAddress.
+        Only 1 specific token with specified tokenId and value can be transfered. This method invokes ERC1155 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
         Tatum now supports MultiToken these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
-        <li><b>Flow</b></li>
         <li><b>Celo</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
@@ -379,9 +355,6 @@ paths:
                 - $ref: "#/components/schemas/TransferMultiTokenCelo"
                 - $ref: "#/components/schemas/TransferMultiTokenKMS"
                 - $ref: "#/components/schemas/TransferMultiTokenKMSCelo"
-                - $ref: "#/components/schemas/TransferMultiTokenFlowPK"
-                - $ref: "#/components/schemas/TransferMultiTokenFlowMnemonic"
-                - $ref: "#/components/schemas/TransferMultiTokenFlowKMS"
         required: true
       responses:
         200:
@@ -415,12 +388,11 @@ paths:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Transfer MultiToken Batch from account to account. Transfer multiple MultiTokens token from smart contract defined in contractAddress.
-        Multiple token with specified tokenIds and values can be transfered. This method invokes ERC721 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
+        <p>Transfer MultiToken Batch from account to various other accounts in one transaction. Transfer multiple MultiTokens token from smart contract defined in contractAddress.
+        Multiple token with specified tokenIds and values can be transfered. This method invokes ERC1155 method safeTransfer() to transfer the token in case of ETH, Celo and BSC.<br/><br/>
         Tatum now supports MultiTokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
-        <li><b>Flow</b></li>
         <li><b>Celo</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
@@ -437,12 +409,9 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/TransferMultiTokenBatch"
-                - $ref: "#/components/schemas/TransferMultiTokenBatchCelo"
                 - $ref: "#/components/schemas/TransferMultiTokenBatchKMS"
+                - $ref: "#/components/schemas/TransferMultiTokenBatchCelo"
                 - $ref: "#/components/schemas/TransferMultiTokenBatchKMSCelo"
-                - $ref: "#/components/schemas/TransferMultiTokenBatchFlowPK"
-                - $ref: "#/components/schemas/TransferMultiTokenBatchFlowMnemonic"
-                - $ref: "#/components/schemas/TransferMultiTokenBatchFlowKMS"
         required: true
       responses:
         200:
@@ -476,7 +445,7 @@ paths:
     put:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Update royalty cashback value for one MultiToken Token. This method updates the first royalty value of specific author for 1 token.
+        <p>Update royalty cashback value for one of the MultiTokens. This method updates the first royalty value of specific author for 1 token.
         If royalty value is set to 0, it will disable the royalty system for the token. Only from author's address of the royalty can change it's royalty value, not the owner of the token.<br/><br/>
         Tatum now supports MultiToken these blockchains:<br/>
         <ul>
@@ -496,10 +465,10 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenCelo"
-                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenKMSCelo"
                 - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiToken"
                 - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenKMS"
+                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenCelo"
+                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenKMSCelo"
         required: true
       responses:
         200:
@@ -543,7 +512,6 @@ paths:
             enum:
               - ETH
               - CELO
-              - FLOW
               - BSC
         - description: "Transaction hash"
           in: path
@@ -586,7 +554,7 @@ paths:
   /v3/multitoken/transaction/{chain}/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken transaction by transaction hash.</p>"
-      operationId: MultiTokenGetTransact
+      operationId: MultiTokenGetTransaction
       parameters:
         - description: Blockchain to work with
           in: path
@@ -597,7 +565,6 @@ paths:
             enum:
               - ETH
               - CELO
-              - FLOW
               - BSC
         - description: "Transaction hash"
           in: path
@@ -614,7 +581,6 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/CeloTx"
                   - $ref: "#/components/schemas/EthTx"
-                  - $ref: "#/components/schemas/FlowTx"
           description: OK
         400:
           <<: *API400
@@ -649,7 +615,6 @@ paths:
             enum:
               - ETH
               - CELO
-              - FLOW
               - BSC
         - description: "Account address"
           in: path
@@ -724,13 +689,6 @@ paths:
           schema:
             type: string
             example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
-        - description: Account holding this token. FLOW only.
-          in: query
-          required: false
-          name: account
-          schema:
-            type: string
-            example: "0xc1b45bc27b9c61c3"
       responses:
         200:
           content:
@@ -869,6 +827,10 @@ components:
           example: "100000"
           type: string
           maxLength: 256
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -925,12 +887,16 @@ components:
             type: string
             maxLength: 32
         amounts:
-          description: Amount of token.
+          description: Amount of token to be transferred
           example: ["100000"]
           type: array
           items:
             type: string
             maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string       
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -959,6 +925,7 @@ components:
         - to
         - contractAddress
         - tokenId
+        - amounts
         - fromPrivateKey
     DeployMultiTokenCelo:
       type: object
@@ -970,13 +937,13 @@ components:
           enum:
             - CELO
         uri:
-          description: URI of the MultiToken token
+          description: URI of the MultiToken contract
           example: example.com
           maxLength: 100
           minLength: 1
           type: string
         fromPrivateKey:
-          description: Private key of Ethereum account address, from which gas for deployment of ERC721 will be paid. Private key, or signature Id must be present.
+          description: Private key of Ethereum account address, from which gas for deployment of ERC1155 will be paid. Private key, or signature Id must be present.
           type: string
           maxLength: 66
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
@@ -994,8 +961,7 @@ components:
             - CEUR
       required:
         - chain
-        - name
-        - symbol
+        - uri
         - feeCurrency
         - fromPrivateKey
     DeployMultiTokenCeloKMS:
@@ -1008,7 +974,7 @@ components:
           enum:
             - CELO
         uri:
-          description: Name of the MultiToken token
+          description: URI of the MultiToken contract
           example: example.com
           maxLength: 100
           minLength: 1
@@ -1036,8 +1002,7 @@ components:
             - CEUR
       required:
         - chain
-        - name
-        - symbol
+        - uri
         - feeCurrency
         - signatureId
     MintMultiTokenBatchKMSCelo:
@@ -1071,6 +1036,10 @@ components:
           items:
             type: string
             maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         authorAddresses:
           type: array
           description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
@@ -1125,7 +1094,8 @@ components:
         - contractAddress
         - feeCurrency
         - tokenId
-        - url
+        - amounts
+        - data
         - signatureId
     BurnMultiTokenCelo:
       type: object
@@ -1175,6 +1145,7 @@ components:
         - feeCurrency
         - fromPrivateKey
         - tokenId
+        - amount
     BurnMultiTokenBatchCelo:
       type: object
       properties:
@@ -1226,6 +1197,7 @@ components:
         - feeCurrency
         - fromPrivateKey
         - tokenId
+        - amounts
     BurnMultiTokenKMSCelo:
       type: object
       properties:
@@ -1278,6 +1250,7 @@ components:
         - feeCurrency
         - contractAddress
         - tokenId
+        - amount
         - signatureId
     BurnMultiTokenBatchKMSCelo:
       type: object
@@ -1334,1018 +1307,8 @@ components:
         - feeCurrency
         - contractAddress
         - tokenId
+        - amount
         - signatureId
-    BurnMultiTokenFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        tokenId:
-          description: ID of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        amount:
-          description: amount of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - contractAddress
-        - account
-        - privateKey
-        - tokenId
-    BurnMultiTokenBatchFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        tokenId:
-          description: ID of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amounts:
-          description: amounts of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - contractAddress
-        - account
-        - privateKey
-        - tokenId
-    BurnMultiTokenFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        tokenId:
-          description: ID of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        amount:
-          description: amount of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - mnemonic
-        - index
-        - tokenId
-    BurnMultiTokenBatchFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        tokenId:
-          description: ID of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amounts:
-          description: amounts of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - mnemonic
-        - index
-        - tokenId
-    BurnMultiTokenFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        tokenId:
-          description: ID of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        amount:
-          description: amount of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - signatureId
-        - tokenId
-    BurnMultiTokenBatchFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        tokenId:
-          description: ID of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amounts:
-          description: amounts of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - signatureId
-        - tokenId        
-    MintMultiTokenFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-        amount:
-          description: amount of token to be minted.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - contractAddress
-        - account
-        - privateKey
-        - to
-        - url
-    MintMultiTokenFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-        amount:
-          description: amount of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - mnemonic
-        - index
-        - to
-        - url
-    MintMultiTokenFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: array
-          description: Blockchain address to send MultiToken token to.
-          example: [ "0xc1b45bc27b9c61c3" ]
-          items:
-            maxLength: 18
-            minLength: 18
-            type: string
-        amount:
-          description: amount of token to be destroyed.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - signatureId
-        - to
-        - url
-    MintMultiTokenBatchFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: array
-          description: Blockchain address to send MultiToken token to.
-          example: ["0xc1b45bc27b9c61c3"]
-          items:
-            type: string
-        amounts:
-          description: amount of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 256
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - contractAddress
-        - account
-        - privateKey
-        - to
-        - url
-    MintMultiTokenBatchFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: array
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          items:
-            type: string
-            maxLength: 18
-            minLength: 18
-        amounts:
-          description: amount of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - mnemonic
-        - index
-        - to
-        - url
-    MintMultiTokenBatchFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: array
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          items:
-            type: string
-            maxLength: 18
-            minLength: 18
-        amounts:
-          description: amount of token to be destroyed.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 256
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - signatureId
-        - to
-        - url
-    DeployMultiTokenFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - account
-        - privateKey
-    DeployMultiTokenFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - account
-        - mnemonic
-        - index
-    DeployMultiTokenFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - account
-        - signatureId
-    TransferMultiTokenFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          maxLength: 18
-          minLength: 18
-        tokenId:
-          description: ID of token to be sent.
-          example: "100000"
-          type: string
-          maxLength: 32
-        amount:
-          description: amount of token to be sent.
-          example: "100000"
-          type: string
-          maxLength: 32
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - contractAddress
-        - account
-        - privateKey
-        - to
-        - tokenId
-    TransferMultiTokenBatchFlowPK:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          maxLength: 18
-          minLength: 18
-        tokenId:
-          description: ID of token to be sent.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amount:
-          description: amount of token to be sent.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 256
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        privateKey:
-          type: string
-          maxLength: 64
-          example: "05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 64
-          description: Private key of sender address. Private key, mnemonic and index or signature Id must be present.
-      required:
-        - chain
-        - contractAddress
-        - account
-        - privateKey
-        - to
-        - tokenId
-    TransferMultiTokenFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          maxLength: 18
-          minLength: 18
-        tokenId:
-          description: ID of token to be sent.
-          example: "100000"
-          type: string
-          maxLength: 32
-        amount:
-          description: amount of token to be sent.
-          example: "100000"
-          type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - mnemonic
-        - index
-        - to
-        - tokenId
-    TransferMultiTokenBatchFlowMnemonic:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          maxLength: 18
-          minLength: 18
-        tokenId:
-          description: IDs of token to be sent.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amounts:
-          description: amounts of token to be sent.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        mnemonic:
-          type: string
-          maxLength: 500
-          example: "urge pulp usage sister evidence arrest palm math please chief egg abuse"
-          minLength: 1
-          description: Mnemonic to generate private key of sender address.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - mnemonic
-        - index
-        - to
-        - tokenId
-    TransferMultiTokenFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          maxLength: 18
-          minLength: 18
-        tokenId:
-          description: ID of token to be sent.
-          example: "100000"
-          type: string
-          maxLength: 32
-        amount:
-          description: amount of token to be sent.
-          example: "100000"
-          type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - signatureId
-        - to
-        - tokenId
-    TransferMultiTokenBatchFlowKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: FLOW
-          description: Chain to work with.
-          enum:
-            - FLOW
-        to:
-          type: string
-          description: Blockchain address to send MultiToken token to.
-          example: "0xc1b45bc27b9c61c3"
-          maxLength: 18
-          minLength: 18
-        tokenId:
-          description: IDs of token to be sent.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amount:
-          description: amount of tokens to be sent.
-          example: ["100000"]
-          type: array
-          items:
-            type: string
-        contractAddress:
-          maxLength: 36
-          minLength: 36
-          description: Address of MultiToken token
-          example: "17a50dad-bcb1-4f3d-ae2c-ea2bfb04419f"
-          type: string
-        account:
-          type: string
-          maxLength: 18
-          example: "0xc1b45bc27b9c61c3"
-          minLength: 18
-          description: Blockchain address of the sender account.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        index:
-          description: Derivation index of sender address.
-          example: 0
-          type: integer
-          maximum: 2147483647
-      required:
-        - chain
-        - contractAddress
-        - account
-        - signatureId
-        - to
-        - tokenId
     UpdateCashbackValueForAuthorMultiTokenCelo:
       type: object
       properties:
@@ -2489,6 +1452,10 @@ components:
           description: amount of token.
           example: "100000"
           type: string
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2524,6 +1491,8 @@ components:
         - feeCurrency
         - signatureId
         - tokenId
+        - amount
+        - data
     TransferMultiTokenBatchKMSCelo:
       type: object
       properties:
@@ -2554,7 +1523,11 @@ components:
           example: ["100000"]
           type: array    
           items:
-            type: string    
+            type: string  
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string  
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2590,6 +1563,8 @@ components:
         - feeCurrency
         - signatureId
         - tokenId
+        - amounts
+        - data
     MintMultiTokenCelo:
       type: object
       properties:
@@ -2620,11 +1595,10 @@ components:
           description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
-        url:
-          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
-          example: "https://my_token_data.com"
+        data:
+          description: Data in bytes
+          example: "0x1234"
           type: string
-          maxLength: 256
         authorAddresses:
           type: array
           description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
@@ -2661,11 +1635,12 @@ components:
       required:
         - chain
         - to
-        - url
+        - tokenId
+        - amount
+        - data
         - feeCurrency
         - contractAddress
         - fromPrivateKey
-        - tokenId
     MintMultiTokenBatchCelo:
       type: object
       properties:
@@ -2690,6 +1665,10 @@ components:
             type: array
             items: 
               type: string
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         to:
           maxLength: 42
           minLength: 42
@@ -2746,11 +1725,12 @@ components:
       required:
         - chain
         - to
-        - url
+        - tokenId
+        - amounts
+        - data
         - feeCurrency
         - contractAddress
         - fromPrivateKey
-        - tokenId
     MintMultiTokenKMSCelo:
       type: object
       properties:
@@ -2782,11 +1762,10 @@ components:
           description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
-        url:
-          description: Metadata of the token. See https://eips.ethereum.org/EIPS/eip-721#specification for more details.
-          example: "https://my_token_data.com"
+        data:
+          description: Data in bytes
+          example: "0x1234"
           type: string
-          maxLength: 256
         authorAddresses:
           type: array
           description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
@@ -2828,11 +1807,12 @@ components:
       required:
         - chain
         - to
-        - url
+        - tokenId
+        - amount
+        - data
         - feeCurrency
         - contractAddress
         - signatureId
-        - tokenId
     TransferMultiToken:
       type: object
       properties:
@@ -2863,6 +1843,10 @@ components:
           example: "100000"
           type: string
           maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2936,6 +1920,10 @@ components:
           items:
             type: string
             maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2974,6 +1962,8 @@ components:
         - chain
         - contractAddress
         - tokenId
+        - amounts
+        - data
         - fromPrivateKey
     DeployMultiToken:
       type: object
@@ -2990,7 +1980,7 @@ components:
           example: example.com
           type: string
         fromPrivateKey:
-          description: Private key of Ethereum account address, from which gas for deployment of ERC721 will be paid. Private key, or signature Id must be present.
+          description: Private key of Ethereum account address, from which gas for deployment of ERC1155 will be paid. Private key, or signature Id must be present.
           type: string
           maxLength: 66
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
@@ -3017,7 +2007,7 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
-        - name
+        - uri
         - chain
         - symbol
         - fromPrivateKey
@@ -3064,7 +2054,7 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
-        - name
+        - uri
         - chain
         - symbol
         - signatureId
@@ -3098,6 +2088,10 @@ components:
           example: "100000"
           type: string
           maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -3142,6 +2136,8 @@ components:
         - contractAddress
         - signatureId
         - tokenId
+        - amount
+        - data
     TransferMultiTokenBatchKMS:
       type: object
       properties:
@@ -3635,10 +2631,10 @@ components:
       required:
         - to
         - chain
-        - url
         - contractAddress
         - fromPrivateKey
         - tokenId
+        - amount
     BurnMultiTokenBatch:
       type: object
       properties:
@@ -3897,7 +2893,7 @@ components:
       required:
         - to
         - chain
-        - url
+        - amount
         - contractAddress
         - tokenId
         - signatureId
@@ -3965,7 +2961,7 @@ components:
       required:
         - to
         - chain
-        - url
+        - amount
         - contractAddress
         - tokenId
         - signatureId

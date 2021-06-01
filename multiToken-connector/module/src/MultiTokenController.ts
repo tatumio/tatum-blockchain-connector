@@ -28,7 +28,7 @@ export abstract class MultiTokenController {
     }
 
     @Get('/v3/multitoken/balance/:chain/:contractAddress/:address')
-    public async getBalanceErc721(@Param() path: PathAddressContractAddressChain) {
+    public async getBalanceMultiToken(@Param() path: PathAddressContractAddressChain) {
         try {
             return await this.service.getTokensOfOwner(path.chain, path.address, path.contractAddress);
         } catch (e) {

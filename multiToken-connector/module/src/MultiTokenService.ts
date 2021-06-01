@@ -75,7 +75,7 @@ export abstract class MultiTokenService {
             return {data: await c.methods.tokenURI(token).call()};
         } catch (e) {
             this.logger.error(e);
-            throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
+            throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
         }
     }
 
@@ -87,7 +87,7 @@ export abstract class MultiTokenService {
             return {addresses, values: values.map(c => new BigNumber(c).dividedBy(1e18).toString(10))};
         } catch (e) {
             this.logger.error(e);
-            throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
+            throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
         }
     }
 
@@ -98,7 +98,7 @@ export abstract class MultiTokenService {
             return {data: await c.methods.tokensOfOwner(address).call()};
         } catch (e) {
             this.logger.error(e);
-            throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
+            throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
         }
     }
 

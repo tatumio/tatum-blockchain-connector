@@ -29,50 +29,6 @@ import {
     prepareCeloTransferErc721SignedTransaction, sendCeloSmartContractReadMethodInvocationTransaction,
     TransactionHash,
     TransferCeloOrCeloErc20Token,
-    CeloDeployMultiToken,
-    CeloBurnMultiToken,
-    CeloBurnMultiTokenBatch,
-    CeloMintMultiToken,
-    CeloMintMultiTokenBatch,
-    CeloTransferMultiToken,
-    CeloTransferMultiTokenBatch,
-    EthBurnMultiToken,
-    EthBurnMultiTokenBatch,
-    EthDeployMultiToken,
-    MintMultiToken,
-    MintMultiTokenBatch,
-    TransferMultiToken,
-    TransferMultiTokenBatch,
-    prepareEthDeployMultiTokenSignedTransaction,
-    prepareCeloDeployMultiTokenSignedTransaction,
-    prepareBscDeployMultiTokenSignedTransaction,
-    prepareBscBurnMultiTokenBatchSignedTransaction,
-    prepareBscBurnMultiTokenSignedTransaction,
-    prepareCeloMintMultiTokenSignedTransaction,
-    prepareBscMintMultiTokenSignedTransaction,
-    prepareEthMintMultiTokenSignedTransaction,
-    prepareCeloMintMultiTokenBatchSignedTransaction,
-    prepareBscMintMultiTokenBatchSignedTransaction,
-    prepareEthMintMultiTokenBatchSignedTransaction,
-    prepareBscMintMultiTokenBatchCashbackSignedTransaction,
-    prepareCeloMintMultiTokenBatchCashbackSignedTransaction,
-    prepareEthMintMultipleCashbackMultiTokenSignedTransaction,
-    prepareCeloMintMultiTokenCashbackSignedTransaction,
-    prepareEthMintCashbackMultiTokenSignedTransaction,
-    prepareBscMintMultiTokenCashbackSignedTransaction,
-    prepareBscTransferMultiTokenSignedTransaction,
-    prepareCeloTransferMultiTokenSignedTransaction,
-    prepareEthTransferMultiTokenSignedTransaction,
-    prepareEthUpdateCashbackForAuthorMultiTokenSignedTransaction,
-    prepareBscUpdateCashbackForAuthorMultiTokenSignedTransaction,
-    prepareCeloUpdateCashbackForAuthorMultiTokenSignedTransaction,
-    prepareEthBurnMultiTokenSignedTransaction,
-    prepareCeloBurnMultiTokenSignedTransaction,
-    prepareEthBatchTransferMultiTokenSignedTransaction,
-    prepareBscBatchTransferMultiTokenSignedTransaction,
-    prepareCeloBatchTransferMultiTokenSignedTransaction,
-    prepareCeloBurnMultiTokenBatchSignedTransaction,
-    prepareEthBurnBatchMultiTokenSignedTransaction,
 } from '@tatumio/tatum';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
 import erc1155_abi from '@tatumio/tatum/dist/src/contracts/erc1155/erc1155_abi';
@@ -81,7 +37,6 @@ import {fromWei} from 'web3-utils';
 import {Block, Transaction, TransactionReceipt} from 'web3-eth';
 import Web3 from 'web3';
 import {CUSD_ADDRESS_MAINNET, CUSD_ADDRESS_TESTNET} from '@tatumio/tatum/dist/src/constants';
-//import { CeloTransferMultiToken, TransferMultiToken, TransferMultiTokenBatch, CeloTransferMultiTokenBatch, CeloMintMultiToken, EthBurnMultiToken, CeloBurnMultiToken, EthBurnMultiTokenBatch, CeloBurnMultiTokenBatch, CeloDeployMultiToken } from '@tatumio/tatum';
 
 export abstract class CeloService {
 
@@ -242,117 +197,6 @@ export abstract class CeloService {
         } catch (e) {
             this.logger.error(e);
             throw new CeloError(`Unable to obtain information for token. ${e}`, 'celo.erc721.failed');
-        }
-    }
-    public async getBalanceMultiToken(address: string, contractAddress: string): Promise<{ data: string }> {
-        // @ts-ignore
-        const c = new (await this.getClient(await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
-        try {
-            return {data: await c.methods.balanceOf(address).call()};
-        } catch (e) {
-            this.logger.error(e);
-            throw new CeloError(`Unable to obtain information for token. ${e}`, 'celo.erc721.failed');
-        }
-    }
-    public async getTokenMultiToken(address: string, index: number, contractAddress: string): Promise<{ data: string }> {
-        // @ts-ignore
-        const c = new (await this.getClient(await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
-        try {
-            return {data: await c.methods.tokenOfOwnerByIndex(address, index).call()};
-        } catch (e) {
-            this.logger.error(e);
-            throw new CeloError(`Unable to obtain information for token. ${e}`, 'celo.erc721.failed');
-        }
-    }
-    public async getMetadataMultiToken(token: string, contractAddress: string): Promise<{ data: string }> {
-        // @ts-ignore
-        const c = new (await this.getClient(await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
-        try {
-            return {data: await c.methods.tokenURI(token).call()};
-        } catch (e) {
-            this.logger.error(e);
-            throw new CeloError(`Unable to obtain information for token. ${e}`, 'celo.erc721.failed');
-        }
-    }
-    public async transferMultiToken(body: CeloTransferMultiToken): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloTransferMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async TransferMultiTokenBatch(body: CeloTransferMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloTransferMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async mintMultiToken(body: CeloMintMultiToken): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloMintMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async mintMultiTokenCashback(body: CeloMintMultiToken): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloMintMultiTokenCashbackSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async mintMultiTokenBatch(body: CeloMintMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloMintMultiTokenBatchSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async mintMultiTokenBatchCashback(body: CeloMintMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloMintMultiTokenBatchCashbackSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async burnMultiToken(body: CeloBurnMultiToken): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloBurnMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async burnMultiTokenBatch(body: CeloBurnMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloBurnMultiTokenBatchSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
-        }
-    }
-    public async deployMultiToken(body: CeloDeployMultiToken): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        const txData = await prepareCeloDeployMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(txData);
         }
     }
 
