@@ -896,7 +896,7 @@ components:
         data:
           description: Data in bytes
           example: "0x1234"
-          type: string       
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -1521,13 +1521,13 @@ components:
         amounts:
           description: amounts of token.
           example: ["100000"]
-          type: array    
+          type: array
           items:
-            type: string  
+            type: string
         data:
           description: Data in bytes
           example: "0x1234"
-          type: string  
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -1656,14 +1656,14 @@ components:
           type: array
           items:
             type: string
-            maxLength: 32          
+            maxLength: 32
         amounts:
           description: amounts of token to be created.
           example: [['10', '10'], ['10', '10']]
           type: array
           items:
             type: array
-            items: 
+            items:
               type: string
         data:
           description: Data in bytes
@@ -1690,21 +1690,23 @@ components:
             type: array
             items:
               type: array
-              items: string  
-              minLength: 42
-              maxLength: 42
-              description: Blockchain address to send royalties to
-            example: [[["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]], [["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]]]
+              items:
+                type: string
+                minLength: 42
+                maxLength: 42
+                description: Blockchain address to send royalties to
+          example: [[["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]], [["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]]]
         cashbackValues:
           type: array
           description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
+          example: [[["1", "1"], ["1", "1"]], [["1", "1"], ["1", "1"]]]
           items:
             type: array
             items:
               type: array
-              items: string
-              description: Value of the royalty to be paid.
-              example: [[["1", "1"], ["1", "1"]], [["1", "1"], ["1", "1"]]]
+              items:
+                type: string
+                description: Value of the royalty to be paid.
         fromPrivateKey:
           type: string
           maxLength: 66
