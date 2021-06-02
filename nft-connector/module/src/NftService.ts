@@ -218,9 +218,9 @@ export abstract class NftService {
                     return await sendFlowNftTransferToken(testnet, body as FlowTransferNft);
                 }
                 break;
-            case Currency.XDC:
-                txData = await prepareXdcTransferErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
-                break;
+            // case Currency.XDC:
+            //     txData = await prepareXdcTransferErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
+            //     break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -264,14 +264,13 @@ export abstract class NftService {
                 } else {
                     return await sendFlowNftMintToken(testnet, body as FlowMintNft);
                 }
-                break;
-            case Currency.XDC:
-                if (!(body as EthMintErc721).authorAddresses) {
-                    txData = await prepareXdcMintErc721SignedTransaction(body as EthMintErc721, provider);
-                } else {
-                    txData = await prepareXdcMintErcCashback721SignedTransaction(body as EthMintErc721, provider);
-                }
-                break;
+            // case Currency.XDC:
+            //     if (!(body as EthMintErc721).authorAddresses) {
+            //         txData = await prepareXdcMintErc721SignedTransaction(body as EthMintErc721, provider);
+            //     } else {
+            //         txData = await prepareXdcMintErcCashback721SignedTransaction(body as EthMintErc721, provider);
+            //     }
+            //     break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -315,14 +314,13 @@ export abstract class NftService {
                 } else {
                     return await sendFlowNftMintMultipleToken(testnet, body as FlowMintMultipleNft);
                 }
-                break;
-            case Currency.XDC:
-                if (!(body as EthMintMultipleErc721).authorAddresses) {
-                    txData = await prepareXdcMintMultipleErc721SignedTransaction(body as EthMintMultipleErc721, provider);
-                } else {
-                    txData = await prepareXdcMintMultipleCashbackErc721SignedTransaction(body as EthMintMultipleErc721, provider);
-                }
-                break;
+            // case Currency.XDC:
+            //     if (!(body as EthMintMultipleErc721).authorAddresses) {
+            //         txData = await prepareXdcMintMultipleErc721SignedTransaction(body as EthMintMultipleErc721, provider);
+            //     } else {
+            //         txData = await prepareXdcMintMultipleCashbackErc721SignedTransaction(body as EthMintMultipleErc721, provider);
+            //     }
+            //     break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -347,9 +345,9 @@ export abstract class NftService {
             case Currency.CELO:
                 txData = await prepareCeloUpdateCashbackForAuthorErc721SignedTransaction(testnet, body as CeloUpdateCashbackErc721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
-            case Currency.XDC:
-                txData = await prepareXdcUpdateCashbackForAuthorErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
-                break;
+            // case Currency.XDC:
+            //     txData = await prepareXdcUpdateCashbackForAuthorErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
+            //     break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -382,9 +380,9 @@ export abstract class NftService {
                     return await sendFlowNftBurnToken(testnet, body as FlowBurnNft);
                 }
                 break;
-            case Currency.XDC:
-                txData = await prepareXdcBurnErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
-                break;
+            // case Currency.XDC:
+            //     txData = await prepareXdcBurnErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
+            //     break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -413,9 +411,9 @@ export abstract class NftService {
             case Currency.FLOW:
                 return await this.deployFlowNft(testnet, body as FlowDeployNft);
                 return;
-            case Currency.XDC:
-                txData = await prepareXdcDeployErc721SignedTransaction(body as EthDeployErc721, (await this.getNodesUrl(chain, testnet))[0]);
-                break;
+            // case Currency.XDC:
+            //     txData = await prepareXdcDeployErc721SignedTransaction(body as EthDeployErc721, (await this.getNodesUrl(chain, testnet))[0]);
+            //     break;
             default:
                 throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }

@@ -13,6 +13,7 @@ tags:
       <li><b>Ethereum</b></li>
       <li><b>Binance Smart Chain</b></li>
       <li><b>Celo</b></li>
+      <li><b>XinFin</b></li>
       </ul>
       </p>
     name: Blockchain / Fungible Token
@@ -308,7 +309,7 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC
+            - ETH, BSC, XDC
         symbol:
           description: Symbol of the ERC20 token
           example: ERC_SYMBOL
@@ -342,7 +343,7 @@ components:
           type: number
         address:
           description: Address on Ethereum blockchain, where all created ERC20 tokens will be transferred.
-          maxLength: 42
+          maxLength: 43
           minLength: 42
           example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
           type: string
@@ -513,20 +514,20 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC
+            - ETH, BSC, XDC
         amount:
           description: Amount to be minted and transfered to the recipient.
           example: "100000"
           type: string
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
         to:
-          maxLength: 42
+          maxLength: 43
           minLength: 42
           description: Blockchain address to send ERC-20 tokens to.
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
         contractAddress:
-          maxLength: 42
+          maxLength: 43
           minLength: 42
           description: Address of ERC-20 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -605,14 +606,14 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC
+            - ETH, BSC, XDC
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"
           type: string
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
         contractAddress:
-          maxLength: 42
+          maxLength: 43
           minLength: 42
           description: Address of ERC20 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -683,7 +684,7 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH
+            - ETH, XDC
         currency:
           description: Currency to transfer from Ethereum Blockchain Account.
           enum:
@@ -703,6 +704,7 @@ components:
             - WBTC
             - XCON
             - ETH
+            - XDC
           example: ETH
           type: string
         to:
@@ -717,7 +719,7 @@ components:
           type: string
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
         contractAddress:
-          maxLength: 42
+          maxLength: 43
           minLength: 42
           description: Address of ERC20 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -940,8 +942,9 @@ components:
           enum:
             - ETH
             - BSC
+            - XDC
         contractAddress:
-          maxLength: 42
+          maxLength: 43
           minLength: 42
           description: Address of ERC20 token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
