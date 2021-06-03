@@ -2335,13 +2335,26 @@ components:
           example: transfer
         methodABI:
           type: object
+          example: {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "stake",
+            "outputs": [ ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
           description: ABI of the method to invoke.
         params:
           type: array
+          example: [ '0x632' ]
           items:
             type: object
-          description: Parameters of the method to be invoked.
-        fromPrivateKey:
+          description: Parameters of the method to be invoked.fromPrivateKey:
           type: string
           maxLength: 66
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"

@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/celo-connector",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Celo Connector for Tatum API",
   "license": "MIT",
   "files": [

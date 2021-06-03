@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/xdc-connector",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "XDC Connector for Tatum API",
   "license": "MIT",
   "files": [
