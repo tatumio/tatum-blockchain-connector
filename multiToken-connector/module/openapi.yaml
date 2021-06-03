@@ -168,14 +168,6 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-        <ul>Following is an example how you can mint multiple tokens with multiple users and multiple cashbackValues
-        <li>Add the addresses to which token is to be minted in</li>
-        to: ['0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f', '0x9115849471F177938A98607D0BE51128Db666775']
-        <li>Add the cashback recipents for each address respectively</li>
-        authorAddresses: [[["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]], [["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]]],
-        <li>Finally add the cashback values wrt each address of author</li>
-        cashbackValues: [[["1", "1"], ["1", "1"]], [["1", "1"], ["1", "1"]]],
-        </ul>
       operationId: MintMultiTokenBatch
       requestBody:
         content:
@@ -441,63 +433,6 @@ paths:
       summary: Transfer MultiToken Batch
       tags:
         - Blockchain / MultiToken
-  /v3/multitoken/royalty:
-    put:
-      description: |
-        <h4>2 credits per API call.</h4><br/>
-        <p>Update royalty cashback value for one of the MultiTokens. This method updates the first royalty value of specific author for 1 token.
-        If royalty value is set to 0, it will disable the royalty system for the token. Only from author's address of the royalty can change it's royalty value, not the owner of the token.<br/><br/>
-        Tatum now supports MultiToken these blockchains:<br/>
-        <ul>
-        <li><b>Ethereum</b></li>
-        <li><b>Celo</b></li>
-        <li><b>Binance Smart Chain</b></li>
-        </ul>
-        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
-        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
-        </p>
-      operationId: UpdateCashbackValueForAuthorMultiToken
-      requestBody:
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiToken"
-                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenKMS"
-                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenCelo"
-                - $ref: "#/components/schemas/UpdateCashbackValueForAuthorMultiTokenKMSCelo"
-        required: true
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/TransactionHashKMS"
-                  - $ref: "#/components/schemas/SignatureId"
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        403:
-          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error403Celo"
-        500:
-          <<: *API500
-      security:
-        - X-Api-Key: [ ]
-      x-code-samples:
-      summary: Update Royalty MultiToken
-      tags:
-        - Blockchain / MultiToken
   /v3/multitoken/address/{chain}/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken contract address from deploy transaction.</p>"
@@ -601,7 +536,72 @@ paths:
       summary: Get Transaction
       tags:
         - Blockchain / MultiToken
-  /v3/multitoken/balance/{chain}/{contractAddress}/{address}:
+  /v3/multitoken/balance/batch/{chain}/{contractAddress}?{tokenId}:
+    get:
+      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiTokens on Account. Returns tokenIDs of tokens Account holds.</p>"
+      operationId: MultiTokenGetBalance
+      parameters:
+        - description: Blockchain to work with
+          in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum:
+              - ETH
+              - CELO
+              - BSC
+        - description: "MultiToken contract address"
+          in: path
+          name: contractAddress
+          required: true
+          schema:
+            type: string
+            example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+        - description: "comma separated TokenIds to get balance for"
+          in: query
+          name: tokenId
+          required: true
+          schema:
+            type: string
+            example: "1,2,3"
+        - description: "comma separated TokenIds to get balance for"
+          in: query
+          name: address
+          required: true
+          schema:
+            type: string
+            example: "0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B,0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B,0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                example: ["10","20"]
+                items:
+                  type: string
+                  description: Token ID.
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403Celo"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Get MultiToken Account balance
+      tags:
+        - Blockchain / MultiToken
+  /v3/multitoken/balance/{chain}/{contractAddress}/{address}?{tokenId}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get MultiTokens on Account. Returns tokenIDs of tokens Account holds.</p>"
       operationId: MultiTokenGetBalance
@@ -630,6 +630,13 @@ paths:
           schema:
             type: string
             example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
+        - description: "MultiToken contract address"
+          in: query
+          name: tokenId
+          required: true
+          schema:
+            type: string
+            example: "100"
       responses:
         200:
           content:
@@ -719,74 +726,6 @@ paths:
       summary: Get MultiToken Token Metadata
       tags:
         - Blockchain / MultiToken
-  /v3/multitoken/royalty/{chain}/{contractAddress}/{token}:
-    get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get MultiToken token royalty.</p>"
-      operationId: MultiTokenGetRoyalty
-      parameters:
-        - description: Blockchain to work with
-          in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            enum:
-              - ETH
-              - CELO
-              - BSC
-        - description: "Token ID"
-          in: path
-          name: token
-          required: true
-          schema:
-            type: string
-            example: "1"
-            maxLength: 32
-        - description: "MultiToken contract address"
-          in: path
-          name: contractAddress
-          required: true
-          schema:
-            type: string
-            example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  addresses:
-                    type: array
-                    description: Addresses of the authors where cashback will be paid.
-                    items:
-                      type: string
-                      example: "0x94Ce79B9F001E25BBEbE7C01998A78F7B27D1326"
-                  values:
-                    type: array
-                    description: Values of the royalties, which will be paid to the authors with every token transfer. Amount is in native asset of the blockchain.
-                    items:
-                      type: string
-                      example: "0.2"
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        403:
-          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error403Celo"
-        500:
-          <<: *API500
-      security:
-        - X-Api-Key: [ ]
-      x-code-samples:
-      summary: Get MultiToken Token Royalty information
-      tags:
-        - Blockchain / MultiToken
 components:
   securitySchemes:
     X-Api-Key:
@@ -801,10 +740,6 @@ components:
     TransferMultiTokenCelo:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: CELO
@@ -863,10 +798,6 @@ components:
     TransferMultiTokenBatchCelo:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: CELO
@@ -1025,41 +956,25 @@ components:
         tokenId:
           type: array
           description: ID of token to be created.
-          example: [ "100000" ]
+          example: [[ "100000","100001" ]]
           items:
-            type: string
-            maxLength: 32
+            type: array
+            items:
+              type: string
+              maxLength: 32
         amounts:
           type: array
           description: ID of token to be created.
-          example: [ "100000" ]
+          example: [[ "100","100" ]]
           items:
-            type: string
-            maxLength: 32
+            type: array
+            items:
+              type: string
+              maxLength: 32
         data:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
-          items:
-            type: array
-            items:
-              type: string
-              minLength: 42
-              maxLength: 42
-              description: Blockchain address to send royalties to
-              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values for every token, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: array
-            items:
-              type: string
-              description: Value of the royalty to be paid.
-              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -1095,7 +1010,6 @@ components:
         - feeCurrency
         - tokenId
         - amounts
-        - data
         - signatureId
     BurnMultiTokenCelo:
       type: object
@@ -1106,6 +1020,12 @@ components:
           description: Chain to work with.
           enum:
             - CELO
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
           example: "100000"
@@ -1146,6 +1066,7 @@ components:
         - fromPrivateKey
         - tokenId
         - amount
+        - account
     BurnMultiTokenBatchCelo:
       type: object
       properties:
@@ -1155,6 +1076,12 @@ components:
           description: Chain to work with.
           enum:
             - CELO
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
           example: ["100000"]
@@ -1198,6 +1125,7 @@ components:
         - fromPrivateKey
         - tokenId
         - amounts
+        - account
     BurnMultiTokenKMSCelo:
       type: object
       properties:
@@ -1207,6 +1135,12 @@ components:
           description: Chain to work with.
           enum:
             - CELO
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
           example: "100000"
@@ -1252,6 +1186,7 @@ components:
         - tokenId
         - amount
         - signatureId
+        - account
     BurnMultiTokenBatchKMSCelo:
       type: object
       properties:
@@ -1261,6 +1196,12 @@ components:
           description: Chain to work with.
           enum:
             - CELO
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: IDs of token to be destroyed.
           example: ["100000"]
@@ -1308,129 +1249,11 @@ components:
         - contractAddress
         - tokenId
         - amount
+        - account
         - signatureId
-    UpdateCashbackValueForAuthorMultiTokenCelo:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: CELO
-          description: Chain to work with.
-          enum:
-            - CELO
-        tokenId:
-          description: ID of token to be updated.
-          example: "100000"
-          type: string
-          maxLength: 32
-        author:
-          maxLength: 42
-          minLength: 42
-          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        cashbackValue:
-          type: string
-          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
-          example: "0.1"
-        contractAddress:
-          maxLength: 42
-          minLength: 42
-          description: Address of MultiToken token
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        fromPrivateKey:
-          type: string
-          maxLength: 66
-          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 66
-          description: Private key of sender address. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
-        feeCurrency:
-          type: string
-          description: Currency to pay for transaction gas
-          enum:
-            - CELO
-            - CUSD
-            - CEUR
-      required:
-        - chain
-        - contractAddress
-        - feeCurrency
-        - fromPrivateKey
-        - tokenId
-        - author
-        - cashbackValue
-    UpdateCashbackValueForAuthorMultiTokenKMSCelo:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: CELO
-          description: Chain to work with.
-          enum:
-            - CELO
-        tokenId:
-          description: ID of token to be updated.
-          example: "100000"
-          type: string
-          maxLength: 32
-        author:
-          maxLength: 42
-          minLength: 42
-          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        cashbackValue:
-          type: string
-          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
-          example: "0.1"
-        contractAddress:
-          maxLength: 42
-          minLength: 42
-          description: Address of MultiToken token
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        index:
-          type: number
-          minimum: 0
-          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
-        feeCurrency:
-          type: string
-          description: Currency to pay for transaction gas
-          enum:
-            - CELO
-            - CUSD
-            - CEUR
-      required:
-        - chain
-        - feeCurrency
-        - contractAddress
-        - tokenId
-        - signatureId
-        - author
-        - cashbackValue
     TransferMultiTokenKMSCelo:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: CELO
@@ -1492,14 +1315,9 @@ components:
         - signatureId
         - tokenId
         - amount
-        - data
     TransferMultiTokenBatchKMSCelo:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: CELO
@@ -1564,7 +1382,6 @@ components:
         - signatureId
         - tokenId
         - amounts
-        - data
     MintMultiTokenCelo:
       type: object
       properties:
@@ -1599,22 +1416,6 @@ components:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
-          items:
-            type: string
-            minLength: 42
-            maxLength: 42
-            description: Blockchain address to send royalties to
-            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: string
-            description: Value of the royalty to be paid.
-            example: "0.5"
         fromPrivateKey:
           type: string
           maxLength: 66
@@ -1637,7 +1438,6 @@ components:
         - to
         - tokenId
         - amount
-        - data
         - feeCurrency
         - contractAddress
         - fromPrivateKey
@@ -1651,20 +1451,23 @@ components:
           enum:
             - CELO
         tokenId:
+          type: array
           description: ID of token to be created.
-          example: ['121002', '121001', '121000']
-          type: array
-          items:
-            type: string
-            maxLength: 32
-        amounts:
-          description: amounts of token to be created.
-          example: [['10', '10'], ['10', '10']]
-          type: array
+          example: [[ "100000","100001" ]]
           items:
             type: array
             items:
               type: string
+              maxLength: 32
+        amounts:
+          type: array
+          description: ID of token to be created.
+          example: [[ "100","100" ]]
+          items:
+            type: array
+            items:
+              type: string
+              maxLength: 32
         data:
           description: Data in bytes
           example: "0x1234"
@@ -1673,7 +1476,7 @@ components:
           maxLength: 42
           minLength: 42
           description: Blockchain address to send MultiToken token to
-          example: ['0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f', '0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f']
+          example: ['0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f']
           type: array
           items:
             type: string
@@ -1683,30 +1486,6 @@ components:
           description: Address of MultiToken token
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
-          items:
-            type: array
-            items:
-              type: array
-              items:
-                type: string
-                minLength: 42
-                maxLength: 42
-                description: Blockchain address to send royalties to
-          example: [[["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]], [["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"], ["0x687422eEA2cB73B5d3e242bA5456b782919AFc85", "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]]]
-        cashbackValues:
-          type: array
-          description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          example: [[["1", "1"], ["1", "1"]], [["1", "1"], ["1", "1"]]]
-          items:
-            type: array
-            items:
-              type: array
-              items:
-                type: string
-                description: Value of the royalty to be paid.
         fromPrivateKey:
           type: string
           maxLength: 66
@@ -1729,7 +1508,6 @@ components:
         - to
         - tokenId
         - amounts
-        - data
         - feeCurrency
         - contractAddress
         - fromPrivateKey
@@ -1768,22 +1546,6 @@ components:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency CELO.
-          items:
-            type: string
-            minLength: 42
-            maxLength: 42
-            description: Blockchain address to send royalties to
-            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: string
-            description: Value of the royalty to be paid.
-            example: "0.5"
         index:
           type: number
           minimum: 0
@@ -1811,17 +1573,12 @@ components:
         - to
         - tokenId
         - amount
-        - data
         - feeCurrency
         - contractAddress
         - signatureId
     TransferMultiToken:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: ETH
@@ -1891,10 +1648,6 @@ components:
     TransferMultiTokenBatch:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: ETH
@@ -1965,7 +1718,6 @@ components:
         - contractAddress
         - tokenId
         - amounts
-        - data
         - fromPrivateKey
     DeployMultiToken:
       type: object
@@ -2011,7 +1763,6 @@ components:
       required:
         - uri
         - chain
-        - symbol
         - fromPrivateKey
     DeployMultiTokenKMS:
       type: object
@@ -2058,15 +1809,10 @@ components:
       required:
         - uri
         - chain
-        - symbol
         - signatureId
     TransferMultiTokenKMS:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: ETH
@@ -2139,14 +1885,9 @@ components:
         - signatureId
         - tokenId
         - amount
-        - data
     TransferMultiTokenBatchKMS:
       type: object
       properties:
-        value:
-          type: string
-          description: If token to be transferred is Royalty MultiToken token, this is a value to be paid as a cashback to the authors of the token.
-          example: "1"
         chain:
           type: string
           example: ETH
@@ -2224,7 +1965,6 @@ components:
         - signatureId
         - tokenId
         - amount
-        - data
     MintMultiToken:
       type: object
       properties:
@@ -2261,22 +2001,6 @@ components:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, like BSC or ETH.
-          items:
-            type: string
-            minLength: 42
-            maxLength: 42
-            description: Blockchain address to send royalties to
-            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: string
-            description: Value of the royalty to be paid.
-            example: "0.5"
         index:
           type: number
           minimum: 0
@@ -2317,7 +2041,6 @@ components:
         - fromPrivateKey
         - tokenId
         - amount
-        - data
     MintMultiTokenKMS:
       type: object
       properties:
@@ -2354,22 +2077,6 @@ components:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, like BSC or ETH.
-          items:
-            type: string
-            minLength: 42
-            maxLength: 42
-            description: Blockchain address to send royalties to
-            example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: string
-            description: Value of the royalty to be paid.
-            example: "0.5"
         index:
           type: number
           minimum: 0
@@ -2410,7 +2117,6 @@ components:
         - signatureId
         - tokenId
         - amount
-        - data
     MintMultiTokenBatch:
       type: object
       properties:
@@ -2424,7 +2130,7 @@ components:
         to:
           type: array
           description: Blockchain address to send MultiToken token to.
-          example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85","0x687422eEA2cB73B5d3e242bA5456b782919AFc85" ]
+          example: [ "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"]
           items:
             maxLength: 42
             minLength: 42
@@ -2432,41 +2138,25 @@ components:
         tokenId:
           type: array
           description: ID of token to be created.
-          example: [ "100000","100001" ]
+          example: [[ "100000","100001" ]]
           items:
-            type: string
-            maxLength: 32
+            type: array
+            items:
+              type: string
+              maxLength: 32
         amounts:
           type: array
           description: ID of token to be created.
-          example: [ "100000" ]
+          example: [[ "100","100" ]]
           items:
-            type: string
-            maxLength: 32
+            type: array
+            items:
+              type: string
+              maxLength: 32
         data:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, ETH or BSC.
-          items:
-            type: array
-            items:
-              type: string
-              minLength: 42
-              maxLength: 42
-              description: Blockchain address to send royalties to
-              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values for every token, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: array
-            items:
-              type: string
-              description: Value of the royalty to be paid.
-              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2508,7 +2198,6 @@ components:
         - fromPrivateKey
         - tokenId
         - amounts
-        - data
     MintMultiTokenBatchKMS:
       type: object
       properties:
@@ -2530,41 +2219,25 @@ components:
         tokenId:
           type: array
           description: ID of token to be created.
-          example: [ "100000" ]
+          example: [[ "100000","100001" ]]
           items:
-            type: string
-            maxLength: 32
+            type: array
+            items:
+              type: string
+              maxLength: 32
         amounts:
           type: array
-          description: amounts of token to be created.
-          example: [ "100000" ]
+          description: ID of token to be created.
+          example: [[ "100","100" ]]
           items:
-            type: string
-            maxLength: 32
+            type: array
+            items:
+              type: string
+              maxLength: 32
         data:
           description: Data in bytes
           example: "0x1234"
           type: string
-        authorAddresses:
-          type: array
-          description: List of addresses for every token, where royalty cashback for every transfer of this MultiToken will be send. Royalties are paid in native blockchain currency, ETH or BSC.
-          items:
-            type: array
-            items:
-              type: string
-              minLength: 42
-              maxLength: 42
-              description: Blockchain address to send royalties to
-              example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-        cashbackValues:
-          type: array
-          description: List of values for every token, which will be paid as a royalty for author of the MultiToken token with every token transfer. This is exact value in native blockhain currency.
-          items:
-            type: array
-            items:
-              type: string
-              description: Value of the royalty to be paid.
-              example: "0.5"
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2611,7 +2284,6 @@ components:
         - url
         - signatureId
         - amounts
-        - data
     BurnMultiToken:
       type: object
       properties:
@@ -2622,6 +2294,12 @@ components:
           enum:
             - ETH
             - BSC
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
           example: "100000"
@@ -2639,6 +2317,15 @@ components:
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
           minLength: 66
           description: Private key of sender address. Private key, or signature Id must be present.
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
+        amount:
+          description: amount of token to be destroyed.
+          example: "100000"
+          type: string
+          maxLength: 32
         nonce:
           type: number
           minimum: 0
@@ -2661,7 +2348,7 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
-        - to
+        - account
         - chain
         - contractAddress
         - fromPrivateKey
@@ -2677,19 +2364,29 @@ components:
           enum:
             - ETH
             - BSC
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
-          example: ["100000"]
+          example: ["1000","1001"]
           type: array
           items:
             type: string
             maxLength: 32
         amounts:
           description: ID of token to be destroyed.
-          example: ["100000"]
+          example: ["10","10"]
           type: array
           items:
             type: string
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2724,148 +2421,10 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
-        - to
+        - account
+        - amounts
         - chain
         - url
-        - contractAddress
-        - fromPrivateKey
-        - tokenId
-    UpdateCashbackValueForAuthorMultiTokenKMS:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: ETH
-          description: Chain to work with.
-          enum:
-            - ETH
-            - BSC
-        tokenId:
-          description: ID of token to be updated.
-          example: "100000"
-          type: string
-          maxLength: 32
-        author:
-          maxLength: 42
-          minLength: 42
-          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        cashbackValue:
-          type: string
-          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
-          example: "0.1"
-        contractAddress:
-          maxLength: 42
-          minLength: 42
-          description: Address of MultiToken token
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        index:
-          type: number
-          minimum: 0
-          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
-        signatureId:
-          type: string
-          minLength: 36
-          maxLength: 36
-          format: uuid
-          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
-          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
-        fee:
-          description: Custom defined fee. If not present, it will be calculated automatically.
-          type: object
-          required:
-            - gasLimit
-            - gasPrice
-          properties:
-            gasLimit:
-              type: string
-              description: Gas limit for transaction in gas price.
-              pattern: ^[+]?\d+$
-              example: "40000"
-            gasPrice:
-              type: string
-              description: Gas price in Gwei.
-              pattern: ^[+]?\d+$
-              example: "20"
-      required:
-        - to
-        - chain
-        - url
-        - contractAddress
-        - tokenId
-        - author
-        - cashbackValue
-        - signatureId
-    UpdateCashbackValueForAuthorMultiToken:
-      type: object
-      properties:
-        chain:
-          type: string
-          example: ETH
-          description: Chain to work with.
-          enum:
-            - ETH
-            - BSC
-        tokenId:
-          description: ID of token to be updated.
-          example: "100000"
-          type: string
-          maxLength: 32
-        author:
-          maxLength: 42
-          minLength: 42
-          description: Blockchain address of author of the royaltz. From this address update operation must be sent.
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        cashbackValue:
-          type: string
-          description: New royalty cashback to be set for the author of token with tokenId. If set to 0, royalty is disabled for this token.
-          example: "0.1"
-        contractAddress:
-          maxLength: 42
-          minLength: 42
-          description: Address of MultiToken token
-          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
-          type: string
-        fromPrivateKey:
-          type: string
-          maxLength: 66
-          example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
-          minLength: 66
-          description: Private key of sender address. Private key, or signature Id must be present.
-        nonce:
-          type: number
-          minimum: 0
-          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
-        fee:
-          description: Custom defined fee. If not present, it will be calculated automatically.
-          type: object
-          required:
-            - gasLimit
-            - gasPrice
-          properties:
-            gasLimit:
-              type: string
-              description: Gas limit for transaction in gas price.
-              pattern: ^[+]?\d+$
-              example: "40000"
-            gasPrice:
-              type: string
-              description: Gas price in Gwei.
-              pattern: ^[+]?\d+$
-              example: "20"
-      required:
-        - to
-        - chain
-        - url
-        - author
-        - cashbackValue
         - contractAddress
         - fromPrivateKey
         - tokenId
@@ -2879,11 +2438,26 @@ components:
           enum:
             - ETH
             - BSC
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
           example: "100000"
           type: string
           maxLength: 32
+        amount:
+          description: amount of token to be destroyed.
+          example: "100"
+          type: string
+          maxLength: 32
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2923,7 +2497,7 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
-        - to
+        - account
         - chain
         - amount
         - contractAddress
@@ -2939,19 +2513,29 @@ components:
           enum:
             - ETH
             - BSC
+        account:
+          maxLength: 42
+          minLength: 42
+          description: Address of holder
+          example: "0x4b812a77b109A150C2Fc89eD133EaBC78bC9EC8f"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
-          example: ["100000"]
+          example: ["100","101"]
           type: array
           items:
             type: string
             maxLength: 32
         amounts:
           description: ID of token to be destroyed.
-          example: ["100000"]
+          example: ["10","10"]
           type: array
           items:
             type: string
+        data:
+          description: Data in bytes
+          example: "0x1234"
+          type: string
         contractAddress:
           maxLength: 42
           minLength: 42
@@ -2991,7 +2575,7 @@ components:
               pattern: ^[+]?\d+$
               example: "20"
       required:
-        - to
+        - account
         - chain
         - amount
         - contractAddress
