@@ -5,6 +5,7 @@ import {
   BurnErc20,
   DeployErc20,
   MintErc20,
+  TransferErc20,
   TransferEthErc20,
   TransferBscBep20,
   BurnCeloErc20,
@@ -33,9 +34,15 @@ export class ChainMintErc20 extends MintErc20 {
   public chain: Currency;
 }
 
+export class ChainTransferErc20 extends TransferErc20 {
+  @IsNotEmpty()
+  @IsIn([Currency.XDC])
+  public chain: Currency;
+}
+
 export class ChainTransferEthErc20 extends TransferEthErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
+  @IsIn([Currency.ETH, Currency.BSC])
   public chain: Currency;
 }
 
