@@ -7,8 +7,7 @@ import {
   BroadcastTx,
   EstimateGasEth,
   SmartContractMethodInvocation,
-  TransferEthErc20,
-  TransferCustomErc20,
+  TransferErc20,
 } from '@tatumio/tatum';
 import {PathAddress} from './dto/PathAddress';
 import {PathHash} from './dto/PathHash';
@@ -50,7 +49,7 @@ export abstract class XdcController {
 
   @Post('v3/xdc/transaction')
   @HttpCode(HttpStatus.OK)
-  public async sendXdcOrErc20Transaction(@Body() body: TransferEthErc20) {
+  public async sendXdcOrErc20Transaction(@Body() body: TransferErc20) {
     try {
       return await this.service.sendXdcOrErc20Transaction(body);
     } catch (e) {
@@ -83,16 +82,6 @@ export abstract class XdcController {
   public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation) {
     try {
       return await this.service.invokeSmartContractMethod(body);
-    } catch (e) {
-      throw new XdcError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'xdc.error');
-    }
-  }
-
-  @Post('v3/xdc/erc20/transaction')
-  @HttpCode(HttpStatus.OK)
-  public async transferErc20Blockchain(@Body() body: TransferCustomErc20) {
-    try {
-      return await this.service.sendCustomErc20Transaction(body);
     } catch (e) {
       throw new XdcError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'xdc.error');
     }

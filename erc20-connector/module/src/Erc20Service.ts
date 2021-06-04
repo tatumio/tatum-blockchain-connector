@@ -10,9 +10,11 @@ import {
     ChainMintErc20,
     ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
+    ChainTransferErc20,
     ChainTransferEthErc20,
 } from './Erc20Base';
 import {
+    fromXdcAddress,
     BurnCeloErc20,
     BurnErc20,
     Currency,
@@ -35,6 +37,7 @@ import {
     TransactionHash,
     TransferBscBep20,
     TransferCeloOrCeloErc20Token,
+    TransferErc20,
     TransferEthErc20,
     prepareXdcOrErc20SignedTransaction,
     prepareXdcBurnErc20SignedTransaction, 
@@ -72,10 +75,6 @@ export abstract class Erc20Service {
         throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
     }
 
-    private fromXdcAddress (xdcAddress) {
-      return xdcAddress.replace('xdc', '0x')
-    }
-
     public async getErc20Balance(chain: Currency, address: string, contractAddress: string): Promise<{ balance: string }> {
         let contractOrAddress;
         switch (chain) {
@@ -85,13 +84,13 @@ export abstract class Erc20Service {
                 contractOrAddress = contractAddress;
                 break;
             case Currency.XDC:
-                contractOrAddress = this.fromXdcAddress(contractAddress);
+                contractOrAddress = fromXdcAddress(contractAddress);
                 break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
 
-        const _address = chain === Currency.XDC ? this.fromXdcAddress(address) : address;
+        const _address = chain === Currency.XDC ? fromXdcAddress(address) : address;
 
         const client = await this.getClient(chain, await this.isTestnet());
         // @ts-ignore
@@ -99,7 +98,7 @@ export abstract class Erc20Service {
         return {balance: await contract.methods.balanceOf(_address).call()};
     }
 
-    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token):
+    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
@@ -115,11 +114,7 @@ export abstract class Erc20Service {
                 txData = await prepareCeloTransferErc20SignedTransaction(testnet, _body as TransferCeloOrCeloErc20Token, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.XDC:
-                const tx = {
-                  ..._body,
-                  to: this.fromXdcAddress(_body.to),
-                };
-                txData = await prepareXdcOrErc20SignedTransaction(tx as TransferEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareXdcOrErc20SignedTransaction(_body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
@@ -146,11 +141,7 @@ export abstract class Erc20Service {
                 txData = await prepareCeloBurnErc20SignedTransaction(testnet, _body as BurnCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.XDC:
-              const tx = {
-                ..._body,
-                contractAddress: this.fromXdcAddress(_body.contractAddress),
-              };
-              txData = await prepareXdcBurnErc20SignedTransaction(tx as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareXdcBurnErc20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
@@ -177,12 +168,7 @@ export abstract class Erc20Service {
                 txData = await prepareCeloMintErc20SignedTransaction(testnet, _body as MintCeloErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.XDC:
-                const tx = {
-                  ..._body,
-                  to: this.fromXdcAddress(_body.to),
-                  contractAddress: this.fromXdcAddress(_body.contractAddress),
-                };
-                txData = await prepareXdcMintErc20SignedTransaction(tx as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                txData = await prepareXdcMintErc20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
                 throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
@@ -211,7 +197,7 @@ export abstract class Erc20Service {
             case Currency.XDC:
                 const tx = {
                   ..._body,
-                  address: this.fromXdcAddress(_body.address),
+                  address: fromXdcAddress(_body.address),
                 };
 
                 txData = await prepareXdcDeployErc20SignedTransaction(tx as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));

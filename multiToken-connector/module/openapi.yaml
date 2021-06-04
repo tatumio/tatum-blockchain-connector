@@ -21,7 +21,7 @@ tags:
       <li><b>Binance Smart Chain</b></li>
       </ul>
       </p>
-    name: Blockchain / Multi Token
+    name: Blockchain / Multi Token (ERC-1155)
 paths:
   /v3/multitoken/deploy:
     post:
@@ -41,16 +41,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: DeployMulti Token
+      operationId: DeployMultiToken
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/DeployMulti Token"
-                - $ref: "#/components/schemas/DeployMulti TokenKMS"
-                - $ref: "#/components/schemas/DeployMulti TokenCelo"
-                - $ref: "#/components/schemas/DeployMulti TokenCeloKMS"
+                - $ref: "#/components/schemas/DeployMultiToken"
+                - $ref: "#/components/schemas/DeployMultiTokenKMS"
+                - $ref: "#/components/schemas/DeployMultiTokenCelo"
+                - $ref: "#/components/schemas/DeployMultiTokenCeloKMS"
         required: true
       responses:
         200:
@@ -93,7 +93,7 @@ paths:
       x-code-samples:
       summary: Deploy Multi Token Smart Contract.
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/mint:
     post:
       description: |
@@ -112,16 +112,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: MintMulti Token
+      operationId: MintMultiToken
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/MintMulti Token"
-                - $ref: "#/components/schemas/MintMulti TokenKMS"
-                - $ref: "#/components/schemas/MintMulti TokenCelo"
-                - $ref: "#/components/schemas/MintMulti TokenKMSCelo"
+                - $ref: "#/components/schemas/MintMultiToken"
+                - $ref: "#/components/schemas/MintMultiTokenKMS"
+                - $ref: "#/components/schemas/MintMultiTokenCelo"
+                - $ref: "#/components/schemas/MintMultiTokenKMSCelo"
         required: true
       responses:
         200:
@@ -150,7 +150,7 @@ paths:
       x-code-samples:
       summary: Mint Multi Token
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/mint/batch:
     post:
       description: |
@@ -168,16 +168,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: MintMulti TokenBatch
+      operationId: MintMultiTokenBatch
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/MintMulti TokenBatch"
-                - $ref: "#/components/schemas/MintMulti TokenBatchKMS"
-                - $ref: "#/components/schemas/MintMulti TokenBatchCelo"
-                - $ref: "#/components/schemas/MintMulti TokenBatchKMSCelo"
+                - $ref: "#/components/schemas/MintMultiTokenBatch"
+                - $ref: "#/components/schemas/MintMultiTokenBatchKMS"
+                - $ref: "#/components/schemas/MintMultiTokenBatchCelo"
+                - $ref: "#/components/schemas/MintMultiTokenBatchKMSCelo"
         required: true
       responses:
         200:
@@ -206,7 +206,7 @@ paths:
       x-code-samples:
       summary: Mint Multi Token Batch
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/burn:
     post:
       description: |
@@ -224,16 +224,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: BurnMulti Token
+      operationId: BurnMultiToken
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/BurnMulti Token"
-                - $ref: "#/components/schemas/BurnMulti TokenKMS"
-                - $ref: "#/components/schemas/BurnMulti TokenCelo"
-                - $ref: "#/components/schemas/BurnMulti TokenKMSCelo"
+                - $ref: "#/components/schemas/BurnMultiToken"
+                - $ref: "#/components/schemas/BurnMultiTokenKMS"
+                - $ref: "#/components/schemas/BurnMultiTokenCelo"
+                - $ref: "#/components/schemas/BurnMultiTokenKMSCelo"
         required: true
       responses:
         200:
@@ -262,7 +262,7 @@ paths:
       x-code-samples:
       summary: Burn Multi Token
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/burn/batch:
     post:
       description: |
@@ -280,16 +280,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: BurnMulti TokenBatch
+      operationId: BurnMultiTokenBatch
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/BurnMulti TokenBatch"
-                - $ref: "#/components/schemas/BurnMulti TokenBatchKMS"
-                - $ref: "#/components/schemas/BurnMulti TokenBatchCelo"
-                - $ref: "#/components/schemas/BurnMulti TokenBatchKMSCelo"
+                - $ref: "#/components/schemas/BurnMultiTokenBatch"
+                - $ref: "#/components/schemas/BurnMultiTokenBatchKMS"
+                - $ref: "#/components/schemas/BurnMultiTokenBatchCelo"
+                - $ref: "#/components/schemas/BurnMultiTokenBatchKMSCelo"
         required: true
       responses:
         200:
@@ -318,7 +318,7 @@ paths:
       x-code-samples:
       summary: Burn Multi Token Batch
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/transaction:
     post:
       description: |
@@ -337,16 +337,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: TransferMulti Token
+      operationId: TransferMultiToken
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/TransferMulti Token"
-                - $ref: "#/components/schemas/TransferMulti TokenCelo"
-                - $ref: "#/components/schemas/TransferMulti TokenKMS"
-                - $ref: "#/components/schemas/TransferMulti TokenKMSCelo"
+                - $ref: "#/components/schemas/TransferMultiToken"
+                - $ref: "#/components/schemas/TransferMultiTokenCelo"
+                - $ref: "#/components/schemas/TransferMultiTokenKMS"
+                - $ref: "#/components/schemas/TransferMultiTokenKMSCelo"
         required: true
       responses:
         200:
@@ -375,7 +375,7 @@ paths:
       x-code-samples:
       summary: Transfer Multi Token Token
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/transaction/batch:
     post:
       description: |
@@ -394,16 +394,16 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: TransferMulti TokenBatch
+      operationId: TransferMultiTokenBatch
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/TransferMulti TokenBatch"
-                - $ref: "#/components/schemas/TransferMulti TokenBatchKMS"
-                - $ref: "#/components/schemas/TransferMulti TokenBatchCelo"
-                - $ref: "#/components/schemas/TransferMulti TokenBatchKMSCelo"
+                - $ref: "#/components/schemas/TransferMultiTokenBatch"
+                - $ref: "#/components/schemas/TransferMultiTokenBatchKMS"
+                - $ref: "#/components/schemas/TransferMultiTokenBatchCelo"
+                - $ref: "#/components/schemas/TransferMultiTokenBatchKMSCelo"
         required: true
       responses:
         200:
@@ -432,7 +432,7 @@ paths:
       x-code-samples:
       summary: Transfer Multi Token Batch
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/address/{chain}/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get Multi Token contract address from deploy transaction.</p>"
@@ -485,7 +485,7 @@ paths:
       x-code-samples:
       summary: Get Contract address
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/transaction/{chain}/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get Multi Token transaction by transaction hash.</p>"
@@ -535,7 +535,7 @@ paths:
       x-code-samples:
       summary: Get Transaction
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/balance/{chain}/{contractAddress}/{address}/{tokenId}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get Multi Tokens on Account. Returns tokenIDs of tokens Account holds.</p>"
@@ -600,7 +600,7 @@ paths:
       x-code-samples:
       summary: Get Multi Token Account balance
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/balance/batch/{chain}/{contractAddress}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get Multi Tokens on Account. Returns tokenIDs of tokens Account holds.</p>"
@@ -665,7 +665,7 @@ paths:
       x-code-samples:
       summary: Get Multi Token Account balance Batch
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
   /v3/multitoken/metadata/{chain}/{contractAddress}/{token}:
     get:
       description: "<h4>1 credit per API call.</h4><br/><p>Get Multi Token metadata.</p>"
@@ -725,7 +725,7 @@ paths:
       x-code-samples:
       summary: Get Multi Token Token Metadata
       tags:
-        - Blockchain / Multi Token
+        - Blockchain / Multi Token (ERC-1155)
 components:
   securitySchemes:
     X-Api-Key:
@@ -737,7 +737,7 @@ components:
       name: x-api-key
       type: apiKey
   schemas:
-    TransferMulti TokenCelo:
+    TransferMultiTokenCelo:
       type: object
       properties:
         chain:
@@ -795,7 +795,7 @@ components:
         - contractAddress
         - tokenId
         - fromPrivateKey
-    TransferMulti TokenBatchCelo:
+    TransferMultiTokenBatchCelo:
       type: object
       properties:
         chain:
@@ -858,7 +858,7 @@ components:
         - tokenId
         - amounts
         - fromPrivateKey
-    DeployMulti TokenCelo:
+    DeployMultiTokenCelo:
       type: object
       properties:
         chain:
@@ -895,7 +895,7 @@ components:
         - uri
         - feeCurrency
         - fromPrivateKey
-    DeployMulti TokenCeloKMS:
+    DeployMultiTokenCeloKMS:
       type: object
       properties:
         chain:
@@ -936,7 +936,7 @@ components:
         - uri
         - feeCurrency
         - signatureId
-    MintMulti TokenBatchKMSCelo:
+    MintMultiTokenBatchKMSCelo:
       type: object
       properties:
         chain:
@@ -1011,7 +1011,7 @@ components:
         - tokenId
         - amounts
         - signatureId
-    BurnMulti TokenCelo:
+    BurnMultiTokenCelo:
       type: object
       properties:
         chain:
@@ -1067,7 +1067,7 @@ components:
         - tokenId
         - amount
         - account
-    BurnMulti TokenBatchCelo:
+    BurnMultiTokenBatchCelo:
       type: object
       properties:
         chain:
@@ -1126,7 +1126,7 @@ components:
         - tokenId
         - amounts
         - account
-    BurnMulti TokenKMSCelo:
+    BurnMultiTokenKMSCelo:
       type: object
       properties:
         chain:
@@ -1187,7 +1187,7 @@ components:
         - amount
         - signatureId
         - account
-    BurnMulti TokenBatchKMSCelo:
+    BurnMultiTokenBatchKMSCelo:
       type: object
       properties:
         chain:
@@ -1251,7 +1251,7 @@ components:
         - amount
         - account
         - signatureId
-    TransferMulti TokenKMSCelo:
+    TransferMultiTokenKMSCelo:
       type: object
       properties:
         chain:
@@ -1315,7 +1315,7 @@ components:
         - signatureId
         - tokenId
         - amount
-    TransferMulti TokenBatchKMSCelo:
+    TransferMultiTokenBatchKMSCelo:
       type: object
       properties:
         chain:
@@ -1382,7 +1382,7 @@ components:
         - signatureId
         - tokenId
         - amounts
-    MintMulti TokenCelo:
+    MintMultiTokenCelo:
       type: object
       properties:
         chain:
@@ -1441,7 +1441,7 @@ components:
         - feeCurrency
         - contractAddress
         - fromPrivateKey
-    MintMulti TokenBatchCelo:
+    MintMultiTokenBatchCelo:
       type: object
       properties:
         chain:
@@ -1511,7 +1511,7 @@ components:
         - feeCurrency
         - contractAddress
         - fromPrivateKey
-    MintMulti TokenKMSCelo:
+    MintMultiTokenKMSCelo:
       type: object
       properties:
         chain:
@@ -1576,7 +1576,7 @@ components:
         - feeCurrency
         - contractAddress
         - signatureId
-    TransferMulti Token:
+    TransferMultiToken:
       type: object
       properties:
         chain:
@@ -1645,7 +1645,7 @@ components:
         - contractAddress
         - tokenId
         - fromPrivateKey
-    TransferMulti TokenBatch:
+    TransferMultiTokenBatch:
       type: object
       properties:
         chain:
@@ -1719,7 +1719,7 @@ components:
         - tokenId
         - amounts
         - fromPrivateKey
-    DeployMulti Token:
+    DeployMultiToken:
       type: object
       properties:
         chain:
@@ -1764,7 +1764,7 @@ components:
         - uri
         - chain
         - fromPrivateKey
-    DeployMulti TokenKMS:
+    DeployMultiTokenKMS:
       type: object
       properties:
         chain:
@@ -1810,7 +1810,7 @@ components:
         - uri
         - chain
         - signatureId
-    TransferMulti TokenKMS:
+    TransferMultiTokenKMS:
       type: object
       properties:
         chain:
@@ -1885,7 +1885,7 @@ components:
         - signatureId
         - tokenId
         - amount
-    TransferMulti TokenBatchKMS:
+    TransferMultiTokenBatchKMS:
       type: object
       properties:
         chain:
@@ -1965,7 +1965,7 @@ components:
         - signatureId
         - tokenId
         - amount
-    MintMulti Token:
+    MintMultiToken:
       type: object
       properties:
         chain:
@@ -2041,7 +2041,7 @@ components:
         - fromPrivateKey
         - tokenId
         - amount
-    MintMulti TokenKMS:
+    MintMultiTokenKMS:
       type: object
       properties:
         chain:
@@ -2117,7 +2117,7 @@ components:
         - signatureId
         - tokenId
         - amount
-    MintMulti TokenBatch:
+    MintMultiTokenBatch:
       type: object
       properties:
         chain:
@@ -2198,7 +2198,7 @@ components:
         - fromPrivateKey
         - tokenId
         - amounts
-    MintMulti TokenBatchKMS:
+    MintMultiTokenBatchKMS:
       type: object
       properties:
         chain:
@@ -2284,7 +2284,7 @@ components:
         - url
         - signatureId
         - amounts
-    BurnMulti Token:
+    BurnMultiToken:
       type: object
       properties:
         chain:
@@ -2354,7 +2354,7 @@ components:
         - fromPrivateKey
         - tokenId
         - amount
-    BurnMulti TokenBatch:
+    BurnMultiTokenBatch:
       type: object
       properties:
         chain:
@@ -2428,7 +2428,7 @@ components:
         - contractAddress
         - fromPrivateKey
         - tokenId
-    BurnMulti TokenKMS:
+    BurnMultiTokenKMS:
       type: object
       properties:
         chain:
@@ -2503,7 +2503,7 @@ components:
         - contractAddress
         - tokenId
         - signatureId
-    BurnMulti TokenBatchKMS:
+    BurnMultiTokenBatchKMS:
       type: object
       properties:
         chain:

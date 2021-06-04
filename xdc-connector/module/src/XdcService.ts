@@ -1,5 +1,6 @@
 import {PinoLogger} from 'nestjs-pino';
 import {
+    fromXdcAddress,
     xdcGetGasPriceInWei,
     CONTRACT_ADDRESSES,
     Currency,
@@ -15,7 +16,7 @@ import {
     sendXdcSmartContractReadMethodInvocationTransaction,
     SmartContractMethodInvocation,
     TransactionHash,
-    TransferEthErc20,
+    TransferErc20,
     TransferCustomErc20,
 } from '@tatumio/tatum';
 import Web3 from 'web3';
@@ -187,10 +188,6 @@ export abstract class XdcService {
         return this.broadcast(transactionData);
     }
 
-    private fromXdcAddress (xdcAddress) {
-      return xdcAddress.replace('xdc', '0x')
-    }
-
     public async web3Method(body: any) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         return (await axios.post(node, body, {headers: {'Content-Type': 'application/json'}})).data;
@@ -214,8 +211,8 @@ export abstract class XdcService {
         const client = await this.getClient(await this.isTestnet());
         const _body = {
           ...body,
-          to: body.to ? this.fromXdcAddress(body.to) : undefined,
-          from: body.from ? this.fromXdcAddress(body.from) : undefined,
+          to: body.to ? fromXdcAddress(body.to) : undefined,
+          from: body.from ? fromXdcAddress(body.from) : undefined,
         } as EstimateGasEth;
         return {
             gasLimit: await client.eth.estimateGas(_body),
@@ -225,50 +222,38 @@ export abstract class XdcService {
 
     public async getBalance(address: string): Promise<{ balance: string }> {
         const client = await this.getClient(await this.isTestnet());
-        return {balance: fromWei(await client.eth.getBalance(this.fromXdcAddress(address)), 'ether')};
+        return {balance: fromWei(await client.eth.getBalance(fromXdcAddress(address)), 'ether')};
     }
 
-    public async sendXdcOrErc20Transaction(transfer: TransferEthErc20): Promise<TransactionHash | SignatureId> {
-        const tx = {
-          ...transfer,
-          to: this.fromXdcAddress(transfer.to)
-        } as TransferEthErc20;
-
-        const transactionData = await prepareXdcOrErc20SignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
+    public async sendXdcOrErc20Transaction(transfer: TransferErc20): Promise<TransactionHash | SignatureId> {
+        const transactionData = await prepareXdcOrErc20SignedTransaction(transfer, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
             transactionData, 
-            signatureId: tx.signatureId,
-            index: tx.index
+            signatureId: transfer.signatureId,
+            index: transfer.index
         });
     }
 
-    public async sendCustomErc20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionHash | SignatureId> {
-      const tx = {
-        ...transferCustomErc20,
-        to: this.fromXdcAddress(transferCustomErc20.to),
-        contractAddress: transferCustomErc20.contractAddress ? this.fromXdcAddress(transferCustomErc20.contractAddress) : undefined,
-      } as TransferCustomErc20;
-
-      const transactionData = await prepareXdcCustomErc20SignedTransaction(tx, await this.getFirstNodeUrl(await this.isTestnet()));
-        return this.broadcastOrStoreKMSTransaction({
-            transactionData,
-            signatureId: tx.signatureId,
-            index: tx.index
-        });
-    }
+    // public async sendCustomErc20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionHash | SignatureId> {
+    //   const transactionData = await prepareXdcCustomErc20SignedTransaction(transferCustomErc20, await this.getFirstNodeUrl(await this.isTestnet()));
+    //     return this.broadcastOrStoreKMSTransaction({
+    //         transactionData,
+    //         signatureId: transferCustomErc20.signatureId,
+    //         index: transferCustomErc20.index
+    //     });
+    // }
 
     public async getTransactionCount(address: string) {
         const client = await this.getClient(await this.isTestnet());
-        return client.eth.getTransactionCount(this.fromXdcAddress(address), 'pending');
+        return client.eth.getTransactionCount(fromXdcAddress(address), 'pending');
     }
 
     public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
-        const params = smartContractMethodInvocation.params.map(e => `${e}`.startsWith('xdc') ? e.replace('xdc', '0x') : e);
+        const params = smartContractMethodInvocation.params.map(e => `${e}`.startsWith('xdc') ? fromXdcAddress(e) : e);
         const tx = {
           ...smartContractMethodInvocation,
           params,
-          contractAddress: this.fromXdcAddress(smartContractMethodInvocation.contractAddress),
         } as SmartContractMethodInvocation;
 
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {

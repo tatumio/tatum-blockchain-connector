@@ -30,7 +30,7 @@ export abstract class MultiTokenController {
         try {
             return await this.service.getContractAddress(path.chain, path.txId);
         } catch (e) {
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
     @Get('/v3/multitoken/balance/:chain/:contractAddress/:address/:tokenId')
@@ -38,7 +38,7 @@ export abstract class MultiTokenController {
         try {
             return await this.service.getTokensOfOwner(path.chain, path.address, path.tokenId, path.contractAddress);
         } catch (e) {
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
     @Get('/v3/multitoken/balance/batch/:chain/:contractAddress')
@@ -48,7 +48,7 @@ export abstract class MultiTokenController {
             const tokenIds = filter.tokenId.split(',')
             return await this.service.getTokensOfOwnerBatch(path.chain, addresses, tokenIds, path.contractAddress);
         } catch (e) {
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 
@@ -57,7 +57,7 @@ export abstract class MultiTokenController {
         try {
             return await this.service.getTransaction(path.chain, path.txId);
         } catch (e) {
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 
@@ -66,7 +66,7 @@ export abstract class MultiTokenController {
         try {
             return await this.service.getMetadataMultiToken(path.chain, path.tokenId, path.contractAddress);
         } catch (e) {
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 
@@ -82,7 +82,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
     @Post('/v3/multitoken/transaction/batch')
@@ -97,7 +97,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 
@@ -113,7 +113,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
     @Post('/v3/multitoken/mint/batch')
@@ -128,7 +128,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 
@@ -144,7 +144,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
     @Post('/v3/multitoken/burn/batch')
@@ -159,7 +159,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 
@@ -175,7 +175,7 @@ export abstract class MultiTokenController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message?.message || e.message || e.response?.data || e}`, 'multitoken.error');
         }
     }
 }

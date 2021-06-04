@@ -69,21 +69,22 @@ export abstract class MultiTokenService {
     }
 
 
-    public async getTokensOfOwner(chain: Currency, address: string, tokenId:string,contractAddress: string): Promise<{ data: string }> {
+    public async getTokensOfOwner(chain: Currency, address: string, tokenId: string, contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
         const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
         try {
-            return {data: await c.methods.balanceOf(address,tokenId).call()};
+            return {data: await c.methods.balanceOf(address, tokenId).call()};
         } catch (e) {
             this.logger.error(e);
             throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
         }
     }
-    public async getTokensOfOwnerBatch(chain: Currency, address: string[], tokenId:string[],contractAddress: string): Promise<{ data: string }> {
+
+    public async getTokensOfOwnerBatch(chain: Currency, address: string[], tokenId: string[], contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
         const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
         try {
-            return {data: await c.methods.balanceOfBatch(address,tokenId).call()};
+            return {data: await c.methods.balanceOfBatch(address, tokenId).call()};
         } catch (e) {
             this.logger.error(e);
             throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
@@ -130,6 +131,7 @@ export abstract class MultiTokenService {
             return this.broadcast(chain, txData);
         }
     }
+
     public async transferMultiTokenBatch(body: CeloTransferMultiTokenBatch | TransferMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
@@ -227,6 +229,7 @@ export abstract class MultiTokenService {
             return this.broadcast(chain, txData);
         }
     }
+
     public async burnMultiTokenBatch(body: CeloBurnMultiTokenBatch | EthBurnMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
@@ -250,6 +253,7 @@ export abstract class MultiTokenService {
             return this.broadcast(chain, txData);
         }
     }
+
     public async deployMultiToken(body: CeloDeployMultiToken | EthDeployMultiToken): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
@@ -273,6 +277,7 @@ export abstract class MultiTokenService {
             return this.broadcast(chain, txData);
         }
     }
+
     public async getContractAddress(chain: Currency, txId: string) {
         try {
             const web3 = await this.getClient(chain, await this.isTestnet());
@@ -283,6 +288,7 @@ export abstract class MultiTokenService {
             throw new MultiTokenError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
         }
     }
+
     private async getClient(chain: Currency, testnet: boolean) {
         return new Web3((await this.getNodesUrl(chain, testnet))[0]);
     }
