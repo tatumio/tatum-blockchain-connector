@@ -1,4 +1,4 @@
-import {BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Put} from '@nestjs/common';
+import { BadRequestException, Body, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
 import {MultiTokenService} from './MultiTokenService';
 import {MultiTokenError} from './MultiTokenError';
 import {
@@ -16,21 +16,37 @@ import {
     MintMultiTokenBatch,
     TransferMultiToken,
     TransferMultiTokenBatch,
-    UpdateCashbackMultiToken,
-    CeloUpdateCashbackMultiToken
 } from '@tatumio/tatum';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
 import {PathChainTxId} from './dto/PathChainTxId';
+import { PathAddressContractBatch } from './dto/PathAddressContractBatch';
 
 export abstract class MultiTokenController {
     protected constructor(protected readonly service: MultiTokenService) {
     }
-
-    @Get('/v3/multitoken/balance/:chain/:contractAddress/:address')
+    @Get('/v3/multitoken/address/:chain/:txId')
+    public async getContractAddress(@Param() path: PathChainTxId) {
+        try {
+            return await this.service.getContractAddress(path.chain, path.txId);
+        } catch (e) {
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+        }
+    }
+    @Get('/v3/multitoken/balance/:chain/:contractAddress/:address/:tokenId')
     public async getBalanceMultiToken(@Param() path: PathAddressContractAddressChain) {
         try {
-            return await this.service.getTokensOfOwner(path.chain, path.address, path.contractAddress);
+            return await this.service.getTokensOfOwner(path.chain, path.address, path.tokenId, path.contractAddress);
+        } catch (e) {
+            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
+        }
+    }
+    @Get('/v3/multitoken/balance/batch/:chain/:contractAddress')
+    public async getBalanceMultiTokenBatch(@Param() path: PathAddressContractBatch, @Query() filter: any) {
+        try {
+            const addresses = filter.address.split(',')
+            const tokenIds = filter.tokenId.split(',')
+            return await this.service.getTokensOfOwnerBatch(path.chain, addresses, tokenIds, path.contractAddress);
         } catch (e) {
             throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
         }
@@ -49,15 +65,6 @@ export abstract class MultiTokenController {
     public async getMetadataMultiToken(@Param() path: PathTokenIdContractAddressChain) {
         try {
             return await this.service.getMetadataMultiToken(path.chain, path.tokenId, path.contractAddress);
-        } catch (e) {
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
-        }
-    }
-
-    @Get('/v3/multitoken/royalty/:chain/:contractAddress/:tokenId')
-    public async getRoyaltyMultiToken(@Param() path: PathTokenIdContractAddressChain) {
-        try {
-            return await this.service.getRoyaltyMultiToken(path.chain, path.tokenId, path.contractAddress);
         } catch (e) {
             throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
         }
@@ -83,22 +90,6 @@ export abstract class MultiTokenController {
     public async transactionMultiTokenBatch(@Body() body: CeloTransferMultiTokenBatch | TransferMultiTokenBatch) {
         try {
             return await this.service.transferMultiTokenBatch(body);
-        } catch (e) {
-            if (['Array', 'MultiTokenError', 'ValidationError'].includes(e.constructor.name)) {
-                throw new BadRequestException(e);
-            }
-            if (e.constructor.name === 'TatumError') {
-                throw e;
-            }
-            throw new MultiTokenError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'multitoken.error');
-        }
-    }
-
-    @Put('/v3/multitoken/royalty')
-    @HttpCode(HttpStatus.OK)
-    public async updateRoyaltyMultiToken(@Body() body: CeloUpdateCashbackMultiToken | UpdateCashbackMultiToken) {
-        try {
-            return await this.service.updateCashbackForAuthor(body);
         } catch (e) {
             if (['Array', 'MultiTokenError', 'ValidationError'].includes(e.constructor.name)) {
                 throw new BadRequestException(e);

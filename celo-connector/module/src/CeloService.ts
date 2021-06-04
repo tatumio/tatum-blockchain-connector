@@ -32,6 +32,7 @@ import {
     TransferCeloOrCeloErc20Token,
 } from '@tatumio/tatum';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
+import erc1155_abi from '@tatumio/tatum/dist/src/contracts/erc1155/erc1155_abi';
 import token_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 import {fromWei} from 'web3-utils';
 import {Block, Transaction, TransactionReceipt} from 'web3-eth';

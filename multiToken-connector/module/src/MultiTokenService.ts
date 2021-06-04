@@ -28,18 +28,9 @@ import {
     prepareCeloMintMultiTokenBatchSignedTransaction,
     prepareBscMintMultiTokenBatchSignedTransaction,
     prepareEthMintMultiTokenBatchSignedTransaction,
-    prepareBscMintMultiTokenBatchCashbackSignedTransaction,
-    prepareCeloMintMultiTokenBatchCashbackSignedTransaction,
-    prepareEthMintMultipleCashbackMultiTokenSignedTransaction,
-    prepareCeloMintMultiTokenCashbackSignedTransaction,
-    prepareEthMintCashbackMultiTokenSignedTransaction,
-    prepareBscMintMultiTokenCashbackSignedTransaction,
     prepareBscTransferMultiTokenSignedTransaction,
     prepareCeloTransferMultiTokenSignedTransaction,
     prepareEthTransferMultiTokenSignedTransaction,
-    prepareEthUpdateCashbackForAuthorMultiTokenSignedTransaction,
-    prepareBscUpdateCashbackForAuthorMultiTokenSignedTransaction,
-    prepareCeloUpdateCashbackForAuthorMultiTokenSignedTransaction,
     prepareEthBurnMultiTokenSignedTransaction,
     prepareCeloBurnMultiTokenSignedTransaction,
     prepareEthBatchTransferMultiTokenSignedTransaction,
@@ -47,9 +38,7 @@ import {
     prepareCeloBatchTransferMultiTokenSignedTransaction,
     prepareCeloBurnMultiTokenBatchSignedTransaction,
     prepareEthBurnBatchMultiTokenSignedTransaction,
-    UpdateCashbackMultiToken,
-    CeloUpdateCashbackMultiToken,
-    TransactionHash,   
+    TransactionHash,
 } from '@tatumio/tatum';
 import erc1155_abi from '@tatumio/tatum/dist/src/contracts/erc1155/erc1155_abi';
 import Web3 from 'web3';
@@ -72,30 +61,29 @@ export abstract class MultiTokenService {
         // @ts-ignore
         const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
         try {
-            return {data: await c.methods.tokenURI(token).call()};
+            return {data: (await c.methods.uri(token).call()).replace('{id}', token)};
         } catch (e) {
             this.logger.error(e);
             throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
         }
     }
 
-    public async getRoyaltyMultiToken(chain: Currency, token: string, contractAddress: string) {
+
+    public async getTokensOfOwner(chain: Currency, address: string, tokenId:string,contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
         const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
         try {
-            const [addresses, values] = await Promise.all([c.methods.tokenCashbackRecipients(token).call(), c.methods.tokenCashbackValues(token).call()]);
-            return {addresses, values: values.map(c => new BigNumber(c).dividedBy(1e18).toString(10))};
+            return {data: await c.methods.balanceOf(address,tokenId).call()};
         } catch (e) {
             this.logger.error(e);
             throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
         }
     }
-
-    public async getTokensOfOwner(chain: Currency, address: string, contractAddress: string): Promise<{ data: string }> {
+    public async getTokensOfOwnerBatch(chain: Currency, address: string[], tokenId:string[],contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
         const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
         try {
-            return {data: await c.methods.tokensOfOwner(address).call()};
+            return {data: await c.methods.balanceOfBatch(address,tokenId).call()};
         } catch (e) {
             this.logger.error(e);
             throw new MultiTokenError(`Unable to obtain information for token. ${e}`, 'multitoken.failed');
@@ -173,25 +161,13 @@ export abstract class MultiTokenService {
         const provider = (await this.getNodesUrl(chain, testnet))[0];
         switch (chain) {
             case Currency.ETH:
-                if (!body.authorAddresses) {
-                    txData = await prepareEthMintMultiTokenSignedTransaction(body, provider);
-                } else {
-                    txData = await prepareEthMintCashbackMultiTokenSignedTransaction(body, provider);
-                }
+                txData = await prepareEthMintMultiTokenSignedTransaction(body, provider);
                 break;
             case Currency.BSC:
-                if (!body.authorAddresses) {
-                    txData = await prepareBscMintMultiTokenSignedTransaction(body, provider);
-                } else {
-                    txData = await prepareBscMintMultiTokenCashbackSignedTransaction(body, provider);
-                }
+                txData = await prepareBscMintMultiTokenSignedTransaction(body, provider);
                 break;
             case Currency.CELO:
-                if (!body.authorAddresses) {
-                    txData = await prepareCeloMintMultiTokenSignedTransaction(testnet, body as CeloMintMultiToken, provider);
-                } else {
-                    txData = await prepareCeloMintMultiTokenCashbackSignedTransaction(testnet, body as CeloMintMultiToken, provider);
-                }
+                txData = await prepareCeloMintMultiTokenSignedTransaction(testnet, body as CeloMintMultiToken, provider);
                 break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
@@ -210,49 +186,13 @@ export abstract class MultiTokenService {
         const provider = (await this.getNodesUrl(chain, testnet))[0];
         switch (chain) {
             case Currency.ETH:
-                if (!body.authorAddresses) {
-                    txData = await prepareEthMintMultiTokenBatchSignedTransaction(body, provider);
-                } else {
-                    txData = await prepareEthMintMultipleCashbackMultiTokenSignedTransaction(body, provider);
-                }
+                txData = await prepareEthMintMultiTokenBatchSignedTransaction(body, provider);
                 break;
             case Currency.BSC:
-                if (!body.authorAddresses) {
-                    txData = await prepareBscMintMultiTokenBatchSignedTransaction(body, provider);
-                } else {
-                    txData = await prepareBscMintMultiTokenBatchCashbackSignedTransaction(body, provider);
-                }
+                txData = await prepareBscMintMultiTokenBatchSignedTransaction(body, provider);
                 break;
             case Currency.CELO:
-                if (!body.authorAddresses) {
-                    txData = await prepareCeloMintMultiTokenBatchSignedTransaction(testnet, body as CeloMintMultiTokenBatch, provider);
-                } else {
-                    txData = await prepareCeloMintMultiTokenBatchCashbackSignedTransaction(testnet, body as CeloMintMultiTokenBatch, provider);
-                }
-                break;
-            default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
-        }
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
-        } else {
-            return this.broadcast(chain, txData);
-        }
-    }
-
-    public async updateCashbackForAuthor(body: CeloUpdateCashbackMultiToken | UpdateCashbackMultiToken): Promise<TransactionHash | { signatureId: string }> {
-        const testnet = await this.isTestnet();
-        let txData;
-        const {chain} = body;
-        switch (chain) {
-            case Currency.ETH:
-                txData = await prepareEthUpdateCashbackForAuthorMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
-                break;
-            case Currency.BSC:
-                txData = await prepareBscUpdateCashbackForAuthorMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
-                break;
-            case Currency.CELO:
-                txData = await prepareCeloUpdateCashbackForAuthorMultiTokenSignedTransaction(testnet, body as CeloUpdateCashbackMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
+                txData = await prepareCeloMintMultiTokenBatchSignedTransaction(testnet, body as CeloMintMultiTokenBatch, provider);
                 break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
@@ -333,7 +273,16 @@ export abstract class MultiTokenService {
             return this.broadcast(chain, txData);
         }
     }
-
+    public async getContractAddress(chain: Currency, txId: string) {
+        try {
+            const web3 = await this.getClient(chain, await this.isTestnet());
+            const {contractAddress} = await web3.eth.getTransactionReceipt(txId);
+            return {contractAddress};
+        } catch (e) {
+            this.logger.error(e);
+            throw new MultiTokenError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+        }
+    }
     private async getClient(chain: Currency, testnet: boolean) {
         return new Web3((await this.getNodesUrl(chain, testnet))[0]);
     }

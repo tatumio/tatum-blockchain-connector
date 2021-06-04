@@ -1118,7 +1118,8 @@ components:
           example: [ '0x632' ]
           items:
             type: object
-          description: Parameters of the method to be invoked.fromPrivateKey:
+          description: Parameters of the method to be invoked.
+        fromPrivateKey:
           type: string
           maxLength: 66
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"

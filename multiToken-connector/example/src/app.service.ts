@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PinoLogger } from 'pino-logger';
 import { InjectPinoLogger } from 'nestjs-pino';
 import { MultiTokenService } from '../../module';
-import { celoBroadcast, Currency } from '@tatumio/tatum';
+import { celoBroadcast, Currency } from '../../module/node_modules/@tatumio/tatum';
 
 @Injectable()
 export class AppService extends MultiTokenService {
@@ -16,7 +16,14 @@ export class AppService extends MultiTokenService {
   }
 
   protected getNodesUrl(chain: Currency, testnet: boolean): Promise<string[]> {
-    return Promise.resolve(['https://alfajores-forno.celo-testnet.org']);
+    switch (chain) {
+      case Currency.ETH:
+        return Promise.resolve(['https://ropsten.infura.io/v3/ab6162e91013410aa46123ef71b67da3']);
+      case Currency.BSC:
+        return Promise.resolve(['https://data-seed-prebsc-1-s1.binance.org:8545']);
+      case Currency.CELO:
+        return Promise.resolve(['https://alfajores-forno.celo-testnet.org']);
+    }
   }
 
   protected isTestnet(): Promise<boolean> {
