@@ -2,11 +2,11 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.0
-  title: Tatum XinFin API
+  version: 1.0.1
+  title: Tatum XDC Network (XinFin) API
 tags:
   - description: |
-      <p>XinBin is enterprise ready hybrid blockchain for global trade and finance, combining the power of Public & Private blockchains with interoperable Smart Contracts.
+      <p>XDC Network (XinFin) is enterprise ready hybrid blockchain for global trade and finance, combining the power of Public & Private blockchains with interoperable Smart Contracts.
       <br/>
       Tatum supports 2 chains:
       <ul><li>Mainnet - a regular live chain
