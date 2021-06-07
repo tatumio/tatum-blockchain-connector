@@ -2,17 +2,17 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.0
-  title: Tatum XinFin API
+  version: 1.0.1
+  title: Tatum XDC Network (XinFin) API
 tags:
   - description: |
-      <p>XinBin is enterprise ready hybrid blockchain for global trade and finance, combining the power of Public & Private blockchains with interoperable Smart Contracts.
+      <p>XDC Network (XinFin) is enterprise ready hybrid blockchain for global trade and finance, combining the power of Public & Private blockchains with interoperable Smart Contracts.
       <br/>
       Tatum supports 2 chains:
       <ul><li>Mainnet - a regular live chain
       <li>Testnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
       a faucet, e.g. <a target="_blank" href="https://apothem.network/#getTestXDC">https://apothem.network/#getTestXDC</a></li></ul></p>
-    name: Blockchain / XDC
+    name: Blockchain / XDC Network (XinFin)
 paths:
   /v3/xdc/wallet:
     get:
@@ -70,7 +70,7 @@ paths:
       x-code-samples:
       summary: Generate XDC wallet
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/address/{xpub}/{index}:
     get:
       description: |
@@ -116,7 +116,7 @@ paths:
       x-code-samples:
       summary: Generate XDC account address from Extended public key
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/wallet/priv:
     post:
       description: |
@@ -148,7 +148,7 @@ paths:
       x-code-samples:
       summary: Generate XDC private key
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/web3/{xApiKey}:
     post:
       description: |
@@ -190,7 +190,7 @@ paths:
       x-code-samples:
       summary: Web3 HTTP driver
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/block/current:
     get:
       description: "<h4>1 credit per API call.</h4><br/>
@@ -214,7 +214,7 @@ paths:
       x-code-samples:
       summary: Get current block number
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/block/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/>
@@ -246,7 +246,7 @@ paths:
       x-code-samples:
       summary: Get XDC block by hash
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/account/balance/{address}:
     get:
       description: "<h4>1 credit per API call.</h4><br/>
@@ -283,7 +283,7 @@ paths:
       x-code-samples:
       summary: Get XDC Account balance
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/transaction/{hash}:
     get:
       description: "<h4>1 credit per API call.</h4><br/>
@@ -325,7 +325,7 @@ paths:
       x-code-samples:
       summary: Get XDC Transaction
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/transaction/count/{address}:
     get:
       description: |
@@ -364,7 +364,7 @@ paths:
       x-code-samples:
       summary: Get count of outgoing XDC transactions
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/transaction:
     post:
       description: |
@@ -415,7 +415,7 @@ paths:
       x-code-samples:
       summary: Send XDC / ERC20 from account to account
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/gas:
     post:
       description: |
@@ -466,7 +466,7 @@ paths:
       x-code-samples:
       summary: Estimate XDC transaction fees
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/smartcontract:
     post:
       description: |
@@ -518,7 +518,7 @@ paths:
       x-code-samples:
       summary: Invoke Smart Contract method
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
   /v3/xdc/broadcast:
     post:
       description: |
@@ -556,7 +556,7 @@ paths:
       x-code-samples:
       summary: Broadcast signed XDC transaction
       tags:
-        - Blockchain / XDC
+        - Blockchain / XDC Network (XinFin)
 components:
   securitySchemes:
     X-Api-Key:

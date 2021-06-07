@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.1
+  version: 1.0.2
   title: Tatum ERC20 Abstraction API
 tags:
   - description: |
@@ -13,7 +13,7 @@ tags:
       <li><b>Ethereum</b></li>
       <li><b>Binance Smart Chain</b></li>
       <li><b>Celo</b></li>
-      <li><b>XinFin</b></li>
+      <li><b>XDC Network (XinFin)</b></li>
       </ul>
       </p>
     name: Blockchain / Fungible Token
