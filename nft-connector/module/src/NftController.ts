@@ -14,7 +14,8 @@ import {
     FlowBurnNft, FlowDeployNft, FlowMintMultipleNft, FlowMintNft, FlowTransferNft,
     EthTransferErc721,
     UpdateCashbackErc721,
-    CeloUpdateCashbackErc721,
+    TronUpdateCashbackTrc721,
+    CeloUpdateCashbackErc721, TronDeployTrc721, TronBurnTrc721, TronMintMultipleTrc721, TronTransferTrc721,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 import {PathTokenIdContractAddressChain} from './dto/PathTokenIdContractAddressChain';
@@ -71,7 +72,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/transaction')
     @HttpCode(HttpStatus.OK)
-    public async transactionErc721(@Body() body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft) {
+    public async transactionErc721(@Body() body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft | TronTransferTrc721) {
         try {
             return await this.service.transferErc721(body);
         } catch (e) {
@@ -87,7 +88,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/mint')
     @HttpCode(HttpStatus.OK)
-    public async mintErc721(@Body() body: CeloMintErc721 | EthMintErc721 | FlowMintNft) {
+    public async mintErc721(@Body() body: CeloMintErc721 | EthMintErc721 | FlowMintNft, TronMintTrc721) {
         try {
             return await this.service.mintErc721(body);
         } catch (e) {
@@ -103,7 +104,7 @@ export abstract class NftController {
 
     @Put('/v3/nft/royalty')
     @HttpCode(HttpStatus.OK)
-    public async updateRoyaltyErc721(@Body() body: CeloUpdateCashbackErc721 | UpdateCashbackErc721) {
+    public async updateRoyaltyErc721(@Body() body: CeloUpdateCashbackErc721 | TronUpdateCashbackTrc721 | UpdateCashbackErc721) {
         try {
             return await this.service.updateCashbackForAuthor(body);
         } catch (e) {
@@ -119,7 +120,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/mint/batch')
     @HttpCode(HttpStatus.OK)
-    public async mintMultipleErc721(@Body() body: CeloMintMultipleErc721 | EthMintMultipleErc721 | FlowMintMultipleNft) {
+    public async mintMultipleErc721(@Body() body: CeloMintMultipleErc721 | TronMintMultipleTrc721 | EthMintMultipleErc721 | FlowMintMultipleNft) {
         try {
             return await this.service.mintMultipleErc721(body);
         } catch (e) {
@@ -135,7 +136,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnErc721(@Body() body: CeloBurnErc721 | EthBurnErc721 | FlowBurnNft) {
+    public async burnErc721(@Body() body: CeloBurnErc721 | TronBurnTrc721 | EthBurnErc721 | FlowBurnNft) {
         try {
             return await this.service.burnErc721(body);
         } catch (e) {
@@ -151,7 +152,7 @@ export abstract class NftController {
 
     @Post('/v3/nft/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployErc721(@Body() body: CeloDeployErc721 | EthDeployErc721 | FlowDeployNft) {
+    public async deployErc721(@Body() body: CeloDeployErc721 | TronDeployTrc721 | EthDeployErc721 | FlowDeployNft) {
         try {
             return await this.service.deployErc721(body);
         } catch (e) {

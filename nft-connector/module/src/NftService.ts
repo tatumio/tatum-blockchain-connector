@@ -1,7 +1,6 @@
 import {PinoLogger} from 'nestjs-pino';
 import BigNumber from 'bignumber.js';
 import * as fcl from '@onflow/fcl';
-import * as types from '@onflow/types';
 import * as sdk from '@onflow/sdk';
 import {NftError} from './NftError';
 import {
@@ -10,12 +9,20 @@ import {
     CeloMintErc721,
     CeloMintMultipleErc721,
     CeloTransferErc721,
+    CeloUpdateCashbackErc721, convertAddressFromHex,
     Currency,
     EthBurnErc721,
     EthDeployErc721,
     EthMintErc721,
     EthMintMultipleErc721,
-    EthTransferErc721, FlowBurnNft, FlowMintMultipleNft, FlowMintNft, FlowTransferNft,
+    EthTransferErc721,
+    FlowBurnNft,
+    FlowDeployNft,
+    FlowMintMultipleNft,
+    FlowMintNft,
+    FlowTransferNft,
+    getFlowNftMetadata,
+    getFlowNftTokenByAddress,
     prepareBscBurnBep721SignedTransaction,
     prepareBscDeployBep721SignedTransaction,
     prepareBscMintBep721SignedTransaction,
@@ -40,31 +47,31 @@ import {
     prepareEthMintMultipleErc721SignedTransaction,
     prepareEthTransferErc721SignedTransaction,
     prepareEthUpdateCashbackForAuthorErc721SignedTransaction,
+    prepareTronBurnTrc721SignedTransaction,
+    prepareTronDeployTrc721SignedTransaction,
+    prepareTronMintCashbackTrc721SignedTransaction,
+    prepareTronMintMultipleTrc721SignedTransaction,
+    prepareTronMintTrc721SignedTransaction,
+    prepareTronTransferTrc721SignedTransaction,
+    prepareTronUpdateCashbackForAuthorTrc721SignedTransaction,
     sendFlowNftBurnToken,
     sendFlowNftMintMultipleToken,
     sendFlowNftMintToken,
     sendFlowNftTransferToken,
-    getFlowNftMetadata,
-    getFlowNftTokenByAddress,
-    FlowDeployNft,
-    prepareXdcTransferErc721SignedTransaction,
-    prepareXdcMintErc721SignedTransaction,
-    prepareXdcMintErcCashback721SignedTransaction,
-    prepareXdcMintMultipleErc721SignedTransaction,
-    prepareXdcMintMultipleCashbackErc721SignedTransaction,
-    prepareXdcUpdateCashbackForAuthorErc721SignedTransaction,
-    prepareXdcBurnErc721SignedTransaction,
-    prepareXdcDeployErc721SignedTransaction,
-    CeloUpdateCashbackErc721,
-    UpdateCashbackErc721,
-    TransactionHash
+    TransactionHash,
+    TronBurnTrc721,
+    TronDeployTrc721,
+    TronMintMultipleTrc721,
+    TronMintTrc721,
+    TronTransferTrc721,
+    TronUpdateCashbackTrc721,
+    UpdateCashbackErc721
 } from '@tatumio/tatum';
 import erc721_abi from '@tatumio/tatum/dist/src/contracts/erc721/erc721_abi';
+import trc721_abi from '@tatumio/tatum/dist/src/contracts/trc721/trc721_abi';
 import Web3 from 'web3';
 import {Transaction, TransactionReceipt} from 'web3-eth';
-import {
-    FlowTxType,
-} from '@tatumio/tatum/dist/src/transaction/flow';
+import {FlowTxType,} from '@tatumio/tatum/dist/src/transaction/flow';
 
 export abstract class NftService {
 
@@ -74,6 +81,8 @@ export abstract class NftService {
     protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[], index?: number): Promise<string>;
 
     protected abstract isTestnet(): Promise<boolean>;
+
+    protected abstract getTronClient(testnet: boolean): Promise<any>;
 
     protected abstract getNodesUrl(chain: Currency, testnet: boolean): Promise<string[]>;
 
@@ -88,6 +97,16 @@ export abstract class NftService {
             }
             try {
                 return {data: await getFlowNftMetadata(await this.isTestnet(), account, token, contractAddress)};
+            } catch (e) {
+                this.logger.error(e);
+                throw new NftError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
+            }
+        } else if (chain === Currency.TRON) {
+            const client = await this.getClient(chain, await this.isTestnet());
+            client.setAddress(contractAddress);
+            const c = await client.contract().at(contractAddress);
+            try {
+                return {data: await c.tokenURI(token).call()};
             } catch (e) {
                 this.logger.error(e);
                 throw new NftError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
@@ -107,6 +126,18 @@ export abstract class NftService {
         if (chain === Currency.FLOW) {
             throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
+        else if (chain === Currency.TRON) {
+            const client = await this.getClient(chain, await this.isTestnet());
+            client.setAddress(contractAddress);
+            const c = await client.contract().at(contractAddress);
+            try {
+                const [addresses, values] = await Promise.all([c.tokenCashbackRecipients(token).call(), c.tokenCashbackValues(token).call()]);
+                return {addresses: addresses.map(a => convertAddressFromHex(a)), values: values.map(c => new BigNumber(c._hex).dividedBy(1e6).toString(10))};
+            } catch (e) {
+                this.logger.error(e);
+                throw new NftError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
+            }
+        }
         // @ts-ignore
         const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc721_abi, contractAddress);
         try {
@@ -122,6 +153,16 @@ export abstract class NftService {
         if (chain === Currency.FLOW) {
             try {
                 return (await getFlowNftTokenByAddress(await this.isTestnet(), address, contractAddress)).map(e => `${e}`);
+            } catch (e) {
+                this.logger.error(e);
+                throw new NftError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
+            }
+        } else if (chain === Currency.TRON) {
+            const client = await this.getClient(chain, await this.isTestnet());
+            client.setAddress(contractAddress);
+            const c = await client.contract().at(contractAddress);
+            try {
+                return {data: (await c.tokensOfOwner(address).call()).map(c => new BigNumber(c._hex).toString(10))};
             } catch (e) {
                 this.logger.error(e);
                 throw new NftError(`Unable to obtain information for token. ${e}`, 'nft.erc721.failed');
@@ -150,6 +191,14 @@ export abstract class NftService {
                 this.logger.error(e);
             }
             throw new NftError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+        } else if (chain === Currency.TRON) {
+            try {
+                const tx = await (await this.getClient(chain, await this.isTestnet())).trx.getTransactionInfo(txId);
+                return {contractAddress: convertAddressFromHex(tx.contract_address)};
+            } catch (e) {
+                this.logger.error(e);
+                throw new NftError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+            }
         }
         try {
             const web3 = await this.getClient(chain, await this.isTestnet());
@@ -179,6 +228,13 @@ export abstract class NftService {
                 this.logger.error(e);
             }
             throw new NftError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+        } else if (chain === Currency.TRON) {
+            try {
+                return await (await this.getClient(chain, await this.isTestnet())).trx.getTransactionInfo(txId);
+            } catch (e) {
+                this.logger.error(e);
+                throw new NftError('Transaction not found. Possible not exists or is still pending.', 'tx.not.found');
+            }
         }
         try {
             const web3 = await this.getClient(chain, await this.isTestnet());
@@ -196,7 +252,7 @@ export abstract class NftService {
         }
     }
 
-    public async transferErc721(body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft): Promise<TransactionHash | { signatureId: string }> {
+    public async transferErc721(body: CeloTransferErc721 | EthTransferErc721 | FlowTransferNft | TronTransferTrc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -204,6 +260,10 @@ export abstract class NftService {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthTransferErc721SignedTransaction(body as EthTransferErc721, provider);
+                break;
+            case Currency.TRON:
+                await this.getClient(chain, await this.isTestnet());
+                txData = await prepareTronTransferTrc721SignedTransaction(testnet, body as TronTransferTrc721);
                 break;
             case Currency.BSC:
                 txData = await prepareBscTransferBep721SignedTransaction(body as EthTransferErc721, provider);
@@ -231,7 +291,7 @@ export abstract class NftService {
         }
     }
 
-    public async mintErc721(body: CeloMintErc721 | EthMintErc721 | FlowMintNft): Promise<TransactionHash | { signatureId: string } | {txId: string, tokenId: number}> {
+    public async mintErc721(body: CeloMintErc721 | EthMintErc721 | FlowMintNft | TronMintTrc721): Promise<TransactionHash | { signatureId: string } | {txId: string, tokenId: number}> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -249,6 +309,14 @@ export abstract class NftService {
                     txData = await prepareBscMintBep721SignedTransaction(body as EthMintErc721, provider);
                 } else {
                     txData = await prepareBscMintBepCashback721SignedTransaction(body as EthMintErc721, provider);
+                }
+                break;
+            case Currency.TRON:
+                await this.getClient(chain, await this.isTestnet());
+                if (!(body as TronMintTrc721).authorAddresses) {
+                    txData = await prepareTronMintTrc721SignedTransaction(testnet, body as TronMintTrc721);
+                } else {
+                    txData = await prepareTronMintCashbackTrc721SignedTransaction(testnet, body as TronMintTrc721);
                 }
                 break;
             case Currency.CELO:
@@ -281,7 +349,7 @@ export abstract class NftService {
         }
     }
 
-    public async mintMultipleErc721(body: CeloMintMultipleErc721 | EthMintMultipleErc721 | FlowMintMultipleNft): Promise<TransactionHash | { signatureId: string } | {txId: string, tokenId: number[]}> {
+    public async mintMultipleErc721(body: CeloMintMultipleErc721 | EthMintMultipleErc721 | FlowMintMultipleNft | TronMintMultipleTrc721): Promise<TransactionHash | { signatureId: string } | {txId: string, tokenId: number[]}> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -292,6 +360,14 @@ export abstract class NftService {
                     txData = await prepareEthMintMultipleErc721SignedTransaction(body as EthMintMultipleErc721, provider);
                 } else {
                     txData = await prepareEthMintMultipleCashbackErc721SignedTransaction(body as EthMintMultipleErc721, provider);
+                }
+                break;
+            case Currency.TRON:
+                await this.getClient(chain, await this.isTestnet());
+                if (!(body as TronMintMultipleTrc721).authorAddresses) {
+                    txData = await prepareTronMintMultipleTrc721SignedTransaction(testnet, body as TronMintMultipleTrc721);
+                } else {
+                    throw new NftError(`Unsupported chain ${chain}.`, 'unsupported.chain');
                 }
                 break;
             case Currency.BSC:
@@ -331,13 +407,17 @@ export abstract class NftService {
         }
     }
 
-    public async updateCashbackForAuthor(body: CeloUpdateCashbackErc721 | UpdateCashbackErc721): Promise<TransactionHash | { signatureId: string }> {
+    public async updateCashbackForAuthor(body: CeloUpdateCashbackErc721 | UpdateCashbackErc721 | TronUpdateCashbackTrc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthUpdateCashbackForAuthorErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
+            case Currency.TRON:
+                await this.getClient(chain, await this.isTestnet());
+                txData = await prepareTronUpdateCashbackForAuthorTrc721SignedTransaction(testnet, body as TronUpdateCashbackTrc721);
                 break;
             case Currency.BSC:
                 txData = await prepareBscUpdateCashbackForAuthorErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
@@ -358,7 +438,7 @@ export abstract class NftService {
         }
     }
 
-    public async burnErc721(body: CeloBurnErc721 | EthBurnErc721 | FlowBurnNft): Promise<TransactionHash | { signatureId: string }> {
+    public async burnErc721(body: CeloBurnErc721 | EthBurnErc721 | FlowBurnNft | TronBurnTrc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -366,6 +446,10 @@ export abstract class NftService {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthBurnErc721SignedTransaction(body as EthBurnErc721, provider);
+                break;
+            case Currency.TRON:
+                await this.getClient(chain, await this.isTestnet());
+                txData = await prepareTronBurnTrc721SignedTransaction(testnet, body as TronBurnTrc721);
                 break;
             case Currency.BSC:
                 txData = await prepareBscBurnBep721SignedTransaction(body as EthBurnErc721, provider);
@@ -393,7 +477,7 @@ export abstract class NftService {
         }
     }
 
-    public async deployErc721(body: CeloDeployErc721 | EthDeployErc721 | FlowDeployNft): Promise<TransactionHash | { signatureId: string }> {
+    public async deployErc721(body: CeloDeployErc721 | EthDeployErc721 | FlowDeployNft | TronDeployTrc721): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -404,6 +488,10 @@ export abstract class NftService {
                 break;
             case Currency.BSC:
                 txData = await prepareBscDeployBep721SignedTransaction(body as EthDeployErc721, provider);
+                break;
+            case Currency.TRON:
+                await this.getClient(chain, await this.isTestnet());
+                txData = await prepareTronDeployTrc721SignedTransaction(testnet, body as TronDeployTrc721);
                 break;
             case Currency.CELO:
                 txData = await prepareCeloDeployErc721SignedTransaction(testnet, body as CeloDeployErc721, provider);
@@ -424,11 +512,13 @@ export abstract class NftService {
         }
     }
 
-    private async getClient(chain: Currency, testnet: boolean) {
+    private async getClient(chain: Currency, testnet: boolean): Promise<any> {
         const url = (await this.getNodesUrl(chain, testnet))[0];
         if (chain === Currency.FLOW) {
             fcl.config().put('accessNode.api', url);
             return;
+        } else if (chain === Currency.TRON) {
+            return this.getTronClient(testnet);
         }
         return new Web3(url);
     }

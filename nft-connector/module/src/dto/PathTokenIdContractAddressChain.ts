@@ -1,10 +1,10 @@
 import {IsNotEmpty, Length} from 'class-validator';
 import {PathChain} from './PathChain';
 
-export class PathTokenIdContractAddressChain extends PathChain{
+export class PathTokenIdContractAddressChain extends PathChain {
 
     @IsNotEmpty()
-    @Length(36, 43)
+    @Length(34, 43)
     public contractAddress: string;
 
     @IsNotEmpty()
