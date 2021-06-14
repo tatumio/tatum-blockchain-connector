@@ -1,9 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2020",
     "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "outDir": "./npm"
-  }
+    "target": "ES2019",
+    "sourceMap": false,
+    "outDir": "./npm",
+    "rootDir": "./src",
+    "baseUrl": "./",
+    "noLib": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }
