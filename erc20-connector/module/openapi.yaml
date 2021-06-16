@@ -13,6 +13,7 @@ tags:
       <li><b>Ethereum</b></li>
       <li><b>Binance Smart Chain</b></li>
       <li><b>Celo</b></li>
+      <li><b>Harmony.ONE</b></li>
       <li><b>XDC Network (XinFin)</b></li>
       </ul>
       </p>
@@ -309,7 +310,10 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC
+            - ETH
+            - BSC
+            - XDC
+            - ONE
         symbol:
           description: Symbol of the ERC20 token
           example: ERC_SYMBOL
@@ -514,7 +518,10 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC
+            - ETH
+            - BSC
+            - XDC
+            - ONE
         amount:
           description: Amount to be minted and transfered to the recipient.
           example: "100000"
@@ -606,7 +613,10 @@ components:
           example: ETH
           description: Chain to work with.
           enum:
-            - ETH, BSC, XDC
+            - ETH
+            - BSC
+            - XDC
+            - ONE
         amount:
           description: Amount of tokens to be destroyed.
           example: "100000"

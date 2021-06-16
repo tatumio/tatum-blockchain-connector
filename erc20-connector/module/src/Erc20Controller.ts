@@ -11,7 +11,7 @@ import {
     ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
     ChainTransferErc20,
-    ChainTransferEthErc20,
+    ChainTransferEthErc20, ChainTransferHrm20,
 } from './Erc20Base';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
 
@@ -31,7 +31,7 @@ export abstract class Erc20Controller {
     @Post('/v3/blockchain/token/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc20(
-      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20
+      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20 | ChainTransferHrm20
     ) {
         try {
             return await this.service.transferErc20(body);

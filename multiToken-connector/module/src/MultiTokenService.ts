@@ -1,10 +1,9 @@
 import {PinoLogger} from 'nestjs-pino';
-import BigNumber from 'bignumber.js';
 import {MultiTokenError} from './MultiTokenError';
 import {
-    CeloDeployMultiToken,
     CeloBurnMultiToken,
     CeloBurnMultiTokenBatch,
+    CeloDeployMultiToken,
     CeloMintMultiToken,
     CeloMintMultiTokenBatch,
     CeloTransferMultiToken,
@@ -15,34 +14,49 @@ import {
     EthDeployMultiToken,
     MintMultiToken,
     MintMultiTokenBatch,
-    TransferMultiToken,
-    TransferMultiTokenBatch,
-    prepareEthDeployMultiTokenSignedTransaction,
-    prepareCeloDeployMultiTokenSignedTransaction,
-    prepareBscDeployMultiTokenSignedTransaction,
+    OneBurnMultiToken,
+    OneBurnMultiTokenBatch,
+    OneDeployMultiToken,
+    OneMintMultiToken,
+    OneMintMultiTokenBatch,
+    OneTransferMultiToken,
+    OneTransferMultiTokenBatch,
+    prepareBscBatchTransferMultiTokenSignedTransaction,
     prepareBscBurnMultiTokenBatchSignedTransaction,
     prepareBscBurnMultiTokenSignedTransaction,
-    prepareCeloMintMultiTokenSignedTransaction,
-    prepareBscMintMultiTokenSignedTransaction,
-    prepareEthMintMultiTokenSignedTransaction,
-    prepareCeloMintMultiTokenBatchSignedTransaction,
+    prepareBscDeployMultiTokenSignedTransaction,
     prepareBscMintMultiTokenBatchSignedTransaction,
-    prepareEthMintMultiTokenBatchSignedTransaction,
+    prepareBscMintMultiTokenSignedTransaction,
     prepareBscTransferMultiTokenSignedTransaction,
-    prepareCeloTransferMultiTokenSignedTransaction,
-    prepareEthTransferMultiTokenSignedTransaction,
-    prepareEthBurnMultiTokenSignedTransaction,
-    prepareCeloBurnMultiTokenSignedTransaction,
-    prepareEthBatchTransferMultiTokenSignedTransaction,
-    prepareBscBatchTransferMultiTokenSignedTransaction,
     prepareCeloBatchTransferMultiTokenSignedTransaction,
     prepareCeloBurnMultiTokenBatchSignedTransaction,
+    prepareCeloBurnMultiTokenSignedTransaction,
+    prepareCeloDeployMultiTokenSignedTransaction,
+    prepareCeloMintMultiTokenBatchSignedTransaction,
+    prepareCeloMintMultiTokenSignedTransaction,
+    prepareCeloTransferMultiTokenSignedTransaction,
+    prepareEthBatchTransferMultiTokenSignedTransaction,
     prepareEthBurnBatchMultiTokenSignedTransaction,
+    prepareEthBurnMultiTokenSignedTransaction,
+    prepareEthDeployMultiTokenSignedTransaction,
+    prepareEthMintMultiTokenBatchSignedTransaction,
+    prepareEthMintMultiTokenSignedTransaction,
+    prepareEthTransferMultiTokenSignedTransaction,
+    prepareOneBatchTransferMultiTokenSignedTransaction,
+    prepareOneBurnMultiTokenBatchSignedTransaction,
+    prepareOneBurnMultiTokenSignedTransaction,
+    prepareOneDeployMultiTokenSignedTransaction,
+    prepareOneMintMultiTokenBatchSignedTransaction,
+    prepareOneMintMultiTokenSignedTransaction,
+    prepareOneTransferMultiTokenSignedTransaction,
     TransactionHash,
+    TransferMultiToken,
+    TransferMultiTokenBatch,
 } from '@tatumio/tatum';
 import erc1155_abi from '@tatumio/tatum/dist/src/contracts/erc1155/erc1155_abi';
 import Web3 from 'web3';
 import {Transaction, TransactionReceipt} from 'web3-eth';
+import {HarmonyAddress} from '@harmony-js/crypto';
 
 export abstract class MultiTokenService {
 
@@ -59,7 +73,7 @@ export abstract class MultiTokenService {
 
     public async getMetadataMultiToken(chain: Currency, token: string, contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
-        const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
+        const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, chain === Currency.ONE ? new HarmonyAddress(contractAddress).basicHex : contractAddress);
         try {
             return {data: (await c.methods.uri(token).call()).replace('{id}', token)};
         } catch (e) {
@@ -71,7 +85,7 @@ export abstract class MultiTokenService {
 
     public async getTokensOfOwner(chain: Currency, address: string, tokenId: string, contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
-        const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
+        const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, chain === Currency.ONE ? new HarmonyAddress(contractAddress).basicHex : contractAddress);
         try {
             return {data: await c.methods.balanceOf(address, tokenId).call()};
         } catch (e) {
@@ -82,7 +96,7 @@ export abstract class MultiTokenService {
 
     public async getTokensOfOwnerBatch(chain: Currency, address: string[], tokenId: string[], contractAddress: string): Promise<{ data: string }> {
         // @ts-ignore
-        const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, contractAddress);
+        const c = new (await this.getClient(chain, await this.isTestnet())).eth.Contract(erc1155_abi, chain === Currency.ONE ? new HarmonyAddress(contractAddress).basicHex : contractAddress);
         try {
             return {data: await c.methods.balanceOfBatch(address, tokenId).call()};
         } catch (e) {
@@ -108,7 +122,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async transferMultiToken(body: CeloTransferMultiToken | TransferMultiToken): Promise<TransactionHash | { signatureId: string }> {
+    public async transferMultiToken(body: CeloTransferMultiToken | TransferMultiToken | OneTransferMultiToken): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -122,6 +136,9 @@ export abstract class MultiTokenService {
             case Currency.CELO:
                 txData = await prepareCeloTransferMultiTokenSignedTransaction(testnet, body as CeloTransferMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.ONE:
+                txData = await prepareOneTransferMultiTokenSignedTransaction(testnet, body as OneTransferMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -132,7 +149,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async transferMultiTokenBatch(body: CeloTransferMultiTokenBatch | TransferMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
+    public async transferMultiTokenBatch(body: CeloTransferMultiTokenBatch | TransferMultiTokenBatch | OneTransferMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -146,6 +163,9 @@ export abstract class MultiTokenService {
             case Currency.CELO:
                 txData = await prepareCeloBatchTransferMultiTokenSignedTransaction(testnet, body as CeloTransferMultiTokenBatch, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.ONE:
+                txData = await prepareOneBatchTransferMultiTokenSignedTransaction(testnet, body as OneTransferMultiTokenBatch, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -156,7 +176,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async mintMultiToken(body: CeloMintMultiToken | MintMultiToken): Promise<TransactionHash | { signatureId: string }> {
+    public async mintMultiToken(body: CeloMintMultiToken | MintMultiToken | OneMintMultiToken): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -171,6 +191,9 @@ export abstract class MultiTokenService {
             case Currency.CELO:
                 txData = await prepareCeloMintMultiTokenSignedTransaction(testnet, body as CeloMintMultiToken, provider);
                 break;
+            case Currency.ONE:
+                txData = await prepareOneMintMultiTokenSignedTransaction(testnet, body as OneMintMultiToken, provider);
+                break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
@@ -181,7 +204,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async mintMultiTokenBatch(body: CeloMintMultiTokenBatch | MintMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
+    public async mintMultiTokenBatch(body: CeloMintMultiTokenBatch | MintMultiTokenBatch | OneMintMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -196,6 +219,9 @@ export abstract class MultiTokenService {
             case Currency.CELO:
                 txData = await prepareCeloMintMultiTokenBatchSignedTransaction(testnet, body as CeloMintMultiTokenBatch, provider);
                 break;
+            case Currency.ONE:
+                txData = await prepareOneMintMultiTokenBatchSignedTransaction(testnet, body as OneMintMultiTokenBatch, provider);
+                break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -206,7 +232,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async burnMultiToken(body: CeloBurnMultiToken | EthBurnMultiToken): Promise<TransactionHash | { signatureId: string }> {
+    public async burnMultiToken(body: CeloBurnMultiToken | EthBurnMultiToken | OneBurnMultiToken): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -220,6 +246,9 @@ export abstract class MultiTokenService {
             case Currency.CELO:
                 txData = await prepareCeloBurnMultiTokenSignedTransaction(testnet, body as CeloBurnMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.ONE:
+                txData = await prepareOneBurnMultiTokenSignedTransaction(testnet, body as OneBurnMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -230,7 +259,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async burnMultiTokenBatch(body: CeloBurnMultiTokenBatch | EthBurnMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
+    public async burnMultiTokenBatch(body: CeloBurnMultiTokenBatch | EthBurnMultiTokenBatch | OneBurnMultiTokenBatch): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -244,6 +273,9 @@ export abstract class MultiTokenService {
             case Currency.CELO:
                 txData = await prepareCeloBurnMultiTokenBatchSignedTransaction(testnet, body as CeloBurnMultiTokenBatch, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.ONE:
+                txData = await prepareOneBurnMultiTokenBatchSignedTransaction(testnet, body as OneBurnMultiTokenBatch, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
         }
@@ -254,7 +286,7 @@ export abstract class MultiTokenService {
         }
     }
 
-    public async deployMultiToken(body: CeloDeployMultiToken | EthDeployMultiToken): Promise<TransactionHash | { signatureId: string }> {
+    public async deployMultiToken(body: CeloDeployMultiToken | EthDeployMultiToken | OneDeployMultiToken): Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         let txData;
         const {chain} = body;
@@ -267,6 +299,9 @@ export abstract class MultiTokenService {
                 break;
             case Currency.CELO:
                 txData = await prepareCeloDeployMultiTokenSignedTransaction(testnet, body as CeloDeployMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
+            case Currency.ONE:
+                txData = await prepareOneDeployMultiTokenSignedTransaction(testnet, body as OneDeployMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
                 throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');

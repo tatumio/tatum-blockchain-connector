@@ -14,6 +14,11 @@ import {
     EthDeployMultiToken,
     MintMultiToken,
     MintMultiTokenBatch,
+    OneBurnMultiToken, OneBurnMultiTokenBatch, OneDeployMultiToken,
+    OneMintMultiToken,
+    OneMintMultiTokenBatch,
+    OneTransferMultiToken,
+    OneTransferMultiTokenBatch,
     TransferMultiToken,
     TransferMultiTokenBatch,
 } from '@tatumio/tatum';
@@ -72,7 +77,7 @@ export abstract class MultiTokenController {
 
     @Post('/v3/multitoken/transaction')
     @HttpCode(HttpStatus.OK)
-    public async transactionMultiToken(@Body() body: CeloTransferMultiToken | TransferMultiToken) {
+    public async transactionMultiToken(@Body() body: CeloTransferMultiToken | TransferMultiToken | OneTransferMultiToken) {
         try {
             return await this.service.transferMultiToken(body);
         } catch (e) {
@@ -87,7 +92,7 @@ export abstract class MultiTokenController {
     }
     @Post('/v3/multitoken/transaction/batch')
     @HttpCode(HttpStatus.OK)
-    public async transactionMultiTokenBatch(@Body() body: CeloTransferMultiTokenBatch | TransferMultiTokenBatch) {
+    public async transactionMultiTokenBatch(@Body() body: CeloTransferMultiTokenBatch | TransferMultiTokenBatch | OneTransferMultiTokenBatch) {
         try {
             return await this.service.transferMultiTokenBatch(body);
         } catch (e) {
@@ -103,7 +108,7 @@ export abstract class MultiTokenController {
 
     @Post('/v3/multitoken/mint/')
     @HttpCode(HttpStatus.OK)
-    public async mintMultiToken(@Body() body: CeloMintMultiToken | MintMultiToken) {
+    public async mintMultiToken(@Body() body: CeloMintMultiToken | MintMultiToken | OneMintMultiToken) {
         try {
             return await this.service.mintMultiToken(body);
         } catch (e) {
@@ -118,7 +123,7 @@ export abstract class MultiTokenController {
     }
     @Post('/v3/multitoken/mint/batch')
     @HttpCode(HttpStatus.OK)
-    public async mintMultiTokenBatch(@Body() body: CeloMintMultiTokenBatch | MintMultiTokenBatch) {
+    public async mintMultiTokenBatch(@Body() body: CeloMintMultiTokenBatch | MintMultiTokenBatch | OneMintMultiTokenBatch) {
         try {
             return await this.service.mintMultiTokenBatch(body);
         } catch (e) {
@@ -134,7 +139,7 @@ export abstract class MultiTokenController {
 
     @Post('/v3/multitoken/burn')
     @HttpCode(HttpStatus.OK)
-    public async burnMultiToken(@Body() body: CeloBurnMultiToken | EthBurnMultiToken) {
+    public async burnMultiToken(@Body() body: CeloBurnMultiToken | EthBurnMultiToken | OneBurnMultiToken) {
         try {
             return await this.service.burnMultiToken(body);
         } catch (e) {
@@ -149,7 +154,7 @@ export abstract class MultiTokenController {
     }
     @Post('/v3/multitoken/burn/batch')
     @HttpCode(HttpStatus.OK)
-    public async burnMultiTokenBatch(@Body() body: CeloBurnMultiTokenBatch | EthBurnMultiTokenBatch) {
+    public async burnMultiTokenBatch(@Body() body: CeloBurnMultiTokenBatch | EthBurnMultiTokenBatch | OneBurnMultiTokenBatch) {
         try {
             return await this.service.burnMultiTokenBatch(body);
         } catch (e) {
@@ -165,7 +170,7 @@ export abstract class MultiTokenController {
 
     @Post('/v3/multitoken/deploy')
     @HttpCode(HttpStatus.OK)
-    public async deployMultiToken(@Body() body: CeloDeployMultiToken | EthDeployMultiToken) {
+    public async deployMultiToken(@Body() body: CeloDeployMultiToken | EthDeployMultiToken | OneDeployMultiToken) {
         try {
             return await this.service.deployMultiToken(body);
         } catch (e) {

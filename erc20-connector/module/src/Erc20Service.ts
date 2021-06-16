@@ -11,8 +11,9 @@ import {
     ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
     ChainTransferErc20,
-    ChainTransferEthErc20,
+    ChainTransferEthErc20, ChainTransferHrm20,
 } from './Erc20Base';
+import {HarmonyAddress} from '@harmony-js/crypto';
 import {
     fromXdcAddress,
     BurnCeloErc20,
@@ -40,9 +41,16 @@ import {
     TransferErc20,
     TransferEthErc20,
     prepareXdcOrErc20SignedTransaction,
-    prepareXdcBurnErc20SignedTransaction, 
-    prepareXdcMintErc20SignedTransaction,   
+    prepareXdcBurnErc20SignedTransaction,
+    prepareXdcMintErc20SignedTransaction,
     prepareXdcDeployErc20SignedTransaction,
+    prepareOneTransfer20SignedTransaction,
+    OneTransfer20,
+    prepareOneBurn20SignedTransaction,
+    OneBurn20,
+    prepareOneMint20SignedTransaction,
+    OneMint20,
+    prepareOneDeploy20SignedTransaction,
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 
@@ -68,7 +76,7 @@ export abstract class Erc20Service {
     }
 
     private async getClient(chain: Currency, testnet: boolean) {
-        if ([Currency.ETH, Currency.BSC, Currency.CELO, Currency.XDC].includes(chain)) {
+        if ([Currency.ETH, Currency.BSC, Currency.CELO, Currency.XDC, Currency.ONE].includes(chain)) {
             return new Web3((await this.getFirstNodeUrl(chain, testnet)));
         }
 
@@ -82,6 +90,8 @@ export abstract class Erc20Service {
             case Currency.BSC:
             case Currency.CELO:
                 contractOrAddress = contractAddress;
+            case Currency.ONE:
+                contractOrAddress = new HarmonyAddress(contractAddress).basicHex;
                 break;
             case Currency.XDC:
                 contractOrAddress = fromXdcAddress(contractAddress);
@@ -98,7 +108,7 @@ export abstract class Erc20Service {
         return {balance: await contract.methods.balanceOf(_address).call()};
     }
 
-    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20):
+    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20 | ChainTransferHrm20):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
@@ -106,6 +116,9 @@ export abstract class Erc20Service {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthOrErc20SignedTransaction(_body as TransferEthErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
+            case Currency.ONE:
+                txData = await prepareOneTransfer20SignedTransaction(testnet, _body as OneTransfer20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareBscOrBep20SignedTransaction(_body as TransferBscBep20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -134,6 +147,9 @@ export abstract class Erc20Service {
             case Currency.ETH:
                 txData = await prepareEthBurnErc20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.ONE:
+                txData = await prepareOneBurn20SignedTransaction(testnet, _body as OneBurn20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             case Currency.BSC:
                 txData = await prepareBurnBep20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
@@ -161,6 +177,9 @@ export abstract class Erc20Service {
             case Currency.ETH:
                 txData = await prepareEthMintErc20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.ONE:
+                txData = await prepareOneMint20SignedTransaction(testnet, _body as OneMint20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             case Currency.BSC:
                 txData = await prepareMintBep20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
@@ -187,6 +206,9 @@ export abstract class Erc20Service {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareDeployErc20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
+            case Currency.ONE:
+                txData = await prepareOneDeploy20SignedTransaction(testnet, _body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareDeployBep20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));

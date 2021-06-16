@@ -18,6 +18,7 @@ tags:
       <ul>
       <li><b>Ethereum</b></li>
       <li><b>Celo</b></li>
+      <li><b>Harmony.ONE</b></li>
       <li><b>Tron</b></li>
       <li><b>Flow</b></li>
       <li><b>Binance Smart Chain</b></li>
@@ -34,6 +35,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Harmony.ONE</b></li>
         <li><b>Flow</b></li>
         <li><b>Tron</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -114,6 +116,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
         <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -180,6 +183,7 @@ paths:
         <li><b>Ethereum</b></li>
         <li><b>Flow</b></li>
         <li><b>Celo</b></li>
+        <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
@@ -242,6 +246,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
         <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -306,6 +311,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
         <li><b>Flow</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -370,6 +376,7 @@ paths:
         <ul>
         <li><b>Ethereum</b></li>
         <li><b>Celo</b></li>
+        <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
         <li><b>Binance Smart Chain</b></li>
         </ul>
@@ -433,6 +440,7 @@ paths:
             type: string
             enum:
               - ETH
+              - ONE
               - CELO
               - TRON
               - FLOW
@@ -488,6 +496,7 @@ paths:
             type: string
             enum:
               - ETH
+              - ONE
               - CELO
               - TRON
               - FLOW
@@ -541,6 +550,7 @@ paths:
             type: string
             enum:
               - ETH
+              - ONE
               - CELO
               - TRON
               - FLOW
@@ -601,6 +611,7 @@ paths:
             type: string
             enum:
               - ETH
+              - ONE
               - CELO
               - TRON
               - FLOW
@@ -670,6 +681,7 @@ paths:
             type: string
             enum:
               - ETH
+              - ONE
               - CELO
               - TRON
               - BSC
@@ -1138,6 +1150,12 @@ components:
           description: Chain to work with.
           enum:
             - TRON
+        account:
+          maxLength: 34
+          minLength: 34
+          description: Blockchain address to perform transaction from
+          example: "TCrmdJmvDUPy8qSTgoVStF51yWm6VUh5yQ"
+          type: string
         name:
           description: Name of the NFT token
           example: My ERC721
@@ -1168,6 +1186,7 @@ components:
       required:
         - chain
         - name
+        - account
         - symbol
         - feeLimit
         - signatureId
@@ -1276,6 +1295,12 @@ components:
             maxLength: 34
             minLength: 34
             type: string
+        account:
+          maxLength: 34
+          minLength: 34
+          description: Blockchain address to perform transaction from
+          example: "TCrmdJmvDUPy8qSTgoVStF51yWm6VUh5yQ"
+          type: string
         tokenId:
           type: array
           description: ID of token to be created.
@@ -1315,6 +1340,7 @@ components:
       required:
         - chain
         - to
+        - account
         - contractAddress
         - feeLimit
         - tokenId
@@ -1456,6 +1482,12 @@ components:
           description: Chain to work with.
           enum:
             - TRON
+        account:
+          maxLength: 34
+          minLength: 34
+          description: Blockchain address to perform transaction from
+          example: "TCrmdJmvDUPy8qSTgoVStF51yWm6VUh5yQ"
+          type: string
         tokenId:
           description: ID of token to be destroyed.
           example: "100000"
@@ -1488,6 +1520,7 @@ components:
         - contractAddress
         - tokenId
         - signatureId
+        - account
     BurnNftFlowPK:
       type: object
       properties:
@@ -2305,6 +2338,12 @@ components:
           description: Chain to work with.
           enum:
             - TRON
+        account:
+          maxLength: 34
+          minLength: 34
+          description: Blockchain address to perform transaction from
+          example: "TCrmdJmvDUPy8qSTgoVStF51yWm6VUh5yQ"
+          type: string
         tokenId:
           description: ID of token to be updated.
           example: "100000"
@@ -2339,6 +2378,7 @@ components:
         - chain
         - feeLimit
         - contractAddress
+        - account
         - tokenId
         - signatureId
         - cashbackValue
@@ -2414,6 +2454,12 @@ components:
           description: Chain to work with.
           enum:
             - TRON
+        account:
+          maxLength: 34
+          minLength: 34
+          description: Blockchain address to perform transaction from
+          example: "TCrmdJmvDUPy8qSTgoVStF51yWm6VUh5yQ"
+          type: string
         to:
           maxLength: 34
           minLength: 34
@@ -2453,6 +2499,7 @@ components:
         - feeLimit
         - signatureId
         - tokenId
+        - account
     MintNftCelo:
       type: object
       properties:
@@ -2676,6 +2723,12 @@ components:
           description: Chain to work with.
           enum:
             - TRON
+        account:
+          maxLength: 34
+          minLength: 34
+          description: Blockchain address to perform transaction from
+          example: "TCrmdJmvDUPy8qSTgoVStF51yWm6VUh5yQ"
+          type: string
         tokenId:
           description: ID of token to be created.
           example: "100000"
@@ -2731,6 +2784,7 @@ components:
           example: 600
       required:
         - chain
+        - account
         - to
         - url
         - feeLimit
@@ -2750,6 +2804,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         to:
           maxLength: 42
@@ -2810,6 +2865,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         name:
           description: Name of the NFT token
@@ -2864,6 +2920,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         name:
           description: Name of the NFT token
@@ -2927,6 +2984,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         to:
           maxLength: 42
@@ -2992,6 +3050,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         tokenId:
           description: ID of token to be created.
@@ -3079,6 +3138,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         tokenId:
           description: ID of token to be created.
@@ -3166,6 +3226,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         to:
           type: array
@@ -3258,6 +3319,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         to:
           type: array
@@ -3355,6 +3417,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         tokenId:
           description: ID of token to be destroyed.
@@ -3410,6 +3473,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         tokenId:
           description: ID of token to be updated.
@@ -3475,6 +3539,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         tokenId:
           description: ID of token to be updated.
@@ -3535,6 +3600,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - ONE
             - BSC
         tokenId:
           description: ID of token to be destroyed.

@@ -1,42 +1,46 @@
-import { IsIn, IsNotEmpty, Length } from "class-validator";
+import {IsIn, IsNotEmpty} from 'class-validator';
 
 import {
-  Currency,
+  BurnCeloErc20,
   BurnErc20,
+  Currency,
+  DeployCeloErc20,
   DeployErc20,
-  MintErc20,
+  MintCeloErc20,
+  MintErc20, OneTransfer20,
+  TransferBscBep20,
+  TransferCeloOrCeloErc20Token,
   TransferErc20,
   TransferEthErc20,
-  TransferBscBep20,
-  BurnCeloErc20,
-  DeployCeloErc20,
-  MintCeloErc20,
-  TransferCeloOrCeloErc20Token,
-  SmartContractMethodInvocation,
-  CeloSmartContractMethodInvocation,
 } from '@tatumio/tatum';
 
 export class ChainBurnErc20 extends BurnErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC, Currency.ONE])
   public chain: Currency;
 }
 
 export class ChainDeployErc20 extends DeployErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC, Currency.ONE])
   public chain: Currency;
 }
 
 export class ChainMintErc20 extends MintErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC, Currency.ONE])
   public chain: Currency;
 }
 
 export class ChainTransferErc20 extends TransferErc20 {
   @IsNotEmpty()
   @IsIn([Currency.XDC])
+  public chain: Currency;
+}
+
+export class ChainTransferHrm20 extends OneTransfer20 {
+  @IsNotEmpty()
+  @IsIn([Currency.ONE])
   public chain: Currency;
 }
 
@@ -71,18 +75,6 @@ export class ChainMintCeloErc20 extends MintCeloErc20 {
 }
 
 export class ChainTransferCeloErc20Token extends TransferCeloOrCeloErc20Token {
-  @IsNotEmpty()
-  @IsIn([Currency.CELO])
-  public chain: Currency;
-}
-
-export class ChainSmartContractMethodInvocation extends SmartContractMethodInvocation {
-  @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC])
-  public chain: Currency;
-}
-
-export class ChainCeloSmartContractMethodInvocation extends CeloSmartContractMethodInvocation {
   @IsNotEmpty()
   @IsIn([Currency.CELO])
   public chain: Currency;
