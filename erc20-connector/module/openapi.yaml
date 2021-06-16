@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.0.2
+  version: 1.0.3
   title: Tatum ERC20 Abstraction API
 tags:
   - description: |
@@ -39,7 +39,9 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/ChainDeployErc20"
+                - $ref: "#/components/schemas/ChainDeployErc20KMS"
                 - $ref: "#/components/schemas/ChainDeployCeloErc20"
+                - $ref: "#/components/schemas/ChainDeployCeloErc20KMS"
                 # - $ref: "#/components/schemas/ChainCreateTronTrc20"
         required: true
       responses:
@@ -103,7 +105,9 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/ChainMintErc20"
+                - $ref: "#/components/schemas/ChainMintErc20KMS"
                 - $ref: "#/components/schemas/ChainMintCeloErc20"
+                - $ref: "#/components/schemas/ChainMintCeloErc20KMS"
         required: true
       responses:
         200:
@@ -152,7 +156,9 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/ChainBurnErc20"
+                - $ref: "#/components/schemas/ChainBurnErc20KMS"
                 - $ref: "#/components/schemas/ChainBurnCeloErc20"
+                - $ref: "#/components/schemas/ChainBurnCeloErc20KMS"
         required: true
       responses:
         200:
@@ -201,8 +207,11 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/ChainTransferEthErc20"
+                - $ref: "#/components/schemas/ChainTransferEthErc20KMS"
                 - $ref: "#/components/schemas/ChainTransferBscBep20"
+                - $ref: "#/components/schemas/ChainTransferBscBep20KMS"
                 - $ref: "#/components/schemas/ChainTransferCeloErc20Token"
+                - $ref: "#/components/schemas/ChainTransferCeloErc20TokenKMS"
                 # - $ref: "#/components/schemas/TransferTronTrc20"
         required: true
       responses:
@@ -386,6 +395,88 @@ components:
         - supply
         - fromPrivateKey
         - digits
+    ChainDeployErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, BSC, XDC
+        symbol:
+          description: Symbol of the ERC20 token
+          example: ERC_SYMBOL
+          maxLength: 30
+          minLength: 1
+          type: string
+        name:
+          description: Name of the ERC20 token
+          example: My ERC20
+          maxLength: 100
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_]+$
+          type: string
+        totalCap:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        supply:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        digits:
+          description: Number of decimal points
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        address:
+          description: Address on Ethereum blockchain, where all created ERC20 tokens will be transferred.
+          maxLength: 43
+          minLength: 42
+          example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - chain
+        - name
+        - symbol
+        - address
+        - supply
+        - signatureId
+        - digits
     ChainDeployCeloErc20:
       type: object
       properties:
@@ -456,6 +547,79 @@ components:
         - address
         - supply
         - fromPrivateKey
+        - digits
+        - feeCurrency
+    ChainDeployCeloErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
+        symbol:
+          description: Symbol of the ERC20 token
+          example: ERC_SYMBOL
+          maxLength: 30
+          minLength: 1
+          type: string
+        name:
+          description: Name of the ERC20 token
+          example: My ERC20
+          maxLength: 100
+          minLength: 1
+          pattern: ^[a-zA-Z0-9_]+$
+          type: string
+        totalCap:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        supply:
+          description: Max supply of ERC20 token.
+          maxLength: 38
+          example: "10000000"
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+          type: string
+        digits:
+          description: Number of decimal points
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        address:
+          description: Address on Ethereum blockchain, where all created ERC20 tokens will be transferred.
+          maxLength: 42
+          minLength: 42
+          example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - chain
+        - name
+        - symbol
+        - address
+        - supply
+        - signatureId
         - digits
         - feeCurrency
     # ChainCreateTronTrc20:
@@ -555,6 +719,49 @@ components:
         - amount
         - contractAddress
         - fromPrivateKey
+    ChainMintErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, BSC, XDC
+        amount:
+          description: Amount to be minted and transfered to the recipient.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        to:
+          maxLength: 43
+          minLength: 42
+          description: Blockchain address to send ERC-20 tokens to.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC-20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to transaction. If not present, last known nonce will be used.
+      required:
+        - chain
+        - to
+        - amount
+        - contractAddress
+        - signatureId
     ChainMintCeloErc20:
       type: object
       properties:
@@ -605,6 +812,57 @@ components:
         - feeCurrency
         - contractAddress
         - fromPrivateKey
+    ChainMintCeloErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
+        amount:
+          description: Amount to be minted and transfered to the recipient.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        to:
+          maxLength: 42
+          minLength: 42
+          description: Blockchain address to send ERC-20 tokens to.
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC-20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - chain
+        - to
+        - amount
+        - feeCurrency
+        - contractAddress
+        - signatureId
     ChainBurnErc20:
       type: object
       properties:
@@ -642,6 +900,42 @@ components:
         - chain
         - contractAddress
         - fromPrivateKey
+        - amount
+    ChainBurnErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, BSC, XDC
+        amount:
+          description: Amount of tokens to be destroyed.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+      required:
+        - chain
+        - contractAddress
+        - signatureId
         - amount
     ChainBurnCeloErc20:
       type: object
@@ -685,6 +979,50 @@ components:
         - contractAddress
         - feeCurrency
         - fromPrivateKey
+        - amount
+    ChainBurnCeloErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
+        amount:
+          description: Amount of tokens to be destroyed.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Celo transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - chain
+        - contractAddress
+        - feeCurrency
+        - signatureId
         - amount
     ChainTransferEthErc20:
       type: object
@@ -775,6 +1113,96 @@ components:
         - digits
         - fromPrivateKey
         - amount
+    ChainTransferEthErc20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: ETH
+          description: Chain to work with.
+          enum:
+            - ETH, XDC
+        currency:
+          description: Currency to transfer from Ethereum Blockchain Account.
+          enum:
+            - USDT
+            - LEO
+            - LINK
+            - UNI
+            - FREE
+            - MKR
+            - USDC
+            - BAT
+            - TUSD
+            - PAX
+            - PAXG
+            - PLTC
+            - MMY
+            - WBTC
+            - XCON
+            - ETH
+            - XDC
+          example: ETH
+          type: string
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send ERC20 token to
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 43
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that ERC20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - chain
+        - currency
+        - to
+        - contractAddress
+        - digits
+        - signatureId
+        - amount
     ChainTransferBscBep20:
       type: object
       properties:
@@ -841,6 +1269,73 @@ components:
         - digits
         - fromPrivateKey
         - amount
+    ChainTransferBscBep20KMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: BSC
+          description: Chain to work with.
+          enum:
+            - BSC
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send BEP20 token to
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of BEP20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that BEP20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+        fee:
+          description: Custom defined fee. If not present, it will be calculated automatically.
+          type: object
+          required:
+            - gasLimit
+            - gasPrice
+          properties:
+            gasLimit:
+              type: string
+              description: Gas limit for transaction in gas price.
+              pattern: ^[+]?\d+$
+              example: "40000"
+            gasPrice:
+              type: string
+              description: Gas price in Gwei.
+              pattern: ^[+]?\d+$
+              example: "20"
+      required:
+        - chain
+        - to
+        - contractAddress
+        - digits
+        - signatureId
+        - amount
     ChainTransferCeloErc20Token:
       type: object
       properties:
@@ -897,6 +1392,64 @@ components:
         - digits
         - feeCurrency
         - fromPrivateKey
+        - amount
+    ChainTransferCeloErc20TokenKMS:
+      type: object
+      properties:
+        chain:
+          type: string
+          example: CELO
+          description: Chain to work with.
+          enum:
+            - CELO
+        to:
+          maxLength: 50
+          minLength: 1
+          description: Blockchain address to send ERC20 token to
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        amount:
+          description: Amount to be sent.
+          example: "100000"
+          type: string
+          pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of ERC20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        digits:
+          description: Number of decimal points that ERC20 token has.
+          example: 18
+          maximum: 30
+          minimum: 1
+          type: number
+        signatureId:
+          type: string
+          minLength: 36
+          maxLength: 36
+          format: uuid
+          example: 26d3883e-4e17-48b3-a0ee-09a3e484ac83
+          description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        nonce:
+          type: number
+          minimum: 0
+          description: Nonce to be set to Ethereum transaction. If not present, last known nonce will be used.
+        feeCurrency:
+          type: string
+          description: Currency to pay for transaction gas
+          enum:
+            - CELO
+            - CUSD
+            - CEUR
+      required:
+        - chain
+        - to
+        - contractAddress
+        - digits
+        - feeCurrency
+        - signatureId
         - amount
     # ChainTransferTronTrc20:
     #   type: object

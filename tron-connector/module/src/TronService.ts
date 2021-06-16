@@ -59,6 +59,10 @@ export abstract class TronService {
         };
     }
 
+    private async getNodeAddress(): Promise<string> {
+      return (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
+    }
+
     protected constructor(protected readonly logger: PinoLogger) {
     }
 
@@ -150,7 +154,7 @@ export abstract class TronService {
     }
 
     public async getAccount(address: string): Promise<TronAccount> {
-        const url = (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
+        const url = await this.getNodeAddress();
         const {data} = (await axios.get(`${url}/v1/accounts/${address}`, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (!data?.length) {
             throw new Error('no such account.');
@@ -169,7 +173,7 @@ export abstract class TronService {
     }
 
     public async getTransactionsByAccount(address: string, next?: string): Promise<{ transactions: TronTransaction[], next?: string }> {
-        const url = (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
+        const url = await this.getNodeAddress();
         let u = `${url}/v1/accounts/${address}/transactions?limit=200`;
         if (next) {
             u += '&fingerprint=' + next;
@@ -182,7 +186,7 @@ export abstract class TronService {
     }
 
     public async getTrc20TransactionsByAccount(address: string, next?: string): Promise<{ transactions: Trc20Tx[], next?: string }> {
-        const url = (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
+        const url = await this.getNodeAddress();
         let u = `${url}/v1/accounts/${address}/transactions/trc20?limit=200`;
         if (next) {
             u += '&fingerprint=' + next;
@@ -261,7 +265,7 @@ export abstract class TronService {
     }
 
     public async getTrc10Detail(id: string): Promise<TronTrc10> {
-        const url = `${(await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io'}/v1/assets/${id}`;
+        const url = `${(await this.getNodeAddress())}/v1/assets/${id}`;
         const {data} = (await axios.get(url, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (!data?.length) {
             throw new Error('No such asset.');
