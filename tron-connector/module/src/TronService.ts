@@ -211,8 +211,9 @@ export abstract class TronService {
     }
 
     public async sendTransaction(body: TransferTron) {
+        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronSignedKMSTransaction(await this.isTestnet(), body);
+            const txData = await prepareTronSignedKMSTransaction(await this.isTestnet(), body, url);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
             return this.broadcast(await prepareTronSignedTransaction(await this.isTestnet(), body));
@@ -229,11 +230,12 @@ export abstract class TronService {
     }
 
     public async sendTrc20Transaction(body: TransferTronTrc20) {
+        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronTrc20SignedKMSTransaction(await this.isTestnet(), body);
+            const txData = await prepareTronTrc20SignedKMSTransaction(await this.isTestnet(), body, url);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
-            return this.broadcast(await prepareTronTrc20SignedTransaction(await this.isTestnet(), body));
+            return this.broadcast(await prepareTronTrc20SignedTransaction(await this.isTestnet(), body, url));
         }
     }
 
@@ -247,8 +249,9 @@ export abstract class TronService {
     }
 
     public async createTrc20Transaction(body: CreateTronTrc20) {
+        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronCreateTrc20SignedKMSTransaction(await this.isTestnet(), body);
+            const txData = await prepareTronCreateTrc20SignedKMSTransaction(await this.isTestnet(), body, url);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
             return this.broadcast(await prepareTronCreateTrc20SignedTransaction(await this.isTestnet(), body));
@@ -256,8 +259,9 @@ export abstract class TronService {
     }
 
     public async freezeBalance(body: FreezeTron) {
+        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronFreezeKMSTransaction(await this.isTestnet(), body);
+            const txData = await prepareTronFreezeKMSTransaction(await this.isTestnet(), body, url);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
             return this.broadcast(await prepareTronFreezeTransaction(await this.isTestnet(), body));
