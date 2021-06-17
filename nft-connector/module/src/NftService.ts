@@ -549,7 +549,7 @@ export abstract class NftService {
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
         } else {
-            return this.broadcast(chain, txData);
+            return await this.broadcast(chain, txData);
         }
     }
 

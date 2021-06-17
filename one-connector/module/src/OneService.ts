@@ -1,6 +1,7 @@
 import {PinoLogger} from 'nestjs-pino';
 import {HarmonyAddress} from '@harmony-js/crypto';
 import {Harmony} from '@harmony-js/core';
+import {numberToHex} from '@harmony-js/utils';
 import {
     Currency,
     EstimateGasEth,
@@ -47,11 +48,17 @@ export abstract class OneService {
         };
     }
 
-    private static mapTransaction(tx: any) {
+    private static mapTransaction(t: any) {
+        const {r, s, v, ...tx} = t;
         return {
             ...tx,
             blockNumber: parseInt(tx.blockNumber, 16),
+            from: tx.from ? new HarmonyAddress(tx.from).basicHex : undefined,
+            to: tx.to ? new HarmonyAddress(tx.to).basicHex : undefined,
+            contractAddress: tx.contractAddress ? new HarmonyAddress(tx.contractAddress).basicHex : undefined,
             gas: parseInt(tx.gas, 16),
+            gasPrice: parseInt(tx.gasPrice, 16),
+            timestamp: parseInt(tx.timestamp, 16),
             nonce: parseInt(tx.nonce, 16),
             transactionIndex: parseInt(tx.transactionIndex, 16),
             value: new BigNumber(tx.value).toString(),
@@ -64,7 +71,7 @@ export abstract class OneService {
                 logIndex: parseInt(l.logIndex, 16),
                 transactionIndex: parseInt(l.transactionIndex, 16),
                 blockNumber: parseInt(l.blockNumber, 16),
-            }))
+            })) || []
         };
     };
 
@@ -79,32 +86,33 @@ export abstract class OneService {
 
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
-    private async getFirstNodeUrl(testnet: boolean): Promise<string> {
+    private async getFirstNodeUrl(testnet: boolean, shardID = 0): Promise<string> {
         const nodes = await this.getNodesUrl(testnet);
         if (nodes.length === 0) {
-            new OneError('Nodes url array must have at least one element.', 'bsc.nodes.url');
+            new OneError('Nodes url array must have at least one element.', 'one.nodes.url');
         }
-        return nodes[0];
+        return nodes[0].replace('s0', `s${shardID}`);
     }
 
-    public async getClient(testnet: boolean): Promise<Harmony> {
-        return new Harmony(await this.getFirstNodeUrl(testnet), {
-            shardID: 0,
+    public async getClient(testnet: boolean, shardID = 0): Promise<Harmony> {
+        const url = await this.getFirstNodeUrl(testnet, shardID);
+        return new Harmony(url, {
+            shardID,
             chainType: ChainType.Harmony,
             chainId: testnet ? ChainID.HmyTestnet : ChainID.HmyMainnet,
         });
     }
 
-    public async broadcast(txData: string, signatureId?: string): Promise<{
+    public async broadcast(txData: string, signatureId?: string, shardID?: number): Promise<{
         txId: string,
         failed?: boolean,
     }> {
         this.logger.info(`Broadcast tx for ONE with data '${txData}'`);
-        const client = new Web3(await this.getFirstNodeUrl(await this.isTestnet()));
+        const client = new Web3(await this.getFirstNodeUrl(await this.isTestnet(), shardID));
         const result: { txId: string } = await new Promise((async (resolve, reject) => {
             client.eth.sendSignedTransaction(txData)
                 .once('transactionHash', txId => resolve({txId}))
-                .on('error', e => reject(new OneError(`Unable to broadcast transaction due to ${e.message}.`, 'bsc.broadcast.failed')));
+                .on('error', e => reject(new OneError(`Unable to broadcast transaction due to ${e.message}.`, 'one.broadcast.failed')));
         }));
 
         if (signatureId) {
@@ -121,22 +129,27 @@ export abstract class OneService {
 
     public async getCurrentBlock(testnet?: boolean): Promise<{ shardID: number, blockNumber: number }[]> {
         const t = testnet === undefined ? await this.isTestnet() : testnet;
-        const harmony = await this.getClient(t);
-        const all = await Promise.all([harmony.blockchain.getBlockNumber(0),
-            harmony.blockchain.getBlockNumber(1),
-            harmony.blockchain.getBlockNumber(2),
-            harmony.blockchain.getBlockNumber(3)]);
-        return all.map((blockNumber: number, shardID: number) => ({shardID, blockNumber}));
+        const clients = await Promise.all([0, 1, 2, 3].map(i => this.getClient(t, i)));
+        const all = await Promise.all(clients.map((harmony, i) => harmony.blockchain.getBlockNumber(i)));
+        return all.map(({result}: { result: string }, shardID: number) => ({
+            shardID,
+            blockNumber: parseInt(result, 16)
+        }));
     }
 
     public async getBlock(hash: string, shardID?: number, testnet?: boolean) {
         const t = testnet === undefined ? await this.isTestnet() : testnet;
-        const harmony = await this.getClient(t);
+        const harmony = await this.getClient(t, shardID);
         try {
             const isHash = typeof hash === 'string' && hash.length >= 64;
-            const block = isHash
-                ? await harmony.blockchain.getBlockByHash({blockHash: hash, shardID})
-                : await harmony.blockchain.getBlockByNumber({blockNumber: hash, shardID})
+            const {result: block} = isHash
+                ? await harmony.blockchain.getBlockByHash({blockHash: hash})
+                : await harmony.blockchain.getBlockByNumber({blockNumber: numberToHex(hash)});
+            const txs = [];
+            for (const tx of block.transactions || []) {
+                txs.push({...tx, ...(await harmony.blockchain.getTransactionReceipt({txnHash: tx.hash})).result});
+            }
+            block.transactions = txs;
             return OneService.mapBlock(block);
         } catch (e) {
             this.logger.error(e);
@@ -146,13 +159,15 @@ export abstract class OneService {
 
     public async getTransaction(txId: string, shardID?: number, testnet?: boolean) {
         const t = testnet === undefined ? await this.isTestnet() : testnet;
-        const harmony = await this.getClient(t);
+        const harmony = await this.getClient(t, shardID);
 
         try {
-            const tx = await harmony.blockchain.getTransactionByHash({txnHash: txId, shardID});
+            const {result} = await harmony.blockchain.getTransactionByHash({txnHash: txId});
+            const {s, r, v, ...tx} = result;
             let receipt = {};
             try {
-                receipt = await harmony.blockchain.getTransactionReceipt({txnHash: txId, shardID});
+                const {result} = await harmony.blockchain.getTransactionReceipt({txnHash: txId});
+                receipt = result;
             } catch (_) {
                 tx.transactionHash = txId;
             }
@@ -167,17 +182,17 @@ export abstract class OneService {
                                                      transactionData,
                                                      signatureId,
                                                      index
-                                                 }: BroadcastOrStoreKMSTransaction) {
+                                                 }: BroadcastOrStoreKMSTransaction, shardID?: number) {
         if (signatureId) {
             return {
                 signatureId: await this.storeKMSTransaction(transactionData, Currency.ONE, [signatureId], index),
             };
         }
-        return this.broadcast(transactionData);
+        return this.broadcast(transactionData, undefined, shardID);
     }
 
-    public async web3Method(body: any) {
-        const node = await this.getFirstNodeUrl(await this.isTestnet());
+    public async web3Method(body: any, shardID?: number) {
+        const node = await this.getFirstNodeUrl(await this.isTestnet(), shardID);
         return (await axios.post(node, body, {headers: {'Content-Type': 'application/json'}})).data;
     }
 
@@ -195,36 +210,28 @@ export abstract class OneService {
         return {address};
     }
 
-    public async estimateGas(body: EstimateGasEth) {
-        const client = await this.getClient(await this.isTestnet());
-        return {
-            gasLimit: await client.blockchain.estimateGas({data: '0x', ...body}),
-            gasPrice: fromWei(await client.blockchain.gasPrice(), 'gwei'),
-        };
-    }
-
     public async getBalance(address: string, shardID?: number): Promise<{ balance: string }> {
-        const client = await this.getClient(await this.isTestnet());
-        return {balance: fromWei(await client.blockchain.getBalance({address, shardID}), 'ether')};
+        const client = await this.getClient(await this.isTestnet(), shardID);
+        return {balance: fromWei((await client.blockchain.getBalance({address, shardID})).result, 'ether')};
     }
 
-    public async sendTransaction(transfer: OneTransfer): Promise<TransactionHash | SignatureId> {
+    public async sendTransaction(transfer: OneTransfer, shardID?: number): Promise<TransactionHash | SignatureId> {
         const testnet = await this.isTestnet();
-        const transactionData = await prepareOneSignedTransaction(testnet, transfer, await this.getFirstNodeUrl(testnet));
+        const transactionData = await prepareOneSignedTransaction(testnet, transfer, await this.getFirstNodeUrl(testnet, shardID));
         return this.broadcastOrStoreKMSTransaction({
             transactionData, signatureId: transfer.signatureId,
             index: transfer.index
-        });
+        }, shardID);
     }
 
     public async getTransactionCount(address: string, shardID?: number) {
-        const client = await this.getClient(await this.isTestnet());
-        return client.blockchain.getTransactionCount({address, shardID, blockNumber: 'pending'});
+        const client = await this.getClient(await this.isTestnet(), shardID);
+        return parseInt((await client.blockchain.getTransactionCount({address, blockNumber: 'pending'})).result, 16);
     }
 
-    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation) {
+    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation, shardID?: number) {
         const testnet = await this.isTestnet();
-        const node = await this.getFirstNodeUrl(testnet);
+        const node = await this.getFirstNodeUrl(testnet, shardID);
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {
             return sendOneSmartContractMethodInvocationTransaction(testnet, smartContractMethodInvocation, node);
         }
@@ -234,10 +241,10 @@ export abstract class OneService {
             transactionData,
             signatureId: smartContractMethodInvocation.signatureId,
             index: smartContractMethodInvocation.index
-        });
+        }, shardID);
     }
 
-    public async formatAddress(address: string) {
-        return new HarmonyAddress(address).bech32;
+    public formatAddress(address: string) {
+        return {address: new HarmonyAddress(address).bech32};
     }
 }

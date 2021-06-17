@@ -39,7 +39,7 @@ export abstract class NftController {
         try {
             return await this.service.getTokensOfOwner(path.chain, path.address, path.contractAddress);
         } catch (e) {
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -48,7 +48,7 @@ export abstract class NftController {
         try {
             return await this.service.getTransaction(path.chain, path.txId);
         } catch (e) {
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -57,7 +57,7 @@ export abstract class NftController {
         try {
             return await this.service.getContractAddress(path.chain, path.txId);
         } catch (e) {
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -66,7 +66,7 @@ export abstract class NftController {
         try {
             return await this.service.getMetadataErc721(path.chain, path.tokenId, path.contractAddress, account);
         } catch (e) {
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -75,7 +75,7 @@ export abstract class NftController {
         try {
             return await this.service.getRoyaltyErc721(path.chain, path.tokenId, path.contractAddress);
         } catch (e) {
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -91,7 +91,7 @@ export abstract class NftController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -107,7 +107,7 @@ export abstract class NftController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -123,7 +123,7 @@ export abstract class NftController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -139,7 +139,7 @@ export abstract class NftController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -155,7 +155,7 @@ export abstract class NftController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 
@@ -171,7 +171,7 @@ export abstract class NftController {
             if (e.constructor.name === 'TatumError') {
                 throw e;
             }
-            throw new NftError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'nft.error');
+            throw new NftError(`Unexpected error occurred. Reason: ${e.response?.message || e.response?.data || e.message || e}`, 'nft.error');
         }
     }
 }

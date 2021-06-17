@@ -14,10 +14,13 @@ export abstract class OneController {
 
     @Post('v3/one/web3/:xApiKey')
     @HttpCode(HttpStatus.OK)
-    public async web3Driver(@Body() body: any) {
+    public async web3Driver(@Body() body: any, @Query('shardID') shardID?: string) {
         try {
-            return await this.service.web3Method(body);
+            return await this.service.web3Method(body, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -28,6 +31,9 @@ export abstract class OneController {
         try {
             return await this.service.generateWallet(mnemonic);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -38,56 +44,61 @@ export abstract class OneController {
         try {
             return await this.service.generatePrivateKey(mnemonic, index);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
 
     @Post('v3/one/transaction')
     @HttpCode(HttpStatus.OK)
-    public async sendOneTransaction(@Body() body: OneTransfer) {
+    public async sendOneTransaction(@Body() body: OneTransfer, @Query('shardID') shardID?: string) {
         try {
-            return await this.service.sendTransaction(body);
+            return await this.service.sendTransaction(body, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
-            throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
-        }
-    }
-
-    @Post('v3/one/gas')
-    @HttpCode(HttpStatus.OK)
-    public async estimateGas(@Body() body: EstimateGasEth) {
-        try {
-            return await this.service.estimateGas(body);
-        } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
 
     @Get('v3/one/transaction/count/:address')
     @HttpCode(HttpStatus.OK)
-    public async countTransactions(@Param() param: PathAddress) {
+    public async countTransactions(@Param() param: PathAddress, @Query('shardID') shardID?: string) {
         try {
-            return await this.service.getTransactionCount(param.address);
+            return await this.service.getTransactionCount(param.address, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
 
     @Post('v3/one/smartcontract')
     @HttpCode(HttpStatus.OK)
-    public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation) {
+    public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation, @Query('shardID') shardID?: string) {
         try {
-            return await this.service.invokeSmartContractMethod(body);
+            return await this.service.invokeSmartContractMethod(body, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
 
     @Post('v3/one/broadcast')
     @HttpCode(HttpStatus.OK)
-    public async broadcast(@Body() body: BroadcastTx) {
+    public async broadcast(@Body() body: BroadcastTx, @Query('shardID') shardID?: string) {
         try {
-            return await this.service.broadcast(body.txData, body.signatureId);
+            return await this.service.broadcast(body.txData, body.signatureId, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -98,6 +109,9 @@ export abstract class OneController {
         try {
             return await this.service.getCurrentBlock();
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -108,6 +122,9 @@ export abstract class OneController {
         try {
             return await this.service.getBlock(path.hash, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -118,6 +135,22 @@ export abstract class OneController {
         try {
             return await this.service.getBalance(path.address, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
+            throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
+        }
+    }
+
+    @Get('v3/one/address/format/:address')
+    @HttpCode(HttpStatus.OK)
+    public async formatAddress(@Param() {address}: PathAddress) {
+        try {
+            return this.service.formatAddress(address);
+        } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -128,16 +161,9 @@ export abstract class OneController {
         try {
             return await this.service.generateAddress(xpub, i);
         } catch (e) {
-            throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
-        }
-    }
-
-    @Get('v3/one/address/format/:address')
-    @HttpCode(HttpStatus.OK)
-    public async formatAddress(@Param() {address}: PathAddress) {
-        try {
-            return await this.service.formatAddress(address);
-        } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }
@@ -147,6 +173,9 @@ export abstract class OneController {
         try {
             return await this.service.getTransaction(path.hash, shardID ? parseInt(shardID) : undefined);
         } catch (e) {
+            if (e.constructor.name === 'OneError') {
+                throw e;
+            }
             throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
         }
     }

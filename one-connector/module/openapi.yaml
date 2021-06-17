@@ -141,7 +141,7 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate ONE account address from Extended public key
+      summary: Transform HEX address to Bech32 ONE address format
       tags:
         - Blockchain / Harmony.ONE
   /v3/one/wallet/priv:
@@ -191,6 +191,14 @@ paths:
           schema:
             type: string
             example: asdlkfjnqunalkwjfnq2oi303294857k
+        - description: "Shard to read data from"
+          in: query
+          name: shardID
+          required: false
+          schema:
+            default: 0
+            type: number
+            example: 0
       requestBody:
         content:
           application/json:
@@ -269,7 +277,7 @@ paths:
           schema:
             default: 0
             type: number
-            example: 1
+            example: 0
       responses:
         200:
           content:
@@ -308,7 +316,7 @@ paths:
           schema:
             default: 0
             type: number
-            example: 1
+            example: 0
       responses:
         200:
           content:
@@ -352,7 +360,7 @@ paths:
           schema:
             default: 0
             type: number
-            example: 1
+            example: 0
       responses:
         200:
           content:
@@ -404,7 +412,7 @@ paths:
           schema:
             default: 0
             type: number
-            example: 1
+            example: 0
       responses:
         200:
           content:
@@ -439,6 +447,15 @@ paths:
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
       operationId: OneBlockchainTransfer
+      parameters:
+        - description: "Shard to read data from"
+          in: query
+          name: shardID
+          required: false
+          schema:
+            default: 0
+            type: number
+            example: 0
       requestBody:
         content:
           application/json:
@@ -480,58 +497,6 @@ paths:
       summary: Send ONE / HRM20 from account to account
       tags:
         - Blockchain / Harmony.ONE
-  /v3/one/gas:
-    post:
-      description: |
-        <h4>2 credits per API call.</h4><br/>
-        <p>Estimate gasLimit and gasPrice of the ONE transaction.
-        </p>
-      operationId: OneEstimateGas
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OneEstimateGas"
-        required: true
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - gasLimit
-                  - gasPrice
-                properties:
-                  gasLimit:
-                    type: string
-                    description: Gas limit for transaction in gas price.
-                    example: "40000"
-                  gasPrice:
-                    type: string
-                    description: Gas price in wei.
-                    example: "20"
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        403:
-          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error403OneTxBody"
-                  - $ref: "#/components/schemas/Error403OneGasCalculation"
-        500:
-          <<: *API500
-      security:
-        - X-Api-Key: [ ]
-      x-code-samples:
-      summary: Estimate ONE transaction fees
-      tags:
-        - Blockchain / Harmony.ONE
   /v3/one/smartcontract:
     post:
       description: |
@@ -545,6 +510,15 @@ paths:
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
       operationId: OneBlockchainSmartContractInvocation
+      parameters:
+        - description: "Shard to read data from"
+          in: query
+          name: shardID
+          required: false
+          schema:
+            default: 0
+            type: number
+            example: 0
       requestBody:
         content:
           application/json:
@@ -594,6 +568,15 @@ paths:
         <p>Broadcast signed transaction to ONE blockchain. This method is used internally from Tatum KMS, Tatum Middleware or Tatum client libraries.
         It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
       operationId: OneBroadcast
+      parameters:
+        - description: "Shard to read data from"
+          in: query
+          name: shardID
+          required: false
+          schema:
+            default: 0
+            type: number
+            example: 0
       requestBody:
         content:
           application/json:
