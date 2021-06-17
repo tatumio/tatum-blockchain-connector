@@ -497,6 +497,67 @@ paths:
       summary: Send ONE / HRM20 from account to account
       tags:
         - Blockchain / Harmony.ONE
+  /v3/one/gas:
+    post:
+      description: |
+        <h4>2 credits per API call.</h4><br/>
+        <p>Estimate gasLimit and gasPrice of the ONE transaction.
+        </p>
+      operationId: OneEstimateGas
+      parameters:
+        - description: "Shard to read data from"
+          in: query
+          name: shardID
+          required: false
+          schema:
+            default: 0
+            type: number
+            example: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OneEstimateGas"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - gasLimit
+                  - gasPrice
+                properties:
+                  gasLimit:
+                    type: string
+                    description: Gas limit for transaction in gas price.
+                    example: "40000"
+                  gasPrice:
+                    type: string
+                    description: Gas price in wei.
+                    example: "20"
+          description: OK
+        400:
+          <<: *API400
+        401:
+          <<: *API401
+        403:
+          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error403OneTxBody"
+                  - $ref: "#/components/schemas/Error403OneGasCalculation"
+        500:
+          <<: *API500
+      security:
+        - X-Api-Key: [ ]
+      x-code-samples:
+      summary: Estimate ONE transaction fees
+      tags:
+        - Blockchain / Harmony.ONE
   /v3/one/smartcontract:
     post:
       description: |

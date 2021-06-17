@@ -53,9 +53,9 @@ export abstract class OneService {
         return {
             ...tx,
             blockNumber: parseInt(tx.blockNumber, 16),
-            from: tx.from ? new HarmonyAddress(tx.from).basicHex : undefined,
-            to: tx.to ? new HarmonyAddress(tx.to).basicHex : undefined,
-            contractAddress: tx.contractAddress ? new HarmonyAddress(tx.contractAddress).basicHex : undefined,
+            from: tx.from ? new HarmonyAddress(tx.from).basicHex : '',
+            to: tx.to ? new HarmonyAddress(tx.to).basicHex : '',
+            contractAddress: tx.contractAddress ? new HarmonyAddress(tx.contractAddress).basicHex : '',
             gas: parseInt(tx.gas, 16),
             gasPrice: parseInt(tx.gasPrice, 16),
             timestamp: parseInt(tx.timestamp, 16),
@@ -145,11 +145,6 @@ export abstract class OneService {
             const {result: block} = isHash
                 ? await harmony.blockchain.getBlockByHash({blockHash: hash})
                 : await harmony.blockchain.getBlockByNumber({blockNumber: numberToHex(hash)});
-            const txs = [];
-            for (const tx of block.transactions || []) {
-                txs.push({...tx, ...(await harmony.blockchain.getTransactionReceipt({txnHash: tx.hash})).result});
-            }
-            block.transactions = txs;
             return OneService.mapBlock(block);
         } catch (e) {
             this.logger.error(e);
@@ -208,6 +203,14 @@ export abstract class OneService {
     public async generateAddress(xpub: string, derivationIndex: string): Promise<{ address: string }> {
         const address = await generateAddressFromXPub(Currency.ONE, await this.isTestnet(), xpub, parseInt(derivationIndex));
         return {address};
+    }
+
+    public async estimateGas(body: EstimateGasEth, shardID?: number) {
+        const client = await this.getClient(await this.isTestnet(), shardID);
+        return {
+            gasLimit: await client.blockchain.estimateGas({data: '0x', ...body}),
+            gasPrice: fromWei(await client.blockchain.gasPrice(), 'gwei'),
+        };
     }
 
     public async getBalance(address: string, shardID?: number): Promise<{ balance: string }> {
