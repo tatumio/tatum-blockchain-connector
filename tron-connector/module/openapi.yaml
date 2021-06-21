@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   - url: 'https://api-eu1.tatum.io'
 info:
-  version: 1.1.0
+  version: 1.1.1
   title: Tatum Tron API
 tags:
   - description: |
@@ -825,11 +825,16 @@ components:
           example: "100000"
           pattern: ^[+]?((\d+(\.\d*)?)|(\.\d+))$
           type: string
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
       required:
         - from
         - signatureId
         - to
         - amount
+        - index
     TransferTronTrc10Blockchain:
       type: object
       properties:
@@ -877,6 +882,10 @@ components:
           format: uuid
           example: 1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6
           description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         to:
           type: string
           minLength: 34
@@ -897,6 +906,7 @@ components:
       required:
         - from
         - signatureId
+        - index
         - tokenId
         - to
         - amount
@@ -953,6 +963,10 @@ components:
           format: uuid
           example: 1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6
           description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         to:
           type: string
           minLength: 34
@@ -978,6 +992,7 @@ components:
       required:
         - from
         - signatureId
+        - index
         - tokenAddress
         - to
         - amount
@@ -1043,6 +1058,10 @@ components:
           format: uuid
           example: 1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6
           description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         recipient:
           type: string
           minLength: 34
@@ -1075,6 +1094,7 @@ components:
       required:
         - from
         - signatureId
+        - index
         - name
         - recipient
         - symbol
@@ -1155,6 +1175,10 @@ components:
           format: uuid
           example: 1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6
           description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         recipient:
           type: string
           minLength: 34
@@ -1199,6 +1223,7 @@ components:
       required:
         - from
         - signatureId
+        - index
         - recipient
         - name
         - abbreviation
@@ -1304,6 +1329,10 @@ components:
           format: uuid
           example: 1f7f7c0c-3906-4aa1-9dfe-4b67c43918f6
           description: Identifier of the private key associated in signing application. Private key, or signature Id must be present.
+        index:
+          type: number
+          minimum: 0
+          description: If signatureId is mnemonic-based, this is the index to the specific address from that mnemonic.
         receiver:
           type: string
           minLength: 34
@@ -1330,6 +1359,7 @@ components:
       required:
         - from
         - signatureId
+        - index
         - receiver
         - resource
         - duration
