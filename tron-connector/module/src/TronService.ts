@@ -1,6 +1,7 @@
 import {PinoLogger} from 'nestjs-pino';
 import axios from 'axios';
 import {
+    convertAddressFromHex,
     CreateTronTrc10,
     CreateTronTrc20,
     Currency,
@@ -33,6 +34,24 @@ import {Trc20Tx} from './dto/Trc20Tx';
 export abstract class TronService {
 
     private static mapTransaction(t: any): TronTransaction {
+
+        if (t.internal_tx_id) {
+            return {...t, fromAddressBase58: convertAddressFromHex(t.from_address), toAddressBase58: convertAddressFromHex(t.to_address)}
+        }
+        const rawData = {...t.raw_data};
+        rawData.contract = rawData.contract?.map(c => ({
+            ...c,
+            parameter: {
+                ...c.parameter,
+                value: {
+                    ...c.parameter.value,
+                    ownerAddressBase58: convertAddressFromHex(c.parameter.value.owner_address),
+                    toAddressBase58: convertAddressFromHex(c.parameter.value.to_address),
+                    contractAddressBase58: convertAddressFromHex(c.parameter.value.contract_address),
+                }
+            }
+        })) || [];
+
         return {
             ret: t.ret,
             signature: t.signature,
@@ -44,7 +63,7 @@ export abstract class TronService {
             energyUsage: t.energy_usage,
             energyUsageTotal: t.energy_usage_total,
             internalTransactions: t.internal_transactions,
-            rawData: t.raw_data,
+            rawData: rawData,
         };
     }
 
@@ -60,7 +79,7 @@ export abstract class TronService {
     }
 
     private async getNodeAddress(): Promise<string> {
-      return (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
+        return (await this.isTestnet()) ? 'https://api.shasta.trongrid.io' : 'https://api.trongrid.io';
     }
 
     protected constructor(protected readonly logger: PinoLogger) {
@@ -172,7 +191,7 @@ export abstract class TronService {
         };
     }
 
-    public async getTransactionsByAccount(address: string, next?: string): Promise<{ transactions: TronTransaction[], next?: string }> {
+    public async getTransactionsByAccount(address: string, next?: string): Promise<{ transactions: TronTransaction[], internalTransactions: TronTransaction[], next?: string }> {
         const url = await this.getNodeAddress();
         let u = `${url}/v1/accounts/${address}/transactions?limit=200`;
         if (next) {
@@ -180,7 +199,8 @@ export abstract class TronService {
         }
         const result = (await axios.get(u, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         return {
-            transactions: result.data.map(TronService.mapTransaction),
+            transactions: result.data.map(TronService.mapTransaction).filter(t => !t.internal_tx_id),
+            internalTransactions: result.data.map(TronService.mapTransaction).filter(t => t.internal_tx_id),
             next: result.meta?.fingerprint
         };
     }
@@ -211,9 +231,8 @@ export abstract class TronService {
     }
 
     public async sendTransaction(body: TransferTron) {
-        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronSignedKMSTransaction(await this.isTestnet(), body, url);
+            const txData = await prepareTronSignedKMSTransaction(await this.isTestnet(), body);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
             return this.broadcast(await prepareTronSignedTransaction(await this.isTestnet(), body));
@@ -230,12 +249,11 @@ export abstract class TronService {
     }
 
     public async sendTrc20Transaction(body: TransferTronTrc20) {
-        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronTrc20SignedKMSTransaction(await this.isTestnet(), body, url);
+            const txData = await prepareTronTrc20SignedKMSTransaction(await this.isTestnet(), body);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
-            return this.broadcast(await prepareTronTrc20SignedTransaction(await this.isTestnet(), body, url));
+            return this.broadcast(await prepareTronTrc20SignedTransaction(await this.isTestnet(), body));
         }
     }
 
@@ -249,9 +267,8 @@ export abstract class TronService {
     }
 
     public async createTrc20Transaction(body: CreateTronTrc20) {
-        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronCreateTrc20SignedKMSTransaction(await this.isTestnet(), body, url);
+            const txData = await prepareTronCreateTrc20SignedKMSTransaction(await this.isTestnet(), body);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
             return this.broadcast(await prepareTronCreateTrc20SignedTransaction(await this.isTestnet(), body));
@@ -259,9 +276,8 @@ export abstract class TronService {
     }
 
     public async freezeBalance(body: FreezeTron) {
-        const url = (await this.getNodesUrl(await this.isTestnet()))[0];
         if (body.signatureId) {
-            const txData = await prepareTronFreezeKMSTransaction(await this.isTestnet(), body, url);
+            const txData = await prepareTronFreezeKMSTransaction(await this.isTestnet(), body);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId])};
         } else {
             return this.broadcast(await prepareTronFreezeTransaction(await this.isTestnet(), body));

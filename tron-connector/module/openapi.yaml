@@ -1522,10 +1522,42 @@ components:
                             type: string
                             example: 41af2c205a7e44f79f680d149d339b733f6d34b6d5
                             description: Address of the recipient.
+                          ownerAddressBase58:
+                            type: string
+                            example: TNCmcTdyrYKMtmE1KU2itzeCX76jGm5Not
+                            description: Address of the sender in Base58 encoding.
+                          contractAddressBase58:
+                              type: string
+                              example: TRwS7apsNdRGzMBfhB2hVC4RhqfubUYZ8P
+                              description: Address of the recipient in Base58 encoding.
           required:
             - contract
             - timestamp
             - expiration
+    TronInternalTx:
+      type: object
+      required:
+        - internal_tx_id
+        - tx_id
+        - to_address
+        - from_address
+      properties:
+        tx_id:
+          type: string
+          description: Transaction ID.
+          example: 24dd2f121a24516f22df78adf1ccc32119e3edb7760297f76a925b879f2baa98
+        internal_tx_id:
+          type: string
+          description: Internal TX ID.
+          example: e1543ab5ac85e8fbf2397f30f19dc5b7a32abd508a57ff0c13642c9963d9f312
+        to_address:
+          type: string
+          description: Recipient address.
+          example: 41a614f803b6fd780986a42c78ec9c7f77e6ded13c
+        from_address:
+          type: string
+          description: Sender address.
+          example: 41a2726afbecbd8e936000ed684cef5e2f5cf43008
     TronTx20:
       type: object
       required:
