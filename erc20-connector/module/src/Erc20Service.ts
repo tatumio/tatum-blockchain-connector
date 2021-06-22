@@ -90,6 +90,7 @@ export abstract class Erc20Service {
             case Currency.BSC:
             case Currency.CELO:
                 contractOrAddress = contractAddress;
+                break;
             case Currency.ONE:
                 contractOrAddress = new HarmonyAddress(contractAddress).basicHex;
                 break;

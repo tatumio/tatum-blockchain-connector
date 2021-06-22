@@ -1,4 +1,5 @@
-import {Body, Get, HttpCode, HttpStatus, Param, Post, Query} from '@nestjs/common';
+import {Body, Get, HttpCode, HttpStatus, Param, Post, Put, Redirect, Req, Query} from '@nestjs/common';
+import { Request } from 'express';
 import {TronService} from './TronService';
 import {
     BroadcastTx,
@@ -20,6 +21,25 @@ import {PathXpubI} from './dto/PathXpubI';
 export abstract class TronController {
     protected constructor(protected readonly service: TronService) {
     }
+
+    // @Post('/v3/tron/node/**')
+    // @Redirect()
+    // redirectPost (@Req() request: Request) {
+    //   // request.path.includes('/v1/')
+    //   return { url: '' }
+    // }
+
+    // @Get('/v3/tron/node/**')
+    // @Redirect()
+    // redirectGet (@Req() request: Request) {
+
+    // }
+
+    // @Put('/v3/tron/node/**')    
+    // @Redirect()
+    // redirectPut (@Req() request: Request) {
+
+    // }
 
     @Post('/v3/tron/broadcast')
     @HttpCode(HttpStatus.OK)
