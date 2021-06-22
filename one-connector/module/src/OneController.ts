@@ -64,19 +64,6 @@ export abstract class OneController {
         }
     }
 
-    @Post('v3/one/gas')
-    @HttpCode(HttpStatus.OK)
-    public async estimateGas(@Body() body: EstimateGasEth, @Query('shardID') shardID?: string) {
-        try {
-            return await this.service.estimateGas(body, shardID ? parseInt(shardID) : undefined);
-        } catch (e) {
-            if (e.constructor.name === 'OneError') {
-                throw e;
-            }
-            throw new OneError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'one.error');
-        }
-    }
-
     @Get('v3/one/transaction/count/:address')
     @HttpCode(HttpStatus.OK)
     public async countTransactions(@Param() param: PathAddress, @Query('shardID') shardID?: string) {
