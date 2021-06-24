@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/one-connector",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Harmony.ONE Connector for Tatum API",
   "license": "MIT",
   "files": [

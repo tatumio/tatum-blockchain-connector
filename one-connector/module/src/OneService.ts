@@ -86,7 +86,7 @@ export abstract class OneService {
 
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
-    private async getFirstNodeUrl(testnet: boolean, shardID = 0): Promise<string> {
+    public async getFirstNodeUrl(testnet: boolean, shardID = 0): Promise<string> {
         const nodes = await this.getNodesUrl(testnet);
         if (nodes.length === 0) {
             new OneError('Nodes url array must have at least one element.', 'one.nodes.url');
