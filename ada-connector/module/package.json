@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/ada-connector",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Ada Connector for Tatum API",
   "license": "MIT",
   "files": [
@@ -43,7 +43,7 @@
   "dependencies": {
     "@cardano-graphql/client-ts": "4.0.0",
     "@emurgo/cardano-serialization-lib-nodejs": "6.0.0",
-    "@tatumio/blockchain-connector-common": "^1.0.0"
+    "@tatumio/blockchain-connector-common": "^1.0.3"
   },
   "devDependencies": {
     "@nestjs/common": "^7.6.1",

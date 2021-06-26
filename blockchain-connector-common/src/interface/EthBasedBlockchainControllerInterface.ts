@@ -7,7 +7,7 @@ import {
   QueryMnemonic, TransactionKMSResponse,
   TransactionResponse,
   TxData,
-  EthBasedEstimateGas
+  EthBasedEstimateGas, BlockchainError,
 } from '../index'
 import {
   DeployErc20,
@@ -102,7 +102,7 @@ export interface EthBasedBlockchainControllerInterface {
    *
    * @param e
    */
-  throwError(e): void
+  throwError(e: BlockchainError): void
 
   /**
    * Returns account by address.
