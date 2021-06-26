@@ -3,7 +3,7 @@ This repository is used as a place to find all connectors to the blockchains, wh
 
 ## Structure
 There is a `blueprint` folder, where there is an example connector prepared for you. You should extend `*Controller.ts` and `*Service.ts` files and implement the required methods, you would like to expose via Tatum API to the developers.
-On top of that, there are `<blockchain>-connector` directories, where custom integrations are being created. Feel free to fork the repo, create your connector and open a PR.
+On top of that, there are `<blockchain>-connector` directories, where custom integrations are being created. Feel free to fork the repo, create your connector and open a PR. All common files which are used across connectors are located in `common` folder.
 
 ## Integration to Tatum API
 Before the integration itself, please read [Integration guide](./INTEGRATION_GUIDE.md).
@@ -24,3 +24,4 @@ If you need support please enter [Telegram group](https://t.me/tatumio) and ask 
 * Quorum connector - connector to the [Quorum](https://consensys.net/quorum/) maintained by [Tatum Team](https://github.com/tatumio)
 * Hyperledger Fabric connector - connector to the [Hyperledger Fabric v2](https://www.hyperledger.org/use/fabric) maintained by [Tatum Team](https://github.com/tatumio)
 * Celo connector - connector to the [Celo](https://celo.org/) maintained by [Tatum Team](https://github.com/tatumio)
+* Ada connector - connector to the [Cardano](https://cardano.org/) maintained by [Tatum Team](https://github.com/tatumio)
