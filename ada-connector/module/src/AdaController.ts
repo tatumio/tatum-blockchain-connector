@@ -4,7 +4,7 @@ import { AdaUtxo, TransferBtcBasedBlockchain } from '@tatumio/tatum';
 import { AdaError } from './AdaError';
 import { AdaService } from './AdaService';
 import { AdaBlockchainInfo } from './constants';
-import { Pagination, PathHash, GeneratePrivateKey, PathAddress, QueryMnemonic, PathXpub, BtcBasedBlockchainControllerInterface, TxData, TransactionResponse } from '@tatumio/blockchain-connector-common'
+import { BlockchainError, Pagination, PathHash, GeneratePrivateKey, PathAddress, QueryMnemonic, PathXpub, BtcBasedBlockchainControllerInterface, TxData, TransactionResponse } from '@tatumio/blockchain-connector-common'
 
 export abstract class AdaController implements BtcBasedBlockchainControllerInterface {
   protected constructor(protected readonly service: AdaService) {
@@ -119,7 +119,7 @@ export abstract class AdaController implements BtcBasedBlockchainControllerInter
     }
   }
 
-  throwError(e): void {
+  throwError(e: BlockchainError): void {
     throw new AdaError(
       `Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`,
       'ada.error',

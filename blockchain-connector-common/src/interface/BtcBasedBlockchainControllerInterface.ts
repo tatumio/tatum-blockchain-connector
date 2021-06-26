@@ -1,4 +1,5 @@
 import {
+  BlockchainError,
   GeneratePrivateKey,
   Pagination,
   PathAddress,
@@ -79,7 +80,7 @@ export interface BtcBasedBlockchainControllerInterface {
    *
    * @param e
    */
-  throwError(e): void
+  throwError(e: BlockchainError): void
 
   /**
    * Returns UTXOs by address.
