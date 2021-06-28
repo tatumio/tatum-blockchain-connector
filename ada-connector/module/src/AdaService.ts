@@ -18,6 +18,9 @@ import {
   TransactionInput, TransactionOutput, TransactionWitnessSet, Value, Vkeywitnesses,
 } from '@emurgo/cardano-serialization-lib-nodejs'
 import BigNumber from 'bignumber.js'
+import { AdaError } from './AdaError'
+
+const TX_FIELDS = '{block{number} includedAt fee hash inputs {address sourceTxHash sourceTxIndex txHash value} outputs {address index txHash value}}';
 
 export abstract class AdaService {
   protected constructor(protected readonly logger: PinoLogger) {}
@@ -237,6 +240,22 @@ export abstract class AdaService {
   ): Promise<{ txId: string }> {
     const txData = await this.prepareAdaTransaction(body);
     return await this.broadcast(txData)
+  }
+
+  public async getTransactionsFromBlockTillNow(blockNumber: number): Promise<Transaction[]> {
+    try {
+      const graphQLUrl = await this.getGraphQLEndpoint();
+      const query = `{transactions(where:{block:{number:{_gte:${blockNumber}}}})${TX_FIELDS}}`;
+      const { data } = (await axios.post(graphQLUrl, { query })).data;
+      return (data?.transactions || []).map((t: any) => {
+        t.block = t.block.number;
+        delete t.block.number;
+        return t;
+      });
+    } catch (e) {
+      this.logger.error(e.response);
+      throw new AdaError('Unable to find transaction.', 'tx.not.found');
+    }
   }
 
   private async prepareAdaTransaction(transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
