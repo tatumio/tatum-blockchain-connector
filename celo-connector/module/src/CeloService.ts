@@ -28,6 +28,7 @@ import {
     prepareCeloTransferErc20SignedTransaction,
     prepareCeloTransferErc721SignedTransaction,
     sendCeloSmartContractReadMethodInvocationTransaction,
+    SmartContractReadMethodInvocation,
     TransactionHash,
     TransferCeloOrCeloErc20Token,
 } from '@tatumio/tatum';
@@ -132,14 +133,14 @@ export abstract class CeloService {
         }
     }
 
-    public async invokeSmartContractMethod(body: CeloSmartContractMethodInvocation) {
+    public async invokeSmartContractMethod(body: CeloSmartContractMethodInvocation | SmartContractReadMethodInvocation) {
         const testnet = await this.isTestnet();
         if (body.methodABI.stateMutability === 'view') {
             return sendCeloSmartContractReadMethodInvocationTransaction(testnet, body, (await this.getNodesUrl(testnet))[0]);
         }
-        const txData = await prepareCeloSmartContractWriteMethodInvocation(testnet, body, (await this.getNodesUrl(testnet))[0]);
-        if (body.signatureId) {
-            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [body.signatureId], body.index)};
+        const txData = await prepareCeloSmartContractWriteMethodInvocation(testnet, body as CeloSmartContractMethodInvocation, (await this.getNodesUrl(testnet))[0]);
+        if ((body as CeloSmartContractMethodInvocation).signatureId) {
+            return {signatureId: await this.storeKMSTransaction(txData, Currency.CELO, [(body as CeloSmartContractMethodInvocation).signatureId], (body as CeloSmartContractMethodInvocation).index)};
         } else {
             return this.broadcast(txData);
         }

@@ -1,10 +1,9 @@
 import {PinoLogger} from 'nestjs-pino';
 import {HarmonyAddress} from '@harmony-js/crypto';
 import {Harmony} from '@harmony-js/core';
-import {numberToHex} from '@harmony-js/utils';
+import {ChainID, ChainType, numberToHex} from '@harmony-js/utils';
 import {
     Currency,
-    EstimateGasEth,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
     generateWallet,
@@ -14,13 +13,13 @@ import {
     sendOneSmartContractMethodInvocationTransaction,
     SignatureId,
     SmartContractMethodInvocation,
+    SmartContractReadMethodInvocation,
     TransactionHash,
 } from '@tatumio/tatum';
 import {fromWei} from 'web3-utils';
 import axios from 'axios';
 import {OneError} from './OneError';
 import BigNumber from 'bignumber.js';
-import {ChainID, ChainType} from '@harmony-js/utils';
 import Web3 from 'web3';
 
 export abstract class OneService {
@@ -229,7 +228,7 @@ export abstract class OneService {
         return parseInt((await client.blockchain.getTransactionCount({address, blockNumber: 'pending'})).result, 16);
     }
 
-    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation, shardID?: number) {
+    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation, shardID?: number) {
         const testnet = await this.isTestnet();
         const node = await this.getFirstNodeUrl(testnet, shardID);
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {
@@ -239,8 +238,8 @@ export abstract class OneService {
         const transactionData = await prepareOneSmartContractWriteMethodInvocation(testnet, smartContractMethodInvocation, node);
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
-            signatureId: smartContractMethodInvocation.signatureId,
-            index: smartContractMethodInvocation.index
+            signatureId: (smartContractMethodInvocation as SmartContractMethodInvocation).signatureId,
+            index: (smartContractMethodInvocation as SmartContractMethodInvocation).index
         }, shardID);
     }
 

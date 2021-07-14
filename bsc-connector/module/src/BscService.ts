@@ -14,7 +14,7 @@ import {
     prepareCustomBep20SignedTransaction,
     prepareDeployBep20SignedTransaction,
     sendBscSmartContractReadMethodInvocationTransaction,
-    SmartContractMethodInvocation,
+    SmartContractMethodInvocation, SmartContractReadMethodInvocation,
     TransactionHash,
     TransferBscBep20,
     TransferCustomErc20,
@@ -253,7 +253,7 @@ export abstract class BscService {
         return client.eth.getTransactionCount(address, 'pending');
     }
 
-    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation) {
+    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         if (smartContractMethodInvocation.methodABI.stateMutability === 'view') {
             return sendBscSmartContractReadMethodInvocationTransaction(smartContractMethodInvocation, node);
@@ -262,8 +262,8 @@ export abstract class BscService {
         const transactionData = await prepareBscSmartContractWriteMethodInvocation(smartContractMethodInvocation, node);
         return this.broadcastOrStoreKMSTransaction({
             transactionData,
-            signatureId: smartContractMethodInvocation.signatureId,
-            index: smartContractMethodInvocation.index
+            signatureId: (smartContractMethodInvocation as SmartContractMethodInvocation).signatureId,
+            index: (smartContractMethodInvocation as SmartContractMethodInvocation).index
         });
     }
 

@@ -8,6 +8,7 @@ import {
   DeployErc20,
   EstimateGasEth,
   SmartContractMethodInvocation,
+  SmartContractReadMethodInvocation,
   TransferBscBep20,
   TransferCustomErc20,
 } from '@tatumio/tatum';
@@ -82,7 +83,7 @@ export abstract class BscController {
 
   @Post('v3/bsc/smartcontract')
   @HttpCode(HttpStatus.OK)
-  public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation) {
+  public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
     try {
       return await this.service.invokeSmartContractMethod(body);
     } catch (e) {

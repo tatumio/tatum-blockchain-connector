@@ -7,6 +7,7 @@ import {
   BroadcastTx,
   EstimateGasEth,
   SmartContractMethodInvocation,
+  SmartContractReadMethodInvocation,
   TransferErc20,
 } from '@tatumio/tatum';
 import {PathAddress} from './dto/PathAddress';
@@ -79,7 +80,7 @@ export abstract class XdcController {
 
   @Post('v3/xdc/smartcontract')
   @HttpCode(HttpStatus.OK)
-  public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation) {
+  public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
     try {
       return await this.service.invokeSmartContractMethod(body);
     } catch (e) {

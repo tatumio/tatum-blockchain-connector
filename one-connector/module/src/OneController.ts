@@ -3,7 +3,7 @@ import {OneService} from './OneService';
 import {QueryMnemonic} from './dto/QueryMnemonic';
 import {GeneratePrivateKey} from './dto/GeneratePrivateKey';
 import {PathXpubI} from './dto/PathXpubI';
-import {BroadcastTx, EstimateGasEth, OneTransfer, SmartContractMethodInvocation,} from '@tatumio/tatum';
+import {BroadcastTx, EstimateGasEth, OneTransfer, SmartContractMethodInvocation, SmartContractReadMethodInvocation} from '@tatumio/tatum';
 import {PathAddress} from './dto/PathAddress';
 import {PathHash} from './dto/PathHash';
 import {OneError} from './OneError';
@@ -79,7 +79,7 @@ export abstract class OneController {
 
     @Post('v3/one/smartcontract')
     @HttpCode(HttpStatus.OK)
-    public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation, @Query('shardID') shardID?: string) {
+    public async invokeSmartContractMethod(@Body() body: SmartContractMethodInvocation | SmartContractReadMethodInvocation, @Query('shardID') shardID?: string) {
         try {
             return await this.service.invokeSmartContractMethod(body, shardID ? parseInt(shardID) : undefined);
         } catch (e) {

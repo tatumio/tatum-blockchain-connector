@@ -1,27 +1,22 @@
 import {PinoLogger} from 'nestjs-pino';
 import {
-    fromXdcAddress,
-    xdcGetGasPriceInWei,
-    CONTRACT_ADDRESSES,
     Currency,
-    DeployErc20,
     EstimateGasEth,
+    fromXdcAddress,
     generateAddressFromXPub,
     generatePrivateKeyFromMnemonic,
     generateWallet,
     prepareXdcOrErc20SignedTransaction,
     prepareXdcSmartContractWriteMethodInvocation,
-    prepareXdcCustomErc20SignedTransaction,
-    prepareXdcDeployErc20SignedTransaction,
     sendXdcSmartContractReadMethodInvocationTransaction,
     SmartContractMethodInvocation,
+    SmartContractReadMethodInvocation,
     TransactionHash,
     TransferErc20,
-    TransferCustomErc20,
+    xdcGetGasPriceInWei,
 } from '@tatumio/tatum';
 import Web3 from 'web3';
 import {fromWei} from 'web3-utils';
-import ERC20_TOKEN_ABI from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 import axios from 'axios';
 import {SignatureId} from '@tatumio/tatum/dist/src/model/response/common/SignatureId';
 import {XdcError} from './XdcError';
@@ -228,7 +223,7 @@ export abstract class XdcService {
     public async sendXdcOrErc20Transaction(transfer: TransferErc20): Promise<TransactionHash | SignatureId> {
         const transactionData = await prepareXdcOrErc20SignedTransaction(transfer, await this.getFirstNodeUrl(await this.isTestnet()));
         return this.broadcastOrStoreKMSTransaction({
-            transactionData, 
+            transactionData,
             signatureId: transfer.signatureId,
             index: transfer.index
         });
@@ -248,7 +243,7 @@ export abstract class XdcService {
         return client.eth.getTransactionCount(fromXdcAddress(address), 'pending');
     }
 
-    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation) {
+    public async invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation) {
         const node = await this.getFirstNodeUrl(await this.isTestnet());
         const params = smartContractMethodInvocation.params.map(e => `${e}`.startsWith('xdc') ? fromXdcAddress(e) : e);
         const tx = {

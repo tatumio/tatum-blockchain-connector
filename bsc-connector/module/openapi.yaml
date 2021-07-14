@@ -530,6 +530,7 @@ paths:
           application/json:
             schema:
               oneOf:
+                - $ref: "#/components/schemas/CallBscSmartContractReadMethod"
                 - $ref: "#/components/schemas/CallBscSmartContractMethod"
                 - $ref: "#/components/schemas/CallBscSmartContractMethodKMS"
         required: true
@@ -1342,6 +1343,48 @@ components:
         - params
         - methodABI
         - fromPrivateKey
+        - methodName
+    CallBscSmartContractReadMethod:
+      type: object
+      properties:
+        contractAddress:
+          maxLength: 42
+          minLength: 42
+          description: Address of BEP20 token
+          example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
+          type: string
+        methodName:
+          minLength: 1
+          maxLength: 500
+          description: Name of the method to invoke on smart contract.
+          type: string
+          example: transfer
+        methodABI:
+          type: object
+          example: {
+            "inputs": [
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "stake",
+            "outputs": [ ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+          description: ABI of the method to invoke.
+        params:
+          type: array
+          example: [ '0x632' ]
+          items:
+            type: object
+            description: Parameters of the method to be invoked
+      required:
+        - contractAddress
+        - params
+        - methodABI
         - methodName
     CallBscSmartContractMethodKMS:
       type: object

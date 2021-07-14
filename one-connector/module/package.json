@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/one-connector",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Harmony.ONE Connector for Tatum API",
   "license": "MIT",
   "files": [
@@ -36,7 +36,7 @@
   "bugs": "https://github.com/tatumio/tatum-blockchain-connector/",
   "peerDependencies": {
     "@nestjs/common": "^7.6.1",
-    "@tatumio/tatum": "^1.15.10",
+    "@tatumio/tatum": "^1.16.20",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "class-transformer": "^0.2.3",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@nestjs/common": "^7.6.1",
-    "@tatumio/tatum": "^1.15.10",
+    "@tatumio/tatum": "^1.16.20",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "class-transformer": "^0.2.3",

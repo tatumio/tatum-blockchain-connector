@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/xdc-connector",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "XDC Connector for Tatum API",
   "license": "MIT",
   "files": [
@@ -36,7 +36,7 @@
   "bugs": "https://github.com/tatumio/tatum-blockchain-connector/",
   "peerDependencies": {
     "@nestjs/common": "^7.6.1",
-    "@tatumio/tatum": "^1.14.24",
+    "@tatumio/tatum": "^1.16.20",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "class-transformer": "^0.2.3",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@nestjs/common": "^7.6.1",
-    "@tatumio/tatum": "^1.14.7",
+    "@tatumio/tatum": "^1.16.20",
     "@types/express": "4.17.9",
     "@types/jest": "26.0.18",
     "@types/node": "14.14.12",

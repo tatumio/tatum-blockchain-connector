@@ -12,6 +12,7 @@ import {
     MintCeloErc20,
     TransferCeloOrCeloErc20Token,
     CeloSmartContractMethodInvocation,
+    SmartContractReadMethodInvocation,
 } from '@tatumio/tatum';
 import {PathAddressContractAddressI} from './dto/PathAddressContractAddressI';
 import {PathTokenContractAddress} from './dto/PathTokenContractAddress';
@@ -198,14 +199,14 @@ export abstract class CeloController {
 
     @Post('v3/celo/smartcontract')
     @HttpCode(HttpStatus.OK)
-    public async invokeCeloSmartContractMethod(@Body() body: CeloSmartContractMethodInvocation) {
+    public async invokeCeloSmartContractMethod(@Body() body: CeloSmartContractMethodInvocation | SmartContractReadMethodInvocation) {
       try {
         return await this.service.invokeSmartContractMethod(body);
       } catch (e) {
         throw new CeloError(`Unexpected error occurred. Reason: ${e.message || e.response?.data || e}`, 'celo.error');
       }
     }
-  
+
       @Post('/v3/celo/erc20/mint')
     @HttpCode(HttpStatus.OK)
     public async mintErc20(@Body() body: MintCeloErc20) {
