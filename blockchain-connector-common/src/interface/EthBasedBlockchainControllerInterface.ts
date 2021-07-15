@@ -13,6 +13,7 @@ import {
   DeployErc20,
   EstimateGasEth,
   SmartContractMethodInvocation,
+  SmartContractReadMethodInvocation,
   TransferCustomErc20,
   TransferEthErc20,
 } from '@tatumio/tatum'
@@ -93,7 +94,7 @@ export interface EthBasedBlockchainControllerInterface {
 
   countTransactions(param: PathAddress)
 
-  invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation)
+  invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation)
 
   deployErc20(deployErc20: DeployErc20)
 

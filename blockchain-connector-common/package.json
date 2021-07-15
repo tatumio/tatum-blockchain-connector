@@ -1,9 +1,9 @@
 {
   "name": "@tatumio/blockchain-connector-common",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Common interface for connectors",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "npm/index.js",
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
@@ -15,16 +15,19 @@
     "url": "https://github.com/tatumio/tatum-blockchain-connector"
   },
   "bugs": "https://github.com/tatumio/tatum-blockchain-connector/issues",
-  "dependencies": {
+  "peerDependencies": {
+    "@tatumio/tatum": "^1.16.20",
     "class-transformer": "^0.2.3",
     "class-validator": "0.13.0"
   },
   "devDependencies": {
+    "class-transformer": "^0.2.3",
+    "class-validator": "0.13.0",
     "@typescript-eslint/eslint-plugin": "4.15.2",
     "@typescript-eslint/parser": "4.15.2",
     "eslint": "7.21.0",
     "prettier": "2.2.1",
     "typescript": "4.2.2",
-    "@tatumio/tatum": "^1.16.2"
+    "@tatumio/tatum": "^1.16.20"
   }
 }
