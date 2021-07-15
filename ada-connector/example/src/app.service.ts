@@ -14,10 +14,6 @@ export class AppService extends AdaService {
   }
 
   protected getNodesUrl(): Promise<string[]> {
-    return Promise.resolve(['http://51.75.161.255:3100/graphql']);
-  }
-
-  protected getAdaGraphQLPort(): Promise<number> {
-    return Promise.resolve(3100);
+    return Promise.resolve(['http://51.75.161.255:3100']);
   }
 }
