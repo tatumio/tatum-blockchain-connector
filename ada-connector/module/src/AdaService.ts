@@ -29,16 +29,10 @@ export abstract class AdaService {
 
   protected abstract getNodesUrl(): Promise<string[]>;
 
-  protected abstract getAdaGraphQLPort(): Promise<number>;
-
   public async getGraphQLEndpoint(): Promise<string> {
-    const [[url], port] = await Promise.all([
-      this.getNodesUrl(),
-      this.getAdaGraphQLPort(),
-    ]);
-    return `${url}:${port}/graphql`;
+    const [url] = await this.getNodesUrl()
+    return `${url}/graphql`;
   }
-
 
   async generateWallet(mnemonic?: string) {
     return generateWallet(Currency.ADA, await this.isTestnet(), mnemonic);
