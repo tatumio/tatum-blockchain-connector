@@ -1,6 +1,6 @@
 {
   "name": "@tatumio/blockchain-connector-common",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Common interface for connectors",
   "license": "MIT",
   "main": "npm/index.js",
