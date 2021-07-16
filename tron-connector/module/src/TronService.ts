@@ -236,7 +236,7 @@ export abstract class TronService {
             const txData = await prepareTronSignedKMSTransaction(t, body, (await this.getNodesUrl(t))[0]);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId], body.index)};
         } else {
-            return this.broadcast(await prepareTronSignedTransaction(t, body));
+            return this.broadcast(await prepareTronSignedTransaction(t, body, (await this.getNodesUrl(t))[0]));
         }
     }
 
@@ -246,7 +246,7 @@ export abstract class TronService {
             const txData = await prepareTronTrc10SignedKMSTransaction(t, body, undefined, (await this.getNodesUrl(t))[0]);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId], body.index)};
         } else {
-            return this.broadcast(await prepareTronTrc10SignedTransaction(t, body));
+            return this.broadcast(await prepareTronTrc10SignedTransaction(t, body, undefined, (await this.getNodesUrl(t))[0]));
         }
     }
 
@@ -266,7 +266,7 @@ export abstract class TronService {
             const txData = await prepareTronCreateTrc10SignedKMSTransaction(t, body, (await this.getNodesUrl(t))[0]);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId], body.index)};
         } else {
-            return this.broadcast(await prepareTronCreateTrc10SignedTransaction(t, body));
+            return this.broadcast(await prepareTronCreateTrc10SignedTransaction(t, body, (await this.getNodesUrl(t))[0]));
         }
     }
 
@@ -276,7 +276,7 @@ export abstract class TronService {
             const txData = await prepareTronCreateTrc20SignedKMSTransaction(t, body, (await this.getNodesUrl(t))[0]);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId], body.index)};
         } else {
-            return this.broadcast(await prepareTronCreateTrc20SignedTransaction(t, body));
+            return this.broadcast(await prepareTronCreateTrc20SignedTransaction(t, body, (await this.getNodesUrl(t))[0]));
         }
     }
 
@@ -286,7 +286,7 @@ export abstract class TronService {
             const txData = await prepareTronFreezeKMSTransaction(t, body, (await this.getNodesUrl(t))[0]);
             return {signatureId: await this.storeKMSTransaction(txData, Currency.TRON, [body.signatureId], body.index)};
         } else {
-            return this.broadcast(await prepareTronFreezeTransaction(t, body));
+            return this.broadcast(await prepareTronFreezeTransaction(t, body, (await this.getNodesUrl(t))[0]));
         }
     }
 
