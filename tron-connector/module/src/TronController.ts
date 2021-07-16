@@ -22,25 +22,6 @@ export abstract class TronController {
     protected constructor(protected readonly service: TronService) {
     }
 
-    // @Post('/v3/tron/node/**')
-    // @Redirect()
-    // redirectPost (@Req() request: Request) {
-    //   // request.path.includes('/v1/')
-    //   return { url: '' }
-    // }
-
-    // @Get('/v3/tron/node/**')
-    // @Redirect()
-    // redirectGet (@Req() request: Request) {
-
-    // }
-
-    // @Put('/v3/tron/node/**')    
-    // @Redirect()
-    // redirectPut (@Req() request: Request) {
-
-    // }
-
     @Post('/v3/tron/broadcast')
     @HttpCode(HttpStatus.OK)
     async broadcast(@Body() body: BroadcastTx) {
