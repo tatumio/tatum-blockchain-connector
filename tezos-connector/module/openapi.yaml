@@ -1,0 +1,689 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://api-eu1.tatum.io'
+info:
+  version: 1.1.0
+  title: Tatum Tezos API
+tags:
+  - description: |
+      Tezos connection APIs
+    name: Blockchain / Tezos
+paths:
+  /v3/tezos/info:
+    get:
+      tags:
+        - Blockchain / Tezos
+      summary: Get current Tezos block
+      description: <p>Get current Tezos block.</p>
+      operationId: TezosGetBlockChainInfo
+      responses:
+        200:
+          $ref: "#/components/schemas/XtzBlockchainInfo"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/block/{hash}:
+    get:
+      tags:
+        - Blockchain / Tezos
+      summary: Get Tezos block
+      description: <br/><p>Get Tezos block by its hash.</p>
+      operationId: TezosGetBlock
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          description: The hash code of the block.
+          schema:
+            $ref: "#/components/schemas/XtzHash"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XtzBlock"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/account/{address}:
+    get:
+      tags:
+        - Blockchain / Tezos
+      summary: Get account by its address
+      description: <p>Get Tezos account</p>
+      operationId: TezosGetAccount
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address of an account.
+          schema:
+            $ref: "#/components/schemas/XtzAddress"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XtzAccount"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/account/{address}/transactions:
+    get:
+      tags:
+        - Blockchain / Tezos
+      summary: Get Transactions by Account
+      description: <p>Get Tezos Transactions by Account</p>
+      operationId: TezosGetTransactionsByAccount
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address of an account.
+          schema:
+            $ref: "#/components/schemas/XtzAddress"
+        - in: query
+          name: pageSize
+          required: true
+          description: The number of items to return.
+          schema:
+            type: number
+            example: 10
+        - in: query
+          name: offset
+          required: true
+          description: Offset to obtain the next page of data.
+          schema:
+            type: number
+            example: 0
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/XtzTx"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/transaction/{hash}:
+    get:
+      tags:
+        - Blockchain / Tezos
+      summary: Get transaction by its hash
+      description: <p>Get Tezos Transaction</p>
+      operationId: TezosGetTransaction
+      parameters:
+        - in: path
+          name: hash
+          required: true
+          description: The hash code of transaction.
+          schema:
+            $ref: "#/components/schemas/XtzHash"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XtzTx"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/wallet:
+    post:
+      tags:
+        - Blockchain / Tezos
+      summary: Generate Tezos Wallet
+      description: <p>Generate Tezos Wallet.</p>
+      operationId: TezosGenerateWallet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mnemonic:
+                  $ref: "#/components/schemas/XtzMnemonic"
+        required: false
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mnemonic:
+                    $ref: "#/components/schemas/XtzMnemonic"
+                  xpub:
+                    type: string
+                    description: "Extended public key of wallet."
+                    example: "d0015610346fda336c1fc894feb23fc35045edd1ebbed634950786bd60d7dbc80d5bc8d179b30ca90abb10e4b7e69a90f78cb841a598390bf24531fb9c3fd793"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/address/:xpub/:index:
+    get:
+      tags:
+        - Blockchain / Tezos
+      summary: Genarate address from xpub and derivation path
+      description: <p>Generate Tezos deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
+        up to 2^32 addresses starting from index 0 until 2^31</p>
+      operationId: TezosGenerateAddress
+      parameters:
+        - description: "Extended public key of wallet."
+          in: path
+          name: xpub
+          required: true
+          example: d0015610346fda336c1fc894feb23fc35045edd1ebbed634950786bd60d7dbc80d5bc8d179b30ca90abb10e4b7e69a90f78cb841a598390bf24531fb9c3fd793
+          schema:
+            type: string
+        - description: "Derivation index of desired address to be generated."
+          in: path
+          name: index
+          required: true
+          example: 1
+          schema:
+            type: number
+            minimum: 0
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: Tezos Address generated by a xpub and a desired derivation index
+                    example: "tz1gAPcAa5iou9pfY7DKUfG9ksxw1z34geVe"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/wallet/priv:
+    post:
+      tags:
+        - Blockchain / Tezos
+      summary: Genarate private key from mnemonic and a desired derivation index
+      description: |
+        <p>Generate private key from mnemonic and a desired derivation index.</p>
+      operationId: TezosGeneratePrivateKeyFromMnemonic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mnemonic:
+                  $ref: "#/components/schemas/XtzMnemonic"
+                index:
+                  type: number
+                  description: Derivation index of desired address to be generated.
+                  example: 1
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: private key generated by mnemonic and a desired derivation index
+                    example: "edsk3HBxVKiyhMtWy41Ld4Go7S4f44J38akYkLydsgHc4QRFvCJsW7"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/broadcast:
+    post:
+      tags:
+        - Blockchain / Tezos
+      summary: Broadcast Tezos transaction
+      description: |
+        <h4>5 credits per API call.</h4><br/>
+        <p>Broadcast Tezos transaction. This method is used internally from Tatum Middleware or Tatum client libraries.
+        It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchain.</p>
+      operationId: TezosBroadcast
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                txData:
+                  type: string
+                  description: Transaction data.
+                  example: "83a400818258207aa56587eefe3bf7597a0cf5bcfbb9294f8d8ce69017b25198de74c585abef720101828258390094adf2d6d52d868d96714c9730d71b883f9666dd690ffe76e1ea144a9c6b98821de0360d005ffc073487bca8fd3e64338e462e7f13547bb81a01312d00825839001f34a1cb96d54a43d199ec2446f051d72adbd6576eb92206bc23fd005cd7064e0630c119aca1da1ba09526c24c5b128d328f349fda8371551a3598126b021a00029151031a0162c456a100818258201415a4576baa24dee656996aed13501dff465e1924f1d5df4a20951a4a65e254584035c87febca0b147b68b70a44c15f0b4a7bd5aeab38d32e7531b02545515dbc3e1420f26dab185bc814296a9fde20aabb4d2934b9cde892c01438f1f54f902309f6"
+                providerUrl:
+                  $ref: "#/components/schemas/XtzProviderUrl"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XtzSendTxSuccessfully"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+  /v3/tezos/transaction:
+    post:
+      tags:
+        - Blockchain / Tezos
+      summary: Send Tezos transaction
+      description: |
+        <p>Send Tezos transaction from address to address.<br/><br/>
+        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
+        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey.
+        PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
+        it is possible to use the Tatum client library for supported languages or Tatum Middleware with a custom key management system.
+        </p>
+      operationId: TezosTransfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                privateKey:
+                  type: string
+                  description: 128-bit extended private key.
+                  example: "00743d174f1009aa9bdec25da77609b3e3f58084473ede452a640cd6f05ccc513f04bb50db037ab623d6ff63222ae1f7e447df95fceabb9e1c1f47a5a4d94495030e3a3b2f20bcb134f626cdadf56b589e047a3d484baefdc9520bf4b1289e66641633ae6fdaad819890d5415079968250aa428a548255005ffea4ad66080b92"
+                to:
+                  description: the reciever's address
+                  $ref: "#/components/schemas/XtzAddress"
+                amount:
+                  type: number
+                  description: the mutez amount to be sent
+                  example: 22000000
+                providerUrl:
+                  $ref: "#/components/schemas/XtzProviderUrl"
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XtzSendTxSuccessfully"
+          description: OK
+        403:
+          $ref: "#/components/schemas/XtzError403"
+        500:
+          $ref: "#/components/schemas/XtzError500"
+components:
+  schemas:
+    XtzError403:
+      type: object
+      description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions
+      properties:
+        message:
+          type: string
+          example: "Forbidden"
+        statusCode:
+          type: number
+          example: 403
+    XtzError500:
+      type: object
+      description: Error caused by the server
+      properties:
+        message:
+          type: string
+          example: "Internal server error"
+        statusCode:
+          type: number
+          example: 500
+    XtzHash:
+      type: string
+      example: "BLhmBhVjnUqSg5MkonQCinFpws5qSijYtiyDbzHsFCescoFdHZu"
+    XtzBlockLevel:
+      type: number
+      description: level of block
+      example: 1432410
+    XtzCounter:
+      type: number
+      example: 13266202
+    XtzFee:
+      type: number
+      example: 167569
+    XtzTimestamp:
+      type: number
+      example: 1618634222
+    XtzMnemonic:
+      type: string
+      description: Mnemonic string
+      example: "reward erosion ripple critic legend leader zero start open stem spend ritual faint home vocal"
+    XtzAddress:
+      type: string
+      example: "tz1Swpithxyd3um3AKyB4S5CoT2sdWaCy9Jr"
+    XtzDoubleOperationDetails:
+      type: object
+      description: double operation details
+      example: {}
+    XtzTransactions:
+      type: number
+      description: number of transactions
+      example: 35
+    XtzStorageLimit:
+      type: number
+      description: storage limit
+      example: 300
+    XtzStatus:
+      type: string
+      description: status of the operation
+      example: "applied"
+    XtzKind:
+      type: string
+      description: kind of operation
+      example: "transaction"
+    XtzCycle:
+      type: number
+      example: 349
+    XtzConsumedGas:
+      type: number
+      description: number of consumedGas
+      example: 21050
+    XtzConfirmations:
+      type: number
+      description: number of confirmations
+      example: 0
+    XtzGasLimit:
+      type: number
+      description: gas Limit
+      example: 15400
+    XtzOperationGroupHash:
+      type: string
+      description: operation group hash
+      example: "op5UPfQ9tffKqEUaXzqFsygS8Bffx9ZPKMvzi6PMBDwcj7bMBi7"
+    XtzOperationId:
+      type: number
+      description: ID of operation
+      example: 44915873
+    XtzProviderUrl:
+      type: string
+      description: URL of Tezos Provider.
+      example: 'https://mainnet-tezos.giganode.io'
+    XtzBlockchainInfo:
+      type: object
+      properties:
+        baker:
+          type: string
+          description: the baker's address
+          example: "tz1irJKkXS2DBWkU1NnmFQx1c1L7pbGg4yhk"
+        chainId:
+          type: string
+          description: ID of the chain
+          example: "NetXdQprcVkpaWU"
+        consumedGas:
+          $ref: "#/components/schemas/XtzConsumedGas"
+        context:
+          type: string
+          description: context of the blockchain
+          example: "CoUhhi8N5V9VmztQ4S49PYR7dAxfLkXnEYeMcUvwz8P4tPWpogPj"
+        currentExpectedQuorum:
+          type: number
+          description: number of current expected quorum
+          example: 5412
+        endorsements:
+          type: number
+          description: endorsements
+          example: 17
+        fees:
+          description: fees of blockchain
+          $ref: "#/components/schemas/XtzFee"
+        fitness:
+          type: string
+          description: fitness of blockchain
+          example: "01,00000000000bdb22"
+        hash:
+          $ref: "#/components/schemas/XtzHash"
+        level:
+          type: number
+          description: level of blockchain
+          example: 1432354
+        metaCycle:
+          type: number
+          description: metaCycle of blockchain
+          example: 349
+        metaCyclePosition:
+          type: number
+          description: metaCyclePosition of blockchain
+          example: 2849
+        metaLevel:
+          type: number
+          description: metaLevel of blockchain
+          example: 1432354
+        metaLevelPosition:
+          type: number
+          description: metaLevelPosition of blockchain
+          example: 1432353
+        metaVotingPeriod:
+          type: number
+          description: metaVotingPeriod of blockchain
+          example: 45
+        metaVotingPeriodPosition:
+          type: number
+          description: metaVotingPeriodPosition of blockchain
+          example: 6946
+        number_of_operations:
+          type: number
+          description: number_of_operations
+          example: 37
+        operationsHash:
+          type: string
+          description: hash of operation
+          example: "LLoa3AsZaCqsBxvKrYQqjTNSpBg3cqA55WjWjaaFKUDLd5rqfZ57T"
+        periodKind:
+          type: string
+          description: periodKind of blockchain
+          example: "promotion_vote"
+        predecessor:
+          type: string
+          description: predecessor of blockchain
+          example: "BKtSzYo9fs8AW7fkdRVk2sVZEbLfk5c4xDVFtQ7yoFxxjtNaDPX"
+        priority:
+          type: number
+          description: priority
+          example: 0
+        proto:
+          type: number
+          description: proto of blockchain
+          example: 2849
+        protocol:
+          type: string
+          description: protocol of blockchain
+          example: "PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA"
+        reward:
+          type: number
+          description: reward of blockchain
+          example: 31250000
+        signature:
+          type: string
+          description: signature of blockchain
+          example: "sigdQw1eAtkRQ4zowjxwwX93UU36KmDxFAyaKeFctxc6kQ7oL1omr5zmB5AnxzZh1dPF3wqRoRYquf62vBRqNkzmrLWKunV1"
+        timestamp:
+          description: timestamp of blockchain
+          $ref: "#/components/schemas/XtzTimestamp"
+        transactions:
+          $ref: "#/components/schemas/XtzTransactions"
+        validationPass:
+          type: number
+          description: validationPass of blockchain
+          example: null
+        volume:
+          type: number
+          description: volume of blockchain
+          example: 7290729585
+    XtzBlock:
+      type: object
+      properties:
+        blockHash:
+          type: string
+          description: hash of block
+          example: "BMKyBDnx64i8jcqaUcHTCspoBdQ5NpTWkzgxE8cB3LKxWXE3A5w"
+        blockLevel:
+          $ref: "#/components/schemas/XtzBlockLevel"
+        confirmations:
+          $ref: "#/components/schemas/XtzConfirmations"
+        consumedGas:
+          $ref: "#/components/schemas/XtzConsumedGas"
+        counter:
+          description: counter of the block
+          $ref: "#/components/schemas/XtzCounter"
+        cycle:
+          description: cycle of block
+          $ref: "#/components/schemas/XtzCycle"
+        destination:
+          description: the address of destination
+          $ref: "#/components/schemas/XtzAddress"
+        doubleOperationDetails:
+          $ref: "#/components/schemas/XtzDoubleOperationDetails"
+        fee:
+          description: fee of block
+          $ref: "#/components/schemas/XtzFee"
+        gasLimit:
+          $ref: "#/components/schemas/XtzGasLimit"
+        kind:
+          $ref: "#/components/schemas/XtzKind"
+        operationGroupHash:
+          $ref: "#/components/schemas/XtzOperationGroupHash"
+        operationId:
+          $ref: "#/components/schemas/XtzOperationId"
+        parameters:
+          type: string
+          description: parameters of the block
+          example: "{ Elt \"BAT-USDC\" (Pair \"spsig1HAhHQp8YuTtgtJ5AvaJRuabcK5FgunbLpRp7G1w7qYDxu9TyL1Gwx8uoHfpwYB813PJUa5ScTw32D4NaUAyygLsFGfjSr\" (Pair 1619164560 (Pair 1619164620 (Pair 974845 (Pair 976214 (Pair 970900 (Pair 971821 11795000000))))))) ; Elt \"BTC-USD\" (Pair \"spsig1QGgNtbLQC2tc8QL1ziaFnuJkX5bHYNbLGcoCs4dDZSUrtL4BZXL33ycndtUg44fykBy91WWa62ezdwxbRuoR8JMfzVtuR\" (Pair 1619164560 (Pair 1619164620 (Pair 47924640000 (Pair 47995490000 (Pair 47853750000 (Pair 47872230000 14980563))))))) ; Elt \"COMP-USD\" (Pair \"spsig1WUnwMJMGQc8BU2ecafw4UUzXF1gQ82LC5pkVogVcVpc3h2eefKPo38jUnKKva84SHnGDurpnRQB8b4k7FBspYQdYnmZ2z\" (Pair 1619164560 (Pair 1619164620 (Pair 451290000 (Pair 452580000 (Pair 450330000 (Pair 451210000 54476000))))))) ; Elt \"DAI-USDC\" (Pair \"spsig1QCHpEQRrchFJNwgCoRxfLYmrGwUWBPSWA7SmKSv1wCLyaSSFgJNdjPqPLrmztKkCBEt37y32Z2rgnWSPetZ6F8vC8L6Z7\" (Pair 1619164560 (Pair 1619164620 (Pair 1000034 (Pair 1000169 (Pair 1000034 (Pair 1000169 89963230))))))) ; Elt \"ETH-USD\" (Pair \"spsig1MN4qThW2Re4VkLrmmHoW2NW4zn67Rs8hf3HJeD8PJ7PMyfGxjSjiSi3KhqzB2BhnhUr3iJH4c75PkYj3AUJQtBhzwD2JE\" (Pair 1619164560 (Pair 1619164620 (Pair 2137330000 (Pair 2145520000 (Pair 2134000000 (Pair 2134719999 500682111))))))) ; Elt \"KNC-USD\" (Pair \"spsig1X1qBMohYxviPgBmowaSzY7c1RQ5AJySTm8bvdaJme8iqLogk3JZXLzMNRvgNcPzAZVHXHC3Cp4arMzHbEekLNySh6P4QC\" (Pair 1619164560 (Pair 1619164620 (Pair 2269500 (Pair 2275200 (Pair 2264500 (Pair 2270000 1474700000))))))) ; Elt \"LINK-USD\" (Pair \"spsig1FX8KrHUY42ecSFsJ9TB5x5pgRBh9TgQynpBhV56enyX2oavfzSFHo47vGUnejcB22HpxT3xwgZwwP5nqpnww1dS6hUkeA\" (Pair 1619164560 (Pair 1619164620 (Pair 30890250 (Pair 31034010 (Pair 30841880 (Pair 30900000 2671880000))))))) ; Elt \"REP-USD\" (Pair \"spsig18FZTdsJyKYaJKU9YHEssSPLY3SCh1rz2ri42kt6e7X745mmTbotFFodSR1dGUWaQKmVv13EXuCBWeNW7g2XshtGGgN9zR\" (Pair 1619164560 (Pair 1619164620 (Pair 34900000 (Pair 34900000 (Pair 34870000 (Pair 34870000 172003036))))))) ; Elt \"XTZ-USD\" (Pair \"spsig1DuHT5eJgHCfmveN8cp58Pq1hd1111bqDqLmPeWLvAE9bAgx6HUfVdB44Ha5CYfju7cNnANmwqJHiW8yf5ozJamqUeXjnT\" (Pair 1619164560 (Pair 1619164620 (Pair 4236900 (Pair 4256900 (Pair 4228300 (Pair 4228300 4361940000))))))) ; Elt \"ZRX-USD\" (Pair \"spsig166F8ZGJhyue6Lre5f6d3gGdrT88JfZRHQJmJ5Q8HA3eP4rAyssqZWKKieNzEZ6Jwt5qAHWUNTTJ2Pd4VDGSREDj9XSi2Q\" (Pair 1619164560 (Pair 1619164620 (Pair 1282902 (Pair 1290052 (Pair 1280005 (Pair 1281774 22014346950))))))) }"
+        source:
+          description: the address of source
+          $ref: "#/components/schemas/XtzAddress"
+        status:
+          $ref: "#/components/schemas/XtzStatus"
+        storageLimit:
+          $ref: "#/components/schemas/XtzStorageLimit"
+        timestamp:
+          description: timestamp of the block
+          $ref: "#/components/schemas/XtzTimestamp"
+    XtzTx:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: amount of block
+          example: 36995060
+        blockHash:
+          type: string
+          description: hash of block
+          example: "BMKyBDnx64i8jcqaUcHTCspoBdQ5NpTWkzgxE8cB3LKxWXE3A5w"
+        blockLevel:
+          $ref: "#/components/schemas/XtzBlockLevel"
+        confirmations:
+          $ref: "#/components/schemas/XtzConfirmations"
+        consumedGas:
+          $ref: "#/components/schemas/XtzConsumedGas"
+        counter:
+          description: counter of the transaction
+          $ref: "#/components/schemas/XtzCounter"
+        cycle:
+          description: cycle of transaction
+          $ref: "#/components/schemas/XtzCycle"
+        destination:
+          description: the address of destination
+          $ref: "#/components/schemas/XtzAddress"
+        doubleOperationDetails:
+          $ref: "#/components/schemas/XtzDoubleOperationDetails"
+        fee:
+          description: fee of block
+          $ref: "#/components/schemas/XtzFee"
+        gasLimit:
+          $ref: "#/components/schemas/XtzGasLimit"
+        kind:
+          $ref: "#/components/schemas/XtzKind"
+        operationGroupHash:
+          $ref: "#/components/schemas/XtzOperationGroupHash"
+        operationId:
+          $ref: "#/components/schemas/XtzOperationId"
+        source:
+          description: the address of source
+          $ref: "#/components/schemas/XtzAddress"
+        status:
+          $ref: "#/components/schemas/XtzStatus"
+        storageLimit:
+          $ref: "#/components/schemas/XtzStorageLimit"
+        timestamp:
+          description: timestamp of the transaction
+          $ref: "#/components/schemas/XtzTimestamp"
+    XtzAccount:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: ID of account
+          example: "tz1Swpithxyd3um3AKyB4S5CoT2sdWaCy9Jr"
+        balance:
+          type: number
+          description: balance of the account
+          example: 0
+        blockId:
+          type: string
+          description: ID of the block
+          example: "BMHjhabx3BDbyevJUhqbHa7i1nKTj9ZWbHHbrzbJ7vqXkwAgFBR"
+        blockLevel:
+          $ref: "#/components/schemas/XtzBlockLevel"
+        counter:
+          description: counter of the account
+          $ref: "#/components/schemas/XtzCounter"
+        createdAt:
+          $ref: "#/components/schemas/XtzTimestamp"
+        delegateSetable:
+          type: string
+          description: delegateSetable
+          example: null
+        is_baker:
+          type: boolean
+          description: Is baker or not?
+          example: false
+        lastActive:
+          $ref: "#/components/schemas/XtzTimestamp"
+        manager:
+          type: string
+          description: manager of the account
+          example: null
+        operations:
+          type: number
+          description: number of account's operations
+          example: 3
+        revealed:
+          type: boolean
+          description: Is bakrevealed or not?
+          example: true
+        spendable:
+          type: string
+          description: the account's spendable
+          example: null
+        transactions:
+          $ref: "#/components/schemas/XtzTransactions"
+    XtzSendTxSuccessfully:
+      type: object
+      properties:
+        txId:
+          type: string
+          description: The ID of transaction
+          example: "ooEfEQP7UZZd8uLs35VzAhDmk7Vv83mENc29JiVYsMo4zkDiB9P"
