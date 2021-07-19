@@ -11,6 +11,7 @@ tags:
       Tatum now supports ERC20 these blockchains:<br/>
       <ul>
       <li><b>Ethereum</b></li>
+      <li><b>Polygon (Matic)</b></li>
       <li><b>Binance Smart Chain</b></li>
       <li><b>Celo</b></li>
       <li><b>Harmony.ONE</b></li>
@@ -321,6 +322,7 @@ components:
           enum:
             - ETH
             - BSC
+            - MATIC
             - XDC
             - ONE
         symbol:
@@ -684,6 +686,7 @@ components:
           enum:
             - ETH
             - BSC
+            - MATIC
             - XDC
             - ONE
         amount:
@@ -873,6 +876,7 @@ components:
           enum:
             - ETH
             - BSC
+            - MATIC
             - XDC
             - ONE
         amount:

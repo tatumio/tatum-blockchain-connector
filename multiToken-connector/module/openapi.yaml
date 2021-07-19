@@ -17,6 +17,7 @@ tags:
       Tatum now supports Multi Token on these blockchains:<br/>
       <ul>
       <li><b>Ethereum</b></li>
+      <li><b>Polygon (Matic)</b></li>
       <li><b>Celo</b></li>
       <li><b>Harmony.ONE</b></li>
       <li><b>Binance Smart Chain</b></li>
@@ -32,6 +33,7 @@ paths:
         Tatum now supports Multi Tokens on these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -105,6 +107,7 @@ paths:
         Tatum now supports Multi Token these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -162,6 +165,7 @@ paths:
         Tatum now supports Multi Tokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -219,6 +223,7 @@ paths:
         Tatum now supports Multi Token these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -276,6 +281,7 @@ paths:
         Tatum now supports Multi Tokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -334,6 +340,7 @@ paths:
         Tatum now supports Multi Token these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -392,6 +399,7 @@ paths:
         Tatum now supports Multi Tokens these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Binance Smart Chain</b></li>
@@ -1599,6 +1607,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         to:
           maxLength: 42
@@ -1669,6 +1678,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         to:
           maxLength: 42
@@ -1744,6 +1754,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         uri:
           description: URI of the Multi Token token
@@ -1790,6 +1801,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         uri:
           description: URI of the Multi Token token
@@ -1837,6 +1849,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         to:
           maxLength: 42
@@ -1913,6 +1926,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         to:
           maxLength: 42
@@ -1994,6 +2008,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         tokenId:
           description: ID of token to be created.
@@ -2071,6 +2086,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         tokenId:
           description: ID of token to be created.
@@ -2148,6 +2164,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         to:
           type: array
@@ -2230,6 +2247,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         to:
           type: array
@@ -2317,6 +2335,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         account:
           maxLength: 42
@@ -2388,6 +2407,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         account:
           maxLength: 42
@@ -2463,6 +2483,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         account:
           maxLength: 42
@@ -2539,6 +2560,7 @@ components:
           enum:
             - ETH
             - ONE
+            - MATIC
             - BSC
         account:
           maxLength: 42

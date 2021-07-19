@@ -18,6 +18,7 @@ If you need support please enter [Telegram group](https://t.me/tatumio) and ask 
 * MultiToken (ERC-1155) connector - abstraction for working with MultiToken (ERC-1155) on different blockchains maintained by [Tatum Team](https://github.com/tatumio)
 * ERC-20 connector - abstraction for working with ERC-20s on different blockchains maintained by [Tatum Team](https://github.com/tatumio)
 * BSC connector - connector to the [Binance Smart Chain](https://www.binance.org/en/smartChain) maintained by [Tatum Team](https://github.com/tatumio)
+* Polygon (MATIC) connector - connector to the [Polygon](https://polygon.technology/) maintained by [Tatum Team](https://github.com/tatumio)
 * XDC connector - connector to the [The XDC Network](https://xinfin.org/) maintained by [Tatum Team](https://github.com/tatumio)
 * Harmony.ONE connector - connector to the [Harmony.ONE](https://harmony.one) maintained by [Tatum Team](https://github.com/tatumio)
 * Tron connector - connector to the [TRON Network](https://tron.network/) maintained by [Tatum Team](https://github.com/tatumio)

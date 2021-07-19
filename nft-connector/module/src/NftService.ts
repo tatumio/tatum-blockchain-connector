@@ -54,7 +54,14 @@ import {
     prepareEthMintMultipleCashbackErc721SignedTransaction,
     prepareEthMintMultipleErc721SignedTransaction,
     prepareEthTransferErc721SignedTransaction,
-    prepareEthUpdateCashbackForAuthorErc721SignedTransaction,
+    prepareEthUpdateCashbackForAuthorErc721SignedTransaction, preparePolygonBurnErc721SignedTransaction,
+    preparePolygonDeployErc721SignedTransaction,
+    preparePolygonMintCashbackErc721SignedTransaction,
+    preparePolygonMintErc721SignedTransaction,
+    preparePolygonMintMultipleCashbackErc721SignedTransaction,
+    preparePolygonMintMultipleErc721SignedTransaction,
+    preparePolygonTransferErc721SignedTransaction,
+    preparePolygonUpdateCashbackForAuthorErc721SignedTransaction,
     prepareTronBurnTrc721SignedTransaction,
     prepareTronDeployTrc721SignedTransaction,
     prepareTronMintCashbackTrc721SignedTransaction,
@@ -278,6 +285,9 @@ export abstract class NftService {
             case Currency.ONE:
                 txData = await prepareOneTransfer721SignedTransaction(testnet, body as OneTransfer721, provider);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonTransferErc721SignedTransaction(testnet, body as EthTransferErc721, provider);
+                break;
             case Currency.TRON:
                 await this.getClient(chain, await this.isTestnet());
                 txData = await prepareTronTransferTrc721SignedTransaction(testnet, body as TronTransferTrc721);
@@ -319,6 +329,13 @@ export abstract class NftService {
                     txData = await prepareEthMintErc721SignedTransaction(body as EthMintErc721, provider);
                 } else {
                     txData = await prepareEthMintCashbackErc721SignedTransaction(body as EthMintErc721, provider);
+                }
+                break;
+            case Currency.MATIC:
+                if (!(body as EthMintErc721).authorAddresses) {
+                    txData = await preparePolygonMintErc721SignedTransaction(testnet, body as EthMintErc721, provider);
+                } else {
+                    txData = await preparePolygonMintCashbackErc721SignedTransaction(testnet, body as EthMintErc721, provider);
                 }
                 break;
             case Currency.ONE:
@@ -387,6 +404,13 @@ export abstract class NftService {
                     txData = await prepareEthMintMultipleCashbackErc721SignedTransaction(body as EthMintMultipleErc721, provider);
                 }
                 break;
+            case Currency.MATIC:
+                if (!(body as EthMintMultipleErc721).authorAddresses) {
+                    txData = await preparePolygonMintMultipleErc721SignedTransaction(testnet, body as EthMintMultipleErc721, provider);
+                } else {
+                    txData = await preparePolygonMintMultipleCashbackErc721SignedTransaction(testnet, body as EthMintMultipleErc721, provider);
+                }
+                break;
             case Currency.ONE:
                 if (!(body as OneMintMultiple721).authorAddresses) {
                     txData = await prepareOneMintMultiple721SignedTransaction(testnet, body as OneMintMultiple721, provider);
@@ -447,6 +471,9 @@ export abstract class NftService {
             case Currency.ETH:
                 txData = await prepareEthUpdateCashbackForAuthorErc721SignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonUpdateCashbackForAuthorErc721SignedTransaction(testnet, body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             case Currency.ONE:
                 txData = await prepareOneUpdateCashbackForAuthor721SignedTransaction(testnet, body as OneUpdateCashback721, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
@@ -481,6 +508,9 @@ export abstract class NftService {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthBurnErc721SignedTransaction(body as EthBurnErc721, provider);
+                break;
+            case Currency.MATIC:
+                txData = await preparePolygonBurnErc721SignedTransaction(testnet, body as EthBurnErc721, provider);
                 break;
             case Currency.ONE:
                 txData = await prepareOneBurn721SignedTransaction(testnet, body as OneBurn721, provider);
@@ -523,6 +553,9 @@ export abstract class NftService {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthDeployErc721SignedTransaction(body as EthDeployErc721, provider);
+                break;
+            case Currency.MATIC:
+                txData = await preparePolygonDeployErc721SignedTransaction(testnet, body as EthDeployErc721, provider);
                 break;
             case Currency.ONE:
                 txData = await prepareOneDeploy721SignedTransaction(testnet, body as OneDeploy721, provider);

@@ -3,22 +3,22 @@ servers:
   - url: 'https://api-eu1.tatum.io'
 info:
   version: 1.0.1
-  title: Tatum Binance Smart Chain API
+  title: Tatum Polygon (Matic) API
 tags:
   - description: |
-      <p>Binance Smart Chain is an Ethereum EVM 100% compatible blockchain, and is very good for decentralized application (Dapp) development within many possible verticals including DeFi, NFT, Gaming, and many others.<br/>
+      <p>Polygon (Matic) is an Ethereum EVM 100% compatible blockchain, and is very good for decentralized application (Dapp) development within many possible verticals including DeFi, NFT, Gaming, and many others.<br/>
       Tatum supports 2 chains:
       <ul><li>Mainnet - a regular live chain
-      <li>Testnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
-      a faucet, e.g. <a target="_blank" href="https://testnet.binance.org/faucet-smart">https://testnet.binance.org/faucet-smart</a></li></ul></p>
-    name: Blockchain / BSC
+      <li>Mumbai Testnet - a chain used for testing purposes. Coins on the test chain have no value and can be obtained from
+      a faucet, e.g. <a target="_blank" href="https://faucet.matic.network/">https://faucet.matic.network/</a></li></ul></p>
+    name: Blockchain / Polygon (Matic)
 paths:
-  /v3/bsc/wallet:
+  /v3/polygon/wallet:
     get:
       description: |
-        <h4>1 credit per API call.</h4><br/><p>Tatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. Mnemonic phrase consists of 24 special words in defined order and can restore access to all generated addresses and private keys.<br/>Each address is identified by 3 main values:<ul><li>Private Key - your secret value, which should never be revealed</li><li>Public Key - public address to be published</li><li>Derivation index - index of generated address</li></ul></p><p>Tatum follows BIP44 specification and generates for BSC wallet with derivation path m'/44'/60'/0'/0. More about BIP44 HD wallets can be found here - <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki</a>.
-        Generate BIP44 compatible BSC wallet.</p>
-      operationId: BscGenerateWallet
+        <h4>1 credit per API call.</h4><br/><p>Tatum supports BIP44 HD wallets. It is very convenient and secure, since it can generate 2^31 addresses from 1 mnemonic phrase. Mnemonic phrase consists of 24 special words in defined order and can restore access to all generated addresses and private keys.<br/>Each address is identified by 3 main values:<ul><li>Private Key - your secret value, which should never be revealed</li><li>Public Key - public address to be published</li><li>Derivation index - index of generated address</li></ul></p><p>Tatum follows BIP44 specification and generates for Polygon wallet with derivation path m'/44'/966'/0'/0. More about BIP44 HD wallets can be found here - <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki</a>.
+        Generate BIP44 compatible Polygon wallet.</p>
+      operationId: PolygonGenerateWallet
       parameters:
         - description: "Mnemonic to use for generation of extended public and private keys."
           in: query
@@ -57,16 +57,16 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate BSC wallet
+      summary: Generate Polygon wallet
       tags:
-        - Blockchain / BSC
-  /v3/bsc/address/{xpub}/{index}:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/address/{xpub}/{index}:
     get:
       description: |
         <h4>1 credit per API call.</h4><br/>
-        <p>Generate BSC account deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
+        <p>Generate Polygon account deposit address from Extended public key. Deposit address is generated for the specific index - each extended public key can generate
         up to 2^31 addresses starting from index 0 until 2^31.</p>
-      operationId: BscGenerateAddress
+      operationId: PolygonGenerateAddress
       parameters:
         - description: "Extended public key of wallet."
           in: path
@@ -91,7 +91,7 @@ paths:
                 properties:
                   address:
                     type: string
-                    description: BSC address
+                    description: Polygon address
                     example: "0xa7673161CbfE0116A4De9E341f8465940c2211d4"
           description: OK
         400:
@@ -103,16 +103,16 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate BSC account address from Extended public key
+      summary: Generate Polygon account address from Extended public key
       tags:
-        - Blockchain / BSC
-  /v3/bsc/wallet/priv:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/wallet/priv:
     post:
       description: |
         <h4>1 credit per API call.</h4><br/>
         <p>Generate private key of address from mnemonic for given derivation path index. Private key is generated for the specific index - each mnemonic
         can generate up to 2^31 private keys starting from index 0 until 2^31.</p>
-      operationId: BscGenerateAddressPrivateKey
+      operationId: PolygonGenerateAddressPrivateKey
       requestBody:
         content:
           application/json:
@@ -135,16 +135,16 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Generate BSC private key
+      summary: Generate Polygon private key
       tags:
-        - Blockchain / BSC
-  /v3/bsc/web3/{xApiKey}:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/web3/{xApiKey}:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Use this endpoint URL as a http-based web3 driver to connect directly to the BSC node provided by Tatum.
-        To learn more about BSC Web3, please visit <a href="https://bsc.org/en/developers/" target="_blank">BSC developer's guide.</a></p>
-      operationId: BscWeb3Driver
+        <p>Use this endpoint URL as a http-based web3 driver to connect directly to the Polygon node provided by Tatum.
+        To learn more about Polygon Web3, please visit <a href="https://docs.matic.network/" target="_blank">Polygon developer's guide.</a></p>
+      operationId: PolygonWeb3Driver
       parameters:
         - description: "Tatum X-API-Key used for authorization."
           in: path
@@ -179,11 +179,11 @@ paths:
       x-code-samples:
       summary: Web3 HTTP driver
       tags:
-        - Blockchain / BSC
-  /v3/bsc/block/current:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/block/current:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get BSC current block number. This is the number of the latest block in the blockchain.</p>"
-      operationId: BscGetCurrentBlock
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon current block number. This is the number of the latest block in the blockchain.</p>"
+      operationId: PolygonGetCurrentBlock
       responses:
         200:
           content:
@@ -202,11 +202,11 @@ paths:
       x-code-samples:
       summary: Get current block number
       tags:
-        - Blockchain / BSC
-  /v3/bsc/block/{hash}:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/block/{hash}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get BSC block by block hash or block number.</p>"
-      operationId: BscGetBlock
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon block by block hash or block number.</p>"
+      operationId: PolygonGetBlock
       parameters:
         - description: "Block hash or block number"
           in: path
@@ -231,13 +231,13 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get BSC block by hash
+      summary: Get Polygon block by hash
       tags:
-        - Blockchain / BSC
-  /v3/bsc/account/balance/{address}:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/account/balance/{address}:
     get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get BSC account balance in BNB. This method does not prints any balance of the BEP20 or BEP721 tokens on the account.</p>"
-      operationId: BscGetBalance
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon account balance in MATIC. This method does not prints any balance of the BEP20 or BEP721 tokens on the account.</p>"
+      operationId: PolygonGetBalance
       parameters:
         - description: "Account address"
           in: path
@@ -255,7 +255,7 @@ paths:
                 properties:
                   balance:
                     type: string
-                    description: Balance in BNB
+                    description: Balance in MATIC
                     example: "10.52"
           description: OK
         400:
@@ -267,74 +267,13 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get BSC Account balance
+      summary: Get Polygon Account balance
       tags:
-        - Blockchain / BSC
-  /v3/bsc/account/balance/bep20/{address}:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/transaction/{hash}:
     get:
-      description: |
-        <h4>1 credit per API call.</h4><br/><p>Get BSC BEP20 Account balance in the smallest BEP20 unit. Result value is balance * 10^decimals.
-        It is possible to obtain the balance of any BEP20 token, either supported by Tatum natively or via the address of the BEP20 token.<br/>
-        BEP20 tokens BETH, BBTC, BADA, WBNB, BDOT, BXRP, BLTC, BBCH are available only for mainnet use.</p>
-      operationId: BscErc20GetBalance
-      parameters:
-        - description: "Account address"
-          in: path
-          name: address
-          required: true
-          schema:
-            type: string
-            example: "0x3223AEB8404C7525FcAA6C512f91e287AE9FfE7B"
-        - description: Tatum supported BEP20 currency for mainnet. Either currency, or contractAddress must be present.
-          in: query
-          name: currency
-          schema:
-            type: string
-            example: BETH
-            enum:
-              - BETH
-              - BBTC
-              - BADA
-              - WBNB
-              - BDOT
-              - BXRP
-              - BLTC
-              - BBCH
-        - description: BEP20 contract address to get balance of. Either contractAddress, or currency must be present.
-          in: query
-          name: contractAddress
-          schema:
-            type: string
-            maxLength: 42
-            minLength: 42
-            example: "0xdac17f958d2ee523a2206206994597c13d831ec7"
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                properties:
-                  balance:
-                    type: string
-                    description: Balance in BEP20 smallest unit
-                    example: "1000000"
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        500:
-          <<: *API500
-      security:
-        - X-Api-Key: [ ]
-      x-code-samples:
-      summary: Get BSC BEP20 Account balance
-      tags:
-        - Blockchain / BSC
-  /v3/bsc/transaction/{hash}:
-    get:
-      description: "<h4>1 credit per API call.</h4><br/><p>Get BSC transaction by transaction hash.</p>"
-      operationId: BscGetTransaction
+      description: "<h4>1 credit per API call.</h4><br/><p>Get Polygon transaction by transaction hash.</p>"
+      operationId: PolygonGetTransaction
       parameters:
         - description: "Transaction hash"
           in: path
@@ -348,7 +287,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BscTx"
+                $ref: "#/components/schemas/PolygonTx"
           description: OK
         400:
           <<: *API400
@@ -366,17 +305,17 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get BSC Transaction
+      summary: Get Polygon Transaction
       tags:
-        - Blockchain / BSC
-  /v3/bsc/transaction/count/{address}:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/transaction/count/{address}:
     get:
       description: |
         <h4>1 credit per API call.</h4><br/>
-        <p>Get a number of outgoing BSC transactions for the address. When a transaction is sent, there can be multiple outgoing transactions,
+        <p>Get a number of outgoing Polygon transactions for the address. When a transaction is sent, there can be multiple outgoing transactions,
         which are not yet processed by the blockchain. To distinguish between them, there is a counter called a nonce, which represents
         the order of the transaction in the list of outgoing transactions.</p>
-      operationId: BscGetTransactionCount
+      operationId: PolygonGetTransactionCount
       parameters:
         - description: "address"
           in: path
@@ -405,28 +344,28 @@ paths:
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Get count of outgoing BSC transactions
+      summary: Get count of outgoing Polygon transactions
       tags:
-        - Blockchain / BSC
-  /v3/bsc/transaction:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/transaction:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Send BNB or Tatum supported BEP20 token from account to account.<br/><br/>
+        <p>Send MATIC from account to account.<br/><br/>
         This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
         No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
         </p>
-      operationId: BscBlockchainTransfer
+      operationId: PolygonBlockchainTransfer
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/TransferBscBlockchain"
-                - $ref: "#/components/schemas/TransferBscBlockchainKMS"
+                - $ref: "#/components/schemas/TransferPolygonBlockchain"
+                - $ref: "#/components/schemas/TransferPolygonBlockchainKMS"
         required: true
       responses:
         200:
@@ -447,32 +386,32 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403BscBroadcast"
-                  - $ref: "#/components/schemas/Error403BscGasPrice"
-                  - $ref: "#/components/schemas/Error403BscTxBody"
-                  - $ref: "#/components/schemas/Error403BscGasCalculation"
-                  - $ref: "#/components/schemas/Error403BscTxHash"
-                  - $ref: "#/components/schemas/Error403BscTxSign"
+                  - $ref: "#/components/schemas/Error403PolygonBroadcast"
+                  - $ref: "#/components/schemas/Error403PolygonGasPrice"
+                  - $ref: "#/components/schemas/Error403PolygonTxBody"
+                  - $ref: "#/components/schemas/Error403PolygonGasCalculation"
+                  - $ref: "#/components/schemas/Error403PolygonTxHash"
+                  - $ref: "#/components/schemas/Error403PolygonTxSign"
         500:
           <<: *API500
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Send BSC / BEP20 from account to account
+      summary: Send MATIC from account to account
       tags:
-        - Blockchain / BSC
-  /v3/bsc/gas:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/gas:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Estimate gasLimit and gasPrice of the BSC transaction. Gas price is obtained from <a href="https://explorer.bitquery.io/bsc/gas" target="_blank">https://explorer.bitquery.io/bsc/gas</a>.
+        <p>Estimate gasLimit and gasPrice of the Polygon transaction. Gas price is obtained from <a href="https://gasstation-mainnet.matic.network/" target="_blank">https://gasstation-mainnet.matic.network/</a>.
         </p>
-      operationId: BscEstimateGas
+      operationId: PolygonEstimateGas
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BscEstimateGas"
+              $ref: "#/components/schemas/PolygonEstimateGas"
         required: true
       responses:
         200:
@@ -503,17 +442,17 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403BscTxBody"
-                  - $ref: "#/components/schemas/Error403BscGasCalculation"
+                  - $ref: "#/components/schemas/Error403PolygonTxBody"
+                  - $ref: "#/components/schemas/Error403PolygonGasCalculation"
         500:
           <<: *API500
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Estimate BSC transaction fees
+      summary: Estimate Polygon transaction fees
       tags:
-        - Blockchain / BSC
-  /v3/bsc/smartcontract:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/smartcontract:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
@@ -524,15 +463,15 @@ paths:
         or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
         <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
         Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.</p>
-      operationId: BscBlockchainSmartContractInvocation
+      operationId: PolygonBlockchainSmartContractInvocation
       requestBody:
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/CallBscSmartContractReadMethod"
-                - $ref: "#/components/schemas/CallBscSmartContractMethod"
-                - $ref: "#/components/schemas/CallBscSmartContractMethodKMS"
+                - $ref: "#/components/schemas/CallPolygonSmartContractReadMethod"
+                - $ref: "#/components/schemas/CallPolygonSmartContractMethod"
+                - $ref: "#/components/schemas/CallPolygonSmartContractMethodKMS"
         required: true
       responses:
         200:
@@ -554,12 +493,12 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Error403BscBroadcast"
-                  - $ref: "#/components/schemas/Error403BscGasPrice"
-                  - $ref: "#/components/schemas/Error403BscScBody"
-                  - $ref: "#/components/schemas/Error403BscGasCalculation"
-                  - $ref: "#/components/schemas/Error403BscTxHash"
-                  - $ref: "#/components/schemas/Error403BscTxSign"
+                  - $ref: "#/components/schemas/Error403PolygonBroadcast"
+                  - $ref: "#/components/schemas/Error403PolygonGasPrice"
+                  - $ref: "#/components/schemas/Error403PolygonScBody"
+                  - $ref: "#/components/schemas/Error403PolygonGasCalculation"
+                  - $ref: "#/components/schemas/Error403PolygonTxHash"
+                  - $ref: "#/components/schemas/Error403PolygonTxSign"
         500:
           <<: *API500
       security:
@@ -567,121 +506,14 @@ paths:
       x-code-samples:
       summary: Invoke Smart Contract method
       tags:
-        - Blockchain / BSC
-  /v3/bsc/bep20/deploy:
+        - Blockchain / Polygon (Matic)
+  /v3/polygon/broadcast:
     post:
       description: |
         <h4>2 credits per API call.</h4><br/>
-        <p>Deploy BSC BEP20 Smart Contract. This method creates new BEP20 (Fungible Tokens) Smart Contract on the blockchain. Smart contract is standardized and audited. It is possible to mint and burn tokens.
-        It is possible to see the code of the deployed contract <a href="https://github.com/tatumio/tatum-middleware/blob/master/src/contracts/token.sol" target="_blank">here</a>.
-        Whole predefined supply of the tokens will be transferred to the chosen address.<br/><br/>
-        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
-        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
-        </p>
-      operationId: BscDeployErc20Blockchain
-      requestBody:
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: "#/components/schemas/DeployBep20"
-                - $ref: "#/components/schemas/DeployBep20KMS"
-        required: true
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/TransactionHashKMS"
-                  - $ref: "#/components/schemas/SignatureId"
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        403:
-          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error403BscBroadcast"
-                  - $ref: "#/components/schemas/Error403BscGasPrice"
-                  - $ref: "#/components/schemas/Error403BscTxBody"
-                  - $ref: "#/components/schemas/Error403BscGasCalculation"
-                  - $ref: "#/components/schemas/Error403BscErc20TxSign"
-        500:
-          <<: *API500
-      security:
-        - X-Api-Key: [ ]
-      x-code-samples:
-      summary: Deploy BSC BEP20 Smart Contract.
-      tags:
-        - Blockchain / BSC
-  /v3/bsc/bep20/transaction:
-    post:
-      description: |
-        <h4>2 credits per API call.</h4><br/>
-        <p>Transfer BSC BEP20 Smart Contract Tokens from account to account. Transfer any BEP20 tokens from smart contract defined in contractAddress. This method invokes BEP20 method transfer() to transfer tokens.<br/><br/>
-        This operation needs the private key of the blockchain address. Every time the funds are transferred, the transaction must be signed with the corresponding private key.
-        No one should ever send it's own private keys to the internet because there is a strong possibility of stealing keys and loss of funds. In this method, it is possible to enter privateKey
-        or signatureId. PrivateKey should be used only for quick development on testnet versions of blockchain when there is no risk of losing funds. In production,
-        <a href="https://github.com/tatumio/tatum-kms" target="_blank">Tatum KMS</a> should be used for the highest security standards, and signatureId should be present in the request.
-        Alternatively, using the Tatum client library for supported languages or Tatum Middleware with a custom key management system is possible.
-        </p>
-      operationId: BscBlockchainTransferErc20
-      requestBody:
-        content:
-          application/json:
-            schema:
-              oneOf:
-                - $ref: "#/components/schemas/TransferBep20Blockchain"
-                - $ref: "#/components/schemas/TransferBep20BlockchainKMS"
-        required: true
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/TransactionHashKMS"
-                  - $ref: "#/components/schemas/SignatureId"
-          description: OK
-        400:
-          <<: *API400
-        401:
-          <<: *API401
-        403:
-          description: Forbidden. The request is authenticated, but it is not possible to required perform operation due to logical error or invalid permissions.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error403BscBroadcast"
-                  - $ref: "#/components/schemas/Error403BscGasPrice"
-                  - $ref: "#/components/schemas/Error403BscTxBody"
-                  - $ref: "#/components/schemas/Error403BscGasCalculation"
-                  - $ref: "#/components/schemas/Error403BscTxHash"
-                  - $ref: "#/components/schemas/Error403BscTxSign"
-        500:
-          <<: *API500
-      security:
-        - X-Api-Key: [ ]
-      x-code-samples:
-      summary: Transfer BSC BEP20
-      tags:
-        - Blockchain / BSC
-  /v3/bsc/broadcast:
-    post:
-      description: |
-        <h4>2 credits per API call.</h4><br/>
-        <p>Broadcast signed transaction to BSC blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
+        <p>Broadcast signed transaction to Polygon blockchain. This method is used internally from Tatum KMS or Tatum client libraries.
         It is possible to create custom signing mechanism and use this method only for broadcasting data to the blockchian.</p>
-      operationId: BscBroadcast
+      operationId: PolygonBroadcast
       requestBody:
         content:
           application/json:
@@ -704,15 +536,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error403BscBroadcast"
+                $ref: "#/components/schemas/Error403PolygonBroadcast"
         500:
           <<: *API500
       security:
         - X-Api-Key: [ ]
       x-code-samples:
-      summary: Broadcast signed BSC transaction
+      summary: Broadcast signed Polygon transaction
       tags:
-        - Blockchain / BSC
+        - Blockchain / Polygon (Matic)
 components:
   securitySchemes:
     X-Api-Key:
@@ -724,7 +556,7 @@ components:
       name: x-api-key
       type: apiKey
   schemas:
-    BscBlock:
+    PolygonBlock:
       type: object
       properties:
         difficulty:
@@ -799,12 +631,12 @@ components:
           description: Array of transactions.
           type: array
           items:
-            $ref: "#/components/schemas/BscTx"
+            $ref: "#/components/schemas/PolygonTx"
         transactionsRoot:
           description: The root of the transaction trie of the block.
           type: string
           example: "0x5990081ef8515d561b50255af03c5d505f7725ddef27405dc67d23bfd0f47704"
-    BscTx:
+    PolygonTx:
       type: object
       properties:
         blockHash:
@@ -904,11 +736,11 @@ components:
                 type: string
                 description: Hash of the transaction this event was created in.
                 example: "0xe6e7340394958674cdf8606936d292f565e4ecc476aaa8b258ec8a141f7c75d7"
-    Error403BscBroadcast:
+    Error403PolygonBroadcast:
       properties:
         errorCode:
-          description: bsc.broadcast.failed
-          example: bsc.broadcast.failed
+          description: polygon.broadcast.failed
+          example: polygon.broadcast.failed
           type: string
         message:
           description: Unable to broadcast transaction due to ${error}.
@@ -923,7 +755,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscBep20NotFound:
+    Error403PolygonBep20NotFound:
       properties:
         errorCode:
           description: erc20.token.notFound
@@ -961,7 +793,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscBep20Set:
+    Error403PolygonBep20Set:
       properties:
         errorCode:
           description: erc20.address.set
@@ -980,7 +812,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscMnemonicPrivateKey:
+    Error403PolygonMnemonicPrivateKey:
       properties:
         errorCode:
           description: private.mnemonic.missing
@@ -999,11 +831,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscBep20Unsupported:
+    Error403PolygonBep20Unsupported:
       properties:
         errorCode:
-          description: bsc.bep20.unsupported
-          example: bsc.bep20.unsupported
+          description: polygon.bep20.unsupported
+          example: polygon.bep20.unsupported
           type: string
         message:
           description: Unsupported ETH BEP20 blockchain.
@@ -1018,11 +850,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscTxHash:
+    Error403PolygonTxHash:
       properties:
         errorCode:
-          description: bsc.transaction.hash
-          example: bsc.transaction.hash
+          description: polygon.transaction.hash
+          example: polygon.transaction.hash
           type: string
         message:
           description: Unable to calculate transaction hash. ${error}
@@ -1037,11 +869,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscTxSign:
+    Error403PolygonTxSign:
       properties:
         errorCode:
-          description: bsc.transaction.sign
-          example: bsc.transaction.sign
+          description: polygon.transaction.sign
+          example: polygon.transaction.sign
           type: string
         message:
           description: Unable to sign transaction. ${error}
@@ -1056,11 +888,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscErc20TxSign:
+    Error403PolygonErc20TxSign:
       properties:
         errorCode:
-          description: bsc.bep20.sign
-          example: bsc.bep20.sign
+          description: polygon.bep20.sign
+          example: polygon.bep20.sign
           type: string
         message:
           description: Unable to sign transaction for contract creation. ${error}
@@ -1075,11 +907,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscGasCalculation:
+    Error403PolygonGasCalculation:
       properties:
         errorCode:
-          description: bsc.transaction.gas
-          example: bsc.transaction.gas
+          description: polygon.transaction.gas
+          example: polygon.transaction.gas
           type: string
         message:
           description: Unable to calculate gas limit for transaction. ${error}
@@ -1094,11 +926,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscTxBody:
+    Error403PolygonTxBody:
       properties:
         errorCode:
-          description: bsc.transaction.body
-          example: bsc.transaction.body
+          description: polygon.transaction.body
+          example: polygon.transaction.body
           type: string
         message:
           description: Either currency, or tokenAddress must be defined.
@@ -1113,11 +945,11 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscScBody:
+    Error403PolygonScBody:
       properties:
         errorCode:
-          description: bsc.sc.invalid
-          example: bsc.sc.invalid
+          description: polygon.sc.invalid
+          example: polygon.sc.invalid
           type: string
         message:
           description: Invalid parameters for smart contract invocation.
@@ -1132,7 +964,7 @@ components:
         - message
         - statusCode
       type: object
-    Error403BscGasPrice:
+    Error403PolygonGasPrice:
       properties:
         errorCode:
           description: gas.price.failed
@@ -1186,7 +1018,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1250,7 +1082,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1274,7 +1106,7 @@ components:
         - signatureId
         - digits
         - amount
-    CallBscSmartContractMethod:
+    CallPolygonSmartContractMethod:
       type: object
       properties:
         contractAddress:
@@ -1320,7 +1152,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1344,7 +1176,7 @@ components:
         - methodABI
         - fromPrivateKey
         - methodName
-    CallBscSmartContractReadMethod:
+    CallPolygonSmartContractReadMethod:
       type: object
       properties:
         contractAddress:
@@ -1386,7 +1218,7 @@ components:
         - params
         - methodABI
         - methodName
-    CallBscSmartContractMethodKMS:
+    CallPolygonSmartContractMethodKMS:
       type: object
       properties:
         contractAddress:
@@ -1423,7 +1255,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1447,7 +1279,7 @@ components:
         - methodABI
         - signatureId
         - methodName
-    TransferBscBlockchain:
+    TransferPolygonBlockchain:
       type: object
       properties:
         data:
@@ -1458,7 +1290,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         to:
           description: Blockchain address to send assets
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -1466,18 +1298,11 @@ components:
           minLength: 42
           type: string
         currency:
-          description: Currency to transfer from BSC Blockchain Account. BEP20 tokens BETH, BBTC, BADA, WBNB, BDOT, BXRP, BLTC, BBCH are available only for mainnet use.
+          description: Currency to transfer from Polygon Blockchain Account. BEP20 tokens BETH, BBTC, BADA, WMATIC, BDOT, BXRP, BLTC, BBCH are available only for mainnet use.
           enum:
-            - BETH
-            - BBTC
-            - BADA
-            - WBNB
-            - BDOT
-            - BXRP
-            - BLTC
-            - BBCH
-            - BSC
-          example: BSC
+            - MATIC
+            - USDC_MATIC
+          example: MATIC
           type: string
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
@@ -1512,7 +1337,7 @@ components:
         - amount
         - currency
         - fromPrivateKey
-    BscEstimateGas:
+    PolygonEstimateGas:
       type: object
       properties:
         from:
@@ -1542,7 +1367,7 @@ components:
         - to
         - amount
         - from
-    TransferBscBlockchainKMS:
+    TransferPolygonBlockchainKMS:
       type: object
       properties:
         data:
@@ -1553,7 +1378,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         to:
           description: Blockchain address to send assets
           example: "0x687422eEA2cB73B5d3e242bA5456b782919AFc85"
@@ -1561,18 +1386,18 @@ components:
           minLength: 42
           type: string
         currency:
-          description: Currency to transfer from BSC Blockchain Account. BEP20 tokens BETH, BBTC, BADA, WBNB, BDOT, BXRP, BLTC, BBCH are available only for mainnet use.
+          description: Currency to transfer from Polygon Blockchain Account. BEP20 tokens BETH, BBTC, BADA, WMATIC, BDOT, BXRP, BLTC, BBCH are available only for mainnet use.
           enum:
             - BETH
             - BBTC
             - BADA
-            - WBNB
+            - WMATIC
             - BDOT
             - BXRP
             - BLTC
             - BBCH
-            - BSC
-          example: BSC
+            - MATIC
+          example: MATIC
           type: string
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
@@ -1647,13 +1472,13 @@ components:
           minimum: 1
           type: number
         address:
-          description: Address on BSC blockchain, where all created BEP20 tokens will be transferred.
+          description: Address on Polygon blockchain, where all created BEP20 tokens will be transferred.
           maxLength: 42
           minLength: 42
           example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
           type: string
         fromPrivateKey:
-          description: Private key of BSC account address, from which the fee for the deployment of BEP20 will be paid. Private key, or signature Id must be present.
+          description: Private key of Polygon account address, from which the fee for the deployment of BEP20 will be paid. Private key, or signature Id must be present.
           type: string
           example: "0x05e150c73f1920ec14caa1e0b6aa09940899678051a78542840c2668ce5080c2"
           maxLength: 66
@@ -1661,7 +1486,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object
@@ -1721,7 +1546,7 @@ components:
           minimum: 1
           type: number
         address:
-          description: Address on BSC blockchain, where all created BEP20 tokens will be transferred.
+          description: Address on Polygon blockchain, where all created BEP20 tokens will be transferred.
           maxLength: 42
           minLength: 42
           example: "0xa0Ca9FF38Bad06eBe64f0fDfF279cAE35129F5C6"
@@ -1740,7 +1565,7 @@ components:
         nonce:
           type: number
           minimum: 0
-          description: Nonce to be set to BSC transaction. If not present, last known nonce will be used.
+          description: Nonce to be set to Polygon transaction. If not present, last known nonce will be used.
         fee:
           description: Custom defined fee. If not present, it will be calculated automatically.
           type: object

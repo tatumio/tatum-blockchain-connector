@@ -17,6 +17,7 @@ tags:
       Tatum now supports NFT these blockchains:<br/>
       <ul>
       <li><b>Ethereum</b></li>
+      <li><b>Polygon (Matic)</b></li>
       <li><b>Celo</b></li>
       <li><b>Harmony.ONE</b></li>
       <li><b>Tron</b></li>
@@ -34,6 +35,7 @@ paths:
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Flow</b></li>
@@ -115,6 +117,7 @@ paths:
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
@@ -181,6 +184,7 @@ paths:
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Flow</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
@@ -245,6 +249,7 @@ paths:
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
@@ -310,6 +315,7 @@ paths:
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
@@ -375,6 +381,7 @@ paths:
         Tatum now supports NFT these blockchains:<br/>
         <ul>
         <li><b>Ethereum</b></li>
+        <li><b>Polygon (Matic)</b></li>
         <li><b>Celo</b></li>
         <li><b>Harmony.ONE</b></li>
         <li><b>Tron</b></li>
@@ -2804,6 +2811,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         to:
@@ -2865,6 +2873,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         name:
@@ -2920,6 +2929,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         name:
@@ -2984,6 +2994,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         to:
@@ -3050,6 +3061,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         tokenId:
@@ -3138,6 +3150,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         tokenId:
@@ -3226,6 +3239,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         to:
@@ -3319,6 +3333,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         to:
@@ -3417,6 +3432,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         tokenId:
@@ -3473,6 +3489,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         tokenId:
@@ -3539,6 +3556,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         tokenId:
@@ -3600,6 +3618,7 @@ components:
           description: Chain to work with.
           enum:
             - ETH
+            - MATIC
             - ONE
             - BSC
         tokenId:

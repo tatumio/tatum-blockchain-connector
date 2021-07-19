@@ -9,14 +9,14 @@ import {
   MintCeloErc20,
   MintErc20, OneTransfer20,
   TransferBscBep20,
-  TransferCeloOrCeloErc20Token,
+  TransferCeloOrCeloErc20Token, TransferCustomErc20,
   TransferErc20,
   TransferEthErc20,
 } from '@tatumio/tatum';
 
 export class ChainBurnErc20 extends BurnErc20 {
   @IsNotEmpty()
-  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC, Currency.ONE])
+  @IsIn([Currency.ETH, Currency.BSC, Currency.XDC, Currency.ONE, Currency.MATIC])
   public chain: Currency;
 }
 
@@ -47,6 +47,12 @@ export class ChainTransferHrm20 extends OneTransfer20 {
 export class ChainTransferEthErc20 extends TransferEthErc20 {
   @IsNotEmpty()
   @IsIn([Currency.ETH, Currency.BSC])
+  public chain: Currency;
+}
+
+export class ChainTransferPolygonErc20 extends TransferCustomErc20 {
+  @IsNotEmpty()
+  @IsIn([Currency.MATIC])
   public chain: Currency;
 }
 

@@ -49,6 +49,13 @@ import {
     prepareOneMintMultiTokenBatchSignedTransaction,
     prepareOneMintMultiTokenSignedTransaction,
     prepareOneTransferMultiTokenSignedTransaction,
+    preparePolygonTransferMultiTokenSignedTransaction,
+    preparePolygonBatchTransferMultiTokenSignedTransaction,
+    preparePolygonMintMultiTokenSignedTransaction,
+    preparePolygonMintMultiTokenBatchSignedTransaction,
+    preparePolygonBurnMultiTokenSignedTransaction,
+    preparePolygonBurnMultiTokenBatchSignedTransaction,
+    preparePolygonDeployMultiTokenSignedTransaction,
     TransactionHash,
     TransferMultiToken,
     TransferMultiTokenBatch,
@@ -130,6 +137,9 @@ export abstract class MultiTokenService {
             case Currency.ETH:
                 txData = await prepareEthTransferMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonTransferMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             case Currency.BSC:
                 txData = await prepareBscTransferMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
@@ -140,7 +150,7 @@ export abstract class MultiTokenService {
                 txData = await prepareOneTransferMultiTokenSignedTransaction(testnet, body as OneTransferMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -157,6 +167,9 @@ export abstract class MultiTokenService {
             case Currency.ETH:
                 txData = await prepareEthBatchTransferMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonBatchTransferMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             case Currency.BSC:
                 txData = await prepareBscBatchTransferMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
@@ -167,7 +180,7 @@ export abstract class MultiTokenService {
                 txData = await prepareOneBatchTransferMultiTokenSignedTransaction(testnet, body as OneTransferMultiTokenBatch, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -184,6 +197,9 @@ export abstract class MultiTokenService {
         switch (chain) {
             case Currency.ETH:
                 txData = await prepareEthMintMultiTokenSignedTransaction(body, provider);
+                break;
+            case Currency.MATIC:
+                txData = await preparePolygonMintMultiTokenSignedTransaction(testnet, body, provider);
                 break;
             case Currency.BSC:
                 txData = await prepareBscMintMultiTokenSignedTransaction(body, provider);
@@ -213,6 +229,9 @@ export abstract class MultiTokenService {
             case Currency.ETH:
                 txData = await prepareEthMintMultiTokenBatchSignedTransaction(body, provider);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonMintMultiTokenBatchSignedTransaction(testnet, body, provider);
+                break;
             case Currency.BSC:
                 txData = await prepareBscMintMultiTokenBatchSignedTransaction(body, provider);
                 break;
@@ -223,7 +242,7 @@ export abstract class MultiTokenService {
                 txData = await prepareOneMintMultiTokenBatchSignedTransaction(testnet, body as OneMintMultiTokenBatch, provider);
                 break;
             default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -240,6 +259,9 @@ export abstract class MultiTokenService {
             case Currency.ETH:
                 txData = await prepareEthBurnMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonBurnMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             case Currency.BSC:
                 txData = await prepareBscBurnMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
@@ -250,7 +272,7 @@ export abstract class MultiTokenService {
                 txData = await prepareOneBurnMultiTokenSignedTransaction(testnet, body as OneBurnMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -267,6 +289,9 @@ export abstract class MultiTokenService {
             case Currency.ETH:
                 txData = await prepareEthBurnBatchMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonBurnMultiTokenBatchSignedTransaction(testnet, body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             case Currency.BSC:
                 txData = await prepareBscBurnMultiTokenBatchSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
@@ -277,7 +302,7 @@ export abstract class MultiTokenService {
                 txData = await prepareOneBurnMultiTokenBatchSignedTransaction(testnet, body as OneBurnMultiTokenBatch, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -294,6 +319,9 @@ export abstract class MultiTokenService {
             case Currency.ETH:
                 txData = await prepareEthDeployMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonDeployMultiTokenSignedTransaction(testnet, body, (await this.getNodesUrl(chain, testnet))[0]);
+                break;
             case Currency.BSC:
                 txData = await prepareBscDeployMultiTokenSignedTransaction(body, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
@@ -304,7 +332,7 @@ export abstract class MultiTokenService {
                 txData = await prepareOneDeployMultiTokenSignedTransaction(testnet, body as OneDeployMultiToken, (await this.getNodesUrl(chain, testnet))[0]);
                 break;
             default:
-                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new MultiTokenError(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};

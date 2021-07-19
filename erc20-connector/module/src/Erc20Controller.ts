@@ -11,9 +11,10 @@ import {
     ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
     ChainTransferErc20,
-    ChainTransferEthErc20, ChainTransferHrm20,
+    ChainTransferEthErc20, ChainTransferHrm20, ChainTransferPolygonErc20,
 } from './Erc20Base';
 import {PathAddressContractAddressChain} from './dto/PathAddressContractAddressChain';
+import {TransferCustomErc20} from '@tatumio/tatum';
 
 export abstract class Erc20Controller {
     protected constructor(protected readonly service: Erc20Service) {
@@ -31,7 +32,7 @@ export abstract class Erc20Controller {
     @Post('/v3/blockchain/token/transaction')
     @HttpCode(HttpStatus.OK)
     public async transactionErc20(
-      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20 | ChainTransferHrm20
+      @Body() body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20 | ChainTransferHrm20 | ChainTransferPolygonErc20
     ) {
         try {
             return await this.service.transferErc20(body);

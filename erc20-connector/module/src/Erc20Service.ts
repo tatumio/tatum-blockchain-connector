@@ -11,7 +11,7 @@ import {
     ChainTransferBscBep20,
     ChainTransferCeloErc20Token,
     ChainTransferErc20,
-    ChainTransferEthErc20, ChainTransferHrm20,
+    ChainTransferEthErc20, ChainTransferHrm20, ChainTransferPolygonErc20,
 } from './Erc20Base';
 import {HarmonyAddress} from '@harmony-js/crypto';
 import {
@@ -40,6 +40,10 @@ import {
     TransferCeloOrCeloErc20Token,
     TransferErc20,
     TransferEthErc20,
+    preparePolygonTransferErc20SignedTransaction,
+    preparePolygonBurnErc20SignedTransaction,
+    preparePolygonMintErc20SignedTransaction,
+    preparePolygonDeployErc20SignedTransaction,
     prepareXdcOrErc20SignedTransaction,
     prepareXdcBurnErc20SignedTransaction,
     prepareXdcMintErc20SignedTransaction,
@@ -50,7 +54,7 @@ import {
     OneBurn20,
     prepareOneMint20SignedTransaction,
     OneMint20,
-    prepareOneDeploy20SignedTransaction,
+    prepareOneDeploy20SignedTransaction, TransferCustomErc20,
 } from '@tatumio/tatum';
 import erc20_abi from '@tatumio/tatum/dist/src/contracts/erc20/token_abi';
 
@@ -80,7 +84,7 @@ export abstract class Erc20Service {
             return new Web3((await this.getFirstNodeUrl(chain, testnet)));
         }
 
-        throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
+        throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
     }
 
     public async getErc20Balance(chain: Currency, address: string, contractAddress: string): Promise<{ balance: string }> {
@@ -89,6 +93,7 @@ export abstract class Erc20Service {
             case Currency.ETH:
             case Currency.BSC:
             case Currency.CELO:
+            case Currency.MATIC:
                 contractOrAddress = contractAddress;
                 break;
             case Currency.ONE:
@@ -98,7 +103,7 @@ export abstract class Erc20Service {
                 contractOrAddress = fromXdcAddress(contractAddress);
                 break;
             default:
-                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
 
         const _address = chain === Currency.XDC ? fromXdcAddress(address) : address;
@@ -109,7 +114,7 @@ export abstract class Erc20Service {
         return {balance: await contract.methods.balanceOf(_address).call()};
     }
 
-    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20 | ChainTransferHrm20):
+    public async transferErc20(body: ChainTransferEthErc20 | ChainTransferBscBep20 | ChainTransferCeloErc20Token | ChainTransferErc20 | ChainTransferHrm20 | ChainTransferPolygonErc20):
         Promise<TransactionHash | { signatureId: string }> {
         const testnet = await this.isTestnet();
         const {chain, ..._body} = body;
@@ -121,6 +126,9 @@ export abstract class Erc20Service {
             case Currency.ONE:
                 txData = await prepareOneTransfer20SignedTransaction(testnet, _body as OneTransfer20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonTransferErc20SignedTransaction(testnet, _body as TransferCustomErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             case Currency.BSC:
                 txData = await prepareBscOrBep20SignedTransaction(_body as TransferBscBep20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
@@ -131,7 +139,7 @@ export abstract class Erc20Service {
                 txData = await prepareXdcOrErc20SignedTransaction(_body as TransferErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
-                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -151,6 +159,9 @@ export abstract class Erc20Service {
             case Currency.ONE:
                 txData = await prepareOneBurn20SignedTransaction(testnet, _body as OneBurn20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonBurnErc20SignedTransaction(testnet, _body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             case Currency.BSC:
                 txData = await prepareBurnBep20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
@@ -161,7 +172,7 @@ export abstract class Erc20Service {
                 txData = await prepareXdcBurnErc20SignedTransaction(_body as BurnErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
-                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};
@@ -180,6 +191,9 @@ export abstract class Erc20Service {
                 break;
             case Currency.ONE:
                 txData = await prepareOneMint20SignedTransaction(testnet, _body as OneMint20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
+            case Currency.MATIC:
+                txData = await preparePolygonMintErc20SignedTransaction(testnet, _body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             case Currency.BSC:
                 txData = await prepareMintBep20SignedTransaction(_body as MintErc20, (await this.getFirstNodeUrl(chain, testnet)));
@@ -211,6 +225,9 @@ export abstract class Erc20Service {
             case Currency.ONE:
                 txData = await prepareOneDeploy20SignedTransaction(testnet, _body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
+            case Currency.MATIC:
+                txData = await preparePolygonDeployErc20SignedTransaction(testnet, _body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
+                break;
             case Currency.BSC:
                 txData = await prepareDeployBep20SignedTransaction(_body as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
@@ -226,7 +243,7 @@ export abstract class Erc20Service {
                 txData = await prepareXdcDeployErc20SignedTransaction(tx as DeployErc20, (await this.getFirstNodeUrl(chain, testnet)));
                 break;
             default:
-                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsuported.chain');
+                throw new Erc20Error(`Unsupported chain ${chain}.`, 'unsupported.chain');
         }
         if (body.signatureId) {
             return {signatureId: await this.storeKMSTransaction(txData, chain, [body.signatureId], body.index)};

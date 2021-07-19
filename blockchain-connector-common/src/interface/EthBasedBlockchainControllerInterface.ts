@@ -1,35 +1,34 @@
 import {
+  EthBasedEstimateGas,
   GeneratePrivateKey,
   Pagination,
   PathAddress,
   PathHash,
   PathXpub,
-  QueryMnemonic, TransactionKMSResponse,
+  QueryMnemonic,
+  TransactionKMSResponse,
   TransactionResponse,
   TxData,
-  EthBasedEstimateGas, BlockchainError,
-} from '../index'
+} from '../index';
 import {
-  DeployErc20,
   EstimateGasEth,
   SmartContractMethodInvocation,
   SmartContractReadMethodInvocation,
-  TransferCustomErc20,
-  TransferEthErc20,
-} from '@tatumio/tatum'
+  TransferErc20,
+} from '@tatumio/tatum';
 
 export interface EthBasedBlockchainControllerInterface {
 
   /**
    * Returns current info about blockchain.
    */
-  getInfo(): Promise<object>
+  getInfo(): Promise<any>
 
   /**
    * Generate wallet via tatum-js lib.
    * @param mnemonic
    */
-  generateWallet(mnemonic: QueryMnemonic): Promise<object>
+  generateWallet(mnemonic: QueryMnemonic): Promise<any>
 
   /**
    * Generate address via tatum-js lib.
@@ -51,14 +50,14 @@ export interface EthBasedBlockchainControllerInterface {
    *
    * @param path
    */
-  getBlock(path: PathHash): Promise<object>
+  getBlock(path: PathHash): Promise<any>
 
   /**
    * Returns transaction by hash.
    *
    * @param path
    */
-  getTransaction(path: PathHash): Promise<object>
+  getTransaction(path: PathHash): Promise<any>
 
   /**
    * Returns transactions by address.
@@ -66,22 +65,12 @@ export interface EthBasedBlockchainControllerInterface {
    * @param path
    * @param query
    */
-  getTransactionsByAccount(path: PathAddress, query: Pagination): Promise<object>
+  getTransactionsByAccount?(path: PathAddress, query: Pagination): Promise<any>
 
   /**
    * Sends transaction to the blockchain. Signing of transaction is done via tatum-js lib.
-   *
-   * @param transferBtcBasedBlockchain
    */
-  sendTransaction(transferEthErc20: TransferEthErc20): Promise<TransactionResponse | TransactionKMSResponse>
-
-  /**
-   * Sends custom erc 20 transaction to the blockchain. Signing of transaction is done via tatum-js lib.
-   *
-   * @param transferBtcBasedBlockchain
-   */
-  sendCustomErc20Transaction(transferCustomErc20: TransferCustomErc20): Promise<TransactionResponse | TransactionKMSResponse>
-
+  sendTransaction(body: TransferErc20): Promise<TransactionResponse | TransactionKMSResponse>
 
   /**
    * Broadcasts signed transaction to the blockchain.
@@ -90,30 +79,21 @@ export interface EthBasedBlockchainControllerInterface {
    */
   broadcast(txData: TxData): Promise<TransactionResponse>
 
-  estimateGas(estimateGasEth: EstimateGasEth): EthBasedEstimateGas
+  estimateGas(estimateGasEth: EstimateGasEth): Promise<EthBasedEstimateGas>
 
   countTransactions(param: PathAddress)
 
   invokeSmartContractMethod(smartContractMethodInvocation: SmartContractMethodInvocation | SmartContractReadMethodInvocation)
-
-  deployErc20(deployErc20: DeployErc20)
-
-  /**
-   * Each endpoint is wrapped inside try catch with the error rethrow.
-   *
-   * @param e
-   */
-  throwError(e: BlockchainError): void
 
   /**
    * Returns account by address.
    *
    * @param path
    */
-  getAccount?(path: PathAddress): Promise<object>
+  getAccount?(path: PathAddress): Promise<any>
 
   /**
    * Set web3 driver.
    */
-  web3Driver?(): Promise<object>
+  web3Driver(body: any): Promise<any>
 }
