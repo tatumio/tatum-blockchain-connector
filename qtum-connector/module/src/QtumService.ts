@@ -1,7 +1,6 @@
 import { PinoLogger } from 'nestjs-pino';
 import axios from 'axios';
 import { QtumError } from './QtumError';
-import { QTUM_URLS } from 'src';
 import { QtumIUTXO, QtumIGetInfo, QtumISendRawTxResult, QtumIRawTransactionInfo, QtumIRawTransactions } from '@tatumio/tatum';
 import { QtumBlock } from '@tatumio/tatum/dist/src/model/response/qtum/QtumBlock';
 export abstract class QtumService {
@@ -25,8 +24,7 @@ export abstract class QtumService {
     }
     public async getQtumUTXOs(address: string): Promise<QtumIUTXO[]> {
         try {
-            const network = await this.isTestnet()
-            const baseURL = network ? QTUM_URLS['QTUM_TESTNET'] : QTUM_URLS['QTUM_MAINNET']
+            const baseURL = await this.getFirstNodeUrl()
             const res = await axios.get(baseURL + `/addr/${address}/utxo`)
             return res.data
         } catch (e) {
@@ -37,8 +35,7 @@ export abstract class QtumService {
     }
     public async getInfo(address: string): Promise<QtumIGetInfo> {
         try {
-            const network = await this.isTestnet()
-            const baseURL = network ? QTUM_URLS['QTUM_TESTNET'] : QTUM_URLS['QTUM_MAINNET']
+            const baseURL = await this.getFirstNodeUrl()
             const res = await axios.get(baseURL + `/addr/${address}`)
             return res.data
         } catch (e) {
@@ -48,11 +45,9 @@ export abstract class QtumService {
     }
     public async getCurrentBlock(): Promise<any> {
         try {
-            const baseurl = await this.getFirstNodeUrl()
-            const data = () => ({ "jsonrpc": "1.0", "method": "getbestblockhash", "params": [] })
-            const config = { headers: { 'content-type': 'text/plain;' } }
-            const res = await axios.post(baseurl, data(), config)
-            return res['result']
+            const baseURL = await this.getFirstNodeUrl()
+            const res = await axios.post(baseURL + `/status?q=getLastBlockHash`)
+            return res['lastblockhash']
         } catch (e) {
             this.logger.error(e)
             throw new QtumError(`Error occurred. ${e}`, 'qtum.error');
@@ -60,10 +55,8 @@ export abstract class QtumService {
     }
     public async getBlock(hash: string): Promise<QtumBlock> {
         try {
-            const baseurl = await this.getFirstNodeUrl()
-            const data = () => ({ "jsonrpc": "1.0", "method": "getblock", "params": [hash] })
-            const config = { headers: { 'content-type': 'text/plain;' } }
-            const res = await axios.post(baseurl, data(), config)
+            const baseURL = await this.getFirstNodeUrl()
+            const res = await axios.get(baseURL + `/block/${hash}`)
             return res.data.result
         } catch (e) {
             this.logger.error(e)
@@ -73,8 +66,7 @@ export abstract class QtumService {
 
     public async broadcast(rawtx: string): Promise<QtumISendRawTxResult> {
         try {
-            const network = await this.isTestnet()
-            const baseURL = network ? QTUM_URLS['QTUM_TESTNET'] : QTUM_URLS['QTUM_MAINNET']
+            const baseURL = await this.getFirstNodeUrl()
             const res = await axios.post(baseURL + "/tx/send", {
                 rawtx,
             })
@@ -87,8 +79,7 @@ export abstract class QtumService {
     }
     public async estimateFee(nblocks: number = 6): Promise<any> {
         try {
-            const network = await this.isTestnet()
-            const baseURL = network ? QTUM_URLS['QTUM_TESTNET'] : QTUM_URLS['QTUM_MAINNET']
+            const baseURL = await this.getFirstNodeUrl()
             const res = await axios.get(baseURL + `/utils/estimatefee?nbBlocks=${nblocks}`)
 
             const feeRate: number = res.data
@@ -119,8 +110,7 @@ export abstract class QtumService {
         id: string,
     ): Promise<QtumIRawTransactionInfo> {
         try {
-            const network = await this.isTestnet()
-            const baseURL = network ? QTUM_URLS['QTUM_TESTNET'] : QTUM_URLS['QTUM_MAINNET']
+            const baseURL = await this.getFirstNodeUrl()
             const res = await axios.get(baseURL + `/tx/${id}`)
             return res.data as QtumIRawTransactionInfo
         } catch (e) {
@@ -131,14 +121,13 @@ export abstract class QtumService {
     }
     public async getQtumTransactions(
         address: string,
-        pageNum: number = 0,
+        pageSize: number = 50,
+        offset: number = 0,
     ): Promise<QtumIRawTransactions> {
         try {
-            const network = await this.isTestnet()
-            const baseURL = network ? QTUM_URLS['QTUM_TESTNET'] : QTUM_URLS['QTUM_MAINNET']
-            const result = await axios.get(baseURL + `/txs/`, {
-                params: { address, pageNum },
-            })
+            const baseURL = await this.getFirstNodeUrl()
+            const to = pageSize + offset
+            const result = await axios.get(baseURL + `addrs/${address}/txs?from=${offset}&to=${to}}`)
             return result.data as QtumIRawTransactions
         } catch (e) {
             this.logger.error(e)
