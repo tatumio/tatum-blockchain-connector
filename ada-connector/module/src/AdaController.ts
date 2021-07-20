@@ -4,7 +4,19 @@ import { AdaUtxo, TransferBtcBasedBlockchain } from '@tatumio/tatum';
 import { AdaError } from './AdaError';
 import { AdaService } from './AdaService';
 import { AdaBlockchainInfo } from './constants';
-import { BlockchainError, Pagination, PathHash, GeneratePrivateKey, PathAddress, QueryMnemonic, PathXpub, BtcBasedBlockchainControllerInterface, TxData, TransactionResponse } from '@tatumio/blockchain-connector-common'
+import {
+  BlockchainError,
+  Pagination,
+  PathHash,
+  GeneratePrivateKey,
+  PathAddress,
+  QueryMnemonic,
+  PathXpub,
+  BtcBasedBlockchainControllerInterface,
+  TxData,
+  TransactionResponse,
+  TransactionKMSResponse,
+} from '@tatumio/blockchain-connector-common'
 
 export abstract class AdaController implements BtcBasedBlockchainControllerInterface {
   protected constructor(protected readonly service: AdaService) {
@@ -92,7 +104,7 @@ export abstract class AdaController implements BtcBasedBlockchainControllerInter
 
   @Post('/v3/ada/broadcast')
   async broadcast(
-    @Body() { txData } : TxData
+    @Body() txData : TxData
   ): Promise<{ txId: string }> {
     try {
       return await this.service.broadcast(txData);
@@ -111,7 +123,7 @@ export abstract class AdaController implements BtcBasedBlockchainControllerInter
   }
 
   @Post('/v3/ada/transaction')
-  async sendTransaction(@Body() body: TransferBtcBasedBlockchain): Promise<TransactionResponse> {
+  async sendTransaction(@Body() body: TransferBtcBasedBlockchain): Promise<TransactionResponse | TransactionKMSResponse> {
     try {
       return await this.service.sendTransaction(body);
     } catch (e) {

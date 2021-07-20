@@ -1,4 +1,4 @@
 interface BroadcastOrStoreKMSTransaction {
   transactionData: string
-  signatureId?: string,
+  signatureIds?: string,
 }

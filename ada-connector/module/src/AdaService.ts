@@ -19,15 +19,25 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs'
 import BigNumber from 'bignumber.js'
 import { AdaError } from './AdaError'
+import {
+    BroadcastOrStoreKMSBtcBasedTransaction,
+    TransactionKMSResponse,
+    TransactionResponse, TxData,
+} from '@tatumio/blockchain-connector-common';
 
 const TX_FIELDS = '{block{number} includedAt fee hash inputs {address sourceTxHash sourceTxIndex txHash value} outputs {address index txHash value}}';
 
 export abstract class AdaService {
-  protected constructor(protected readonly logger: PinoLogger) {}
+  protected constructor(protected readonly logger: PinoLogger) {
+  }
 
   protected abstract isTestnet(): Promise<boolean>;
 
   protected abstract getNodesUrl(): Promise<string[]>;
+
+  protected abstract storeKMSTransaction(txData: string, currency: string, signatureId: string[]): Promise<string>;
+
+  protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
   public async getGraphQLEndpoint(): Promise<string> {
     const [url] = await this.getNodesUrl()
@@ -195,10 +205,7 @@ export abstract class AdaService {
   }
 
 
-
-  public async broadcast(
-    txData: string,
-  ): Promise<{ txId: string }> {
+  public async broadcast({txData, signatureId}: TxData): Promise<TransactionResponse> {
     const graphQLUrl = await this.getGraphQLEndpoint();
     const txId = (await axios.post(graphQLUrl, {
       query: `mutation {
@@ -207,6 +214,16 @@ export abstract class AdaService {
         }
       }`,
     })).data.data.submitTransaction.hash;
+
+    if (signatureId) {
+      try {
+        await this.completeKMSTransaction(txId, signatureId)
+      } catch (e) {
+        this.logger.error(e);
+        return { txId, failed: true };
+      }
+    }
+
     return { txId };
   }
 
@@ -229,12 +246,22 @@ export abstract class AdaService {
     return utxos;
   }
 
-  public async sendTransaction(
-    body: TransferBtcBasedBlockchain,
-  ): Promise<{ txId: string }> {
-    const txData = await this.prepareAdaTransaction(body);
-    return await this.broadcast(txData)
-  }
+    public async sendTransaction(
+        body: TransferBtcBasedBlockchain,
+    ): Promise<TransactionResponse | TransactionKMSResponse> {
+        const transactionData = await this.prepareAdaTransaction(body);
+        const signatureIds = []
+        if (body.fromUTXO) {
+            signatureIds.push(body.fromUTXO.map(utxo => utxo.signatureId))
+        }
+        if (body.fromAddress) {
+            signatureIds.push(body.fromAddress.map(address => address.signatureId))
+        }
+        return await this.broadcastOrStoreKMSTransaction({
+            transactionData,
+            signatureIds: signatureIds.length > 0 ? signatureIds : undefined,
+        });
+    }
 
   public async getTransactionsFromBlockTillNow(blockNumber: number): Promise<Transaction[]> {
     try {
@@ -277,7 +304,7 @@ export abstract class AdaService {
   }
 
   private async processFeeAndRest(transactionBuilder: TransactionBuilder, fromAmount: BigNumber, toAmount: BigNumber,
-                                          transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
+                                  transferBtcBasedBlockchain: TransferBtcBasedBlockchain) {
     const { fromAddress, fromUTXO } = transferBtcBasedBlockchain
     if (fromAddress) {
       this.addFeeAndRest(transactionBuilder, fromAddress[0].address, fromAmount, toAmount)
@@ -319,7 +346,7 @@ export abstract class AdaService {
     return { amount, privateKeysToSign }
   }
 
-private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: FromUTXO[]) {
+  private async addUtxoInputs(transactionBuilder: TransactionBuilder, fromUTXOs: FromUTXO[]) {
     let amount = new BigNumber(0)
     const privateKeysToSign: string[] = [];
     for (const utxo of fromUTXOs) {
@@ -369,7 +396,7 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     const { fromAddress, fromUTXO } = transferBtcBasedBlockchain
 
     if ((fromAddress && fromAddress[0].signatureId) || (fromUTXO && fromUTXO[0].signatureId)) {
-      return JSON.stringify({ txData: JSON.stringify(txBody.to_bytes()), privateKeysToSign });
+      return JSON.stringify({ txData: transferBtcBasedBlockchain, privateKeysToSign });
     }
 
     const witnesses = this.createWitnesses(txBody, transferBtcBasedBlockchain)
@@ -399,7 +426,7 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
     return witnesses
   }
 
-   private makeWitness (privateKey: string, txHash: TransactionHash, vKeyWitnesses: Vkeywitnesses) {
+  private makeWitness(privateKey: string, txHash: TransactionHash, vKeyWitnesses: Vkeywitnesses) {
     const privateKeyCardano = Bip32PrivateKey.from_128_xprv(
       Buffer.from(privateKey, 'hex'),
     ).to_raw_key();
@@ -414,6 +441,15 @@ private async addUtxoInputs (transactionBuilder: TransactionBuilder, fromUTXOs: 
       this.addOutput(transactionBuilder, to.address, value.toString())
     }
     return amount
+  }
+
+  private async broadcastOrStoreKMSTransaction({ transactionData, signatureIds }: BroadcastOrStoreKMSBtcBasedTransaction) {
+    if (signatureIds) {
+      return {
+        signatureId: await this.storeKMSTransaction(transactionData, Currency.ADA, signatureIds),
+      }
+    }
+    return this.broadcast({ txData: transactionData })
   }
 }
 

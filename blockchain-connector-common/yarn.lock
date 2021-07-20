@@ -653,22 +653,21 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@onflow/config@0.0.2", "@onflow/config@^0.0.2":
+"@onflow/config@^0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@onflow/config/-/config-0.0.2.tgz#caed7df27e9258ce2d4eae43f5e6f22caa119547"
   integrity sha512-H/+yrAalzEnMWkubiWsDdWytKSzd+OfRCddTlaRUelxfXhcfw2QWegH9N8EzeKfKXcQ6PLzvu9vQwhFxCZTE8Q==
   dependencies:
     "@onflow/util-actor" "0.0.2"
 
-"@onflow/fcl@^0.0.70":
-  version "0.0.70"
-  resolved "https://registry.yarnpkg.com/@onflow/fcl/-/fcl-0.0.70.tgz#9330235f9e329d6f418513963897d5c03b848ba5"
-  integrity sha512-FRjyLUx9hbWrz2gQizF2sWgWHsMG8RoMW7+dQ5mVE0NpCV7knjyM6peqlNYTYvOWGsNf8TdG0M8fDEFpu1bRQw==
+"@onflow/fcl@^0.0.73":
+  version "0.0.73"
+  resolved "https://registry.yarnpkg.com/@onflow/fcl/-/fcl-0.0.73.tgz#c90b86af4527559ddc0e2e2592203edbfbda926d"
+  integrity sha512-A6HNPgfck51uBMyhuKoOQaH9Ro1Ma7iE45Q5imrjeAT0Jk1DLUgG78M28oFpt+mlCwhYFsLuyMVmVPwGsAL64w==
   dependencies:
-    "@onflow/config" "0.0.2"
     "@onflow/interaction" "0.0.11"
     "@onflow/rlp" "0.0.3"
-    "@onflow/sdk" "0.0.46-alpha.1"
+    "@onflow/sdk" "0.0.50"
     "@onflow/types" "^0.0.4"
     "@onflow/util-actor" "0.0.2"
     "@onflow/util-address" "0.0.0"
@@ -694,35 +693,20 @@
   resolved "https://registry.yarnpkg.com/@onflow/rlp/-/rlp-0.0.3.tgz#42e10944309732bfd9acca79710c8210b9aabd4c"
   integrity sha512-oAf0VEiMjX8eC6Vd66j1BdGYTHOM6UBaS/sLSScnc7bKX5gICqe2gtEsCeJVE9rUzRk3GD3JqXRnPAW6YFWd/Q==
 
-"@onflow/sdk@0.0.46-alpha.1":
-  version "0.0.46-alpha.1"
-  resolved "https://registry.yarnpkg.com/@onflow/sdk/-/sdk-0.0.46-alpha.1.tgz#822e47cef023ba2b379d336217c2fa6e6d7c7000"
-  integrity sha512-wURqXSyEMRBRxo1DSUD7c9mG2igQWsKrAeZgxE+ZeVDOtaHIooTMX+gd2KgFx2FvUHHiNj3x+YY70KSEaH2OXQ==
+"@onflow/sdk@0.0.50":
+  version "0.0.50"
+  resolved "https://registry.yarnpkg.com/@onflow/sdk/-/sdk-0.0.50.tgz#86dbd252c76b7d3b6860e52254e683004bb32a31"
+  integrity sha512-A3g43Qx7OgeFfpgz9Tk4bJIE2xJ6zWe6FPGAm6Al+5OP+TNU5vdLcxKNgR+Pk2u+QVCYBaA0Jf4pncF9+K+pVw==
   dependencies:
     "@improbable-eng/grpc-web" "^0.14.0"
     "@improbable-eng/grpc-web-node-http-transport" "^0.14.0"
-    "@onflow/config" "^0.0.2"
     "@onflow/protobuf" "^0.1.8"
     "@onflow/rlp" "^0.0.3"
+    "@onflow/util-actor" "0.0.2"
     "@onflow/util-address" "^0.0.0"
     "@onflow/util-invariant" "^0.0.0"
     "@onflow/util-template" "0.0.1"
     deepmerge "^4.2.2"
-
-"@onflow/six-add-new-key@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@onflow/six-add-new-key/-/six-add-new-key-0.0.5.tgz#15f0796e756c893339d23d5f3db26489af6a955e"
-  integrity sha512-XN3TTBmgcWStDJi8kjRLWd2PKf2MZIIaqt0r7SejQq6QCXlisveFuMjBQ6sI58PLr0aQ3h2MBBOideyqXPb2Kw==
-
-"@onflow/six-create-account@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@onflow/six-create-account/-/six-create-account-0.0.4.tgz#11e5692e47817fb507e6a62ec249a65b2e4087a7"
-  integrity sha512-TaFgYU/mS8z7UP7e4Q3EFWcKlSd1CcHwkGv3Jqc6xVGitAuaC9r9W+QjXMDSkY4ujz4Nzeb9I+EQtSaMcZrWag==
-
-"@onflow/six-transfer-tokens@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@onflow/six-transfer-tokens/-/six-transfer-tokens-0.0.5.tgz#fc77cd6e8c65d79613b316f80fa131ac4028bcc6"
-  integrity sha512-O9pNlPRrn2JW/dtG37YBIjMxb8lAcxAQ+hJvcKtyE7h1Ml+BZgS0cjVUSRLUax1abz1zSHIWRa2wuQ4R4yzR/A==
 
 "@onflow/types@^0.0.4":
   version "0.0.4"
@@ -809,10 +793,10 @@
   dependencies:
     "@tatumio/bitcoincash-ops" "2.0.0"
 
-"@tatumio/tatum@^1.16.2":
-  version "1.16.4"
-  resolved "https://registry.yarnpkg.com/@tatumio/tatum/-/tatum-1.16.4.tgz#c81f5811d794b0c13bc4dcd304b180dcf087a04e"
-  integrity sha512-PkTleYMk5O10GZfL3RHVXmYdHUm9puJ0qpHt2zGYCkWrGIpdCardS8ctf0dH8hwrrKFj8hIvzkLQk1N35S8dLQ==
+"@tatumio/tatum@^1.17.1":
+  version "1.17.1"
+  resolved "https://registry.yarnpkg.com/@tatumio/tatum/-/tatum-1.17.1.tgz#3675db09b9fe09f13de52ad63057ea7bc2ff20ef"
+  integrity sha512-MII9pno5ttxMw9bT+wr6UZ6yWU6VbyiFpG3s4tB08HFP4cIzuc113E+HclF9VrXsUPWpwSGtesKWVgG/wOYzxQ==
   dependencies:
     "@binance-chain/javascript-sdk" "^4.1.1"
     "@celo-tools/celo-ethers-wrapper" "0.0.5"
@@ -820,10 +804,7 @@
     "@emurgo/cardano-serialization-lib-nodejs" "^6.0.0"
     "@harmony-js/crypto" "^0.1.56"
     "@onflow/config" "^0.0.2"
-    "@onflow/fcl" "^0.0.70"
-    "@onflow/six-add-new-key" "^0.0.5"
-    "@onflow/six-create-account" "^0.0.4"
-    "@onflow/six-transfer-tokens" "^0.0.5"
+    "@onflow/fcl" "^0.0.73"
     "@onflow/types" "^0.0.4"
     "@onflow/util-encode-key" "^0.0.2"
     "@tatumio/bitcoincashjs2-lib" "4.1.2"
