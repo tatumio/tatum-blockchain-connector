@@ -98,8 +98,12 @@ export abstract class TronService {
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
     public async broadcast(txData: string, signatureId?: string) {
+        const transaction = JSON.parse(txData);
+        if (Date.now() > transaction?.raw_data?.expiration) {
+            throw new Error('Transaction expired');
+        }
         const url = (await this.getNodesUrl(await this.isTestnet()))[0];
-        const broadcast = (await axios.post(`${url}/wallet/broadcasttransaction`, JSON.parse(txData), {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
+        const broadcast = (await axios.post(`${url}/wallet/broadcasttransaction`, transaction, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (broadcast.result) {
             if (signatureId) {
                 try {
