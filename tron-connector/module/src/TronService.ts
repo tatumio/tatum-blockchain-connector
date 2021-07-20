@@ -30,6 +30,7 @@ import {
     TronTrc10
 } from '@tatumio/tatum';
 import {Trc20Tx} from './dto/Trc20Tx';
+import {TronError} from './TronError';
 
 export abstract class TronService {
 
@@ -98,8 +99,12 @@ export abstract class TronService {
     protected abstract completeKMSTransaction(txId: string, signatureId: string): Promise<void>;
 
     public async broadcast(txData: string, signatureId?: string) {
+        const transaction = JSON.parse(txData);
+        if (Date.now() > transaction?.raw_data?.expiration) {
+            throw new TronError('Transaction expired', 'tron.error');
+        }
         const url = (await this.getNodesUrl(await this.isTestnet()))[0];
-        const broadcast = (await axios.post(`${url}/wallet/broadcasttransaction`, JSON.parse(txData), {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
+        const broadcast = (await axios.post(`${url}/wallet/broadcasttransaction`, transaction, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (broadcast.result) {
             if (signatureId) {
                 try {
@@ -111,7 +116,7 @@ export abstract class TronService {
             }
             return {txId: broadcast.txid};
         }
-        throw new Error(`Broadcast failed due to ${broadcast.message}`);
+        throw new TronError(`Broadcast failed due to ${broadcast.message}`, 'tron.error');
     }
 
     public async getBlockChainInfo(testnet?: boolean): Promise<{ testnet: boolean, hash: string, blockNumber: number }> {
@@ -176,7 +181,7 @@ export abstract class TronService {
         const url = await this.getNodeAddress();
         const {data} = (await axios.get(`${url}/v1/accounts/${address}`, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (!data?.length) {
-            throw new Error('no such account.');
+            throw new TronError('no such account.', 'tron.error');
         }
         const account = data[0];
         return {
@@ -294,7 +299,7 @@ export abstract class TronService {
         const url = `${(await this.getNodeAddress())}/v1/assets/${id}`;
         const {data} = (await axios.get(url, {headers: {'TRON-PRO-API-KEY': this.getApiKey()}})).data;
         if (!data?.length) {
-            throw new Error('No such asset.');
+            throw new TronError('No such asset.', 'tron.error');
         }
         return {
             abbr: data[0].abbr,
